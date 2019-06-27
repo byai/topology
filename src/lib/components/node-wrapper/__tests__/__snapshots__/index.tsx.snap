@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`nodeWrapper basic render 1`] = `
+<body>
+  <div>
+    <div
+      class="byai-topology-node-wrapper"
+      id=""
+    >
+      <div
+        class="topology-node-preview"
+      />
+      <div
+        class="topology-node-content"
+      >
+        <div>
+          这是一个节点
+          <div
+            class="topology-anchor-wrapper"
+            id="1-1-0"
+          >
+            <span>
+              锚点
+            </span>
+            <div
+              class="topology-anchor-wrapper-preview"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`nodeWrapper basic render with position 1`] = `
+<body>
+  <div>
+    <div
+      class="byai-topology-node-wrapper"
+      id="topology-node-1"
+      style="position: absolute; left: 500px; top: 500px; transition: .2s;"
+    >
+      <div
+        class="topology-node-preview"
+      />
+      <div
+        class="topology-node-content"
+      >
+        <div>
+          这是一个节点
+          <div
+            class="topology-anchor-wrapper"
+            id="1-1-0"
+          >
+            <span>
+              锚点
+            </span>
+            <div
+              class="topology-anchor-wrapper-preview"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

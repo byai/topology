@@ -1,0 +1,119 @@
+.byai-topology {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    .topology-anchor-wrapper {
+        position: relative;
+        &:hover {
+            cursor: crosshair;
+        }
+        &-preview {
+            position: absolute;
+            display: block;
+            background: transparent;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 0;
+        }
+    }
+    .topology-wrapper {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        overflow: scroll;
+        user-select: none;
+
+        .topology-canvas {
+            position: relative;
+            background: #F7F7F7;
+            z-index: 0;
+            .topology-svg {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                pointer-events: none;
+                overflow: visible;
+                z-index: 1;
+            }
+        }
+    }
+    .topology-tools {
+        position: absolute;
+        right: 30px;
+        bottom: 28px;
+        &-btn {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            border: 1px solid #E1E1E1;
+            background: #fff;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            img {
+                width: 16px;
+                height: 16px;
+                opacity: 0.75;
+            }
+            &:hover {
+                cursor: pointer;
+                .tooltip {
+                    display: block;
+                }
+            }
+            &:nth-child(n + 2) {
+                margin-top: 10px;
+            }
+            .tooltip {
+                position: absolute;
+                display: none;
+                height: 30px;
+                line-height: 30px;
+                padding: 0 10px;
+                right: 42px;
+                top: 0;
+                font-size: 12px;
+                word-break: keep-all;
+                background: #666666;
+                color: #fff;
+                border-radius: 3px;
+
+                &::after {
+                    display: block;
+                    transform: rotate(-45deg);
+                    position: absolute;
+                    content: '';
+                    width: 12px;
+                    height: 12px;
+                    background-color: inherit;
+                    top: 9px;
+                    right: -6px;
+                    border-left: none;
+                    border-top: none;
+                }
+            }
+        }
+    }
+}
+
+#topology-dom-map {
+    position: fixed;
+    left: -9999999px;
+    top: -9999999px;
+    visibility: hidden;
+    z-index: -1;
+
+    .dom-map-wrapper {
+        display: inline-block;
+    }
+}
+.topology-linking {
+    cursor: crosshair !important;
+}
+
+

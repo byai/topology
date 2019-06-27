@@ -1,0 +1,31 @@
+*.DS_Store
+
+##排除打包文件
+**/build
+**/dist
+
+## 排除NodeJs的加载模块
+**/node_modules
+
+## 排除happyback
+**/.happypack
+
+## 排除npm-debug.log
+**/npm-debug.log
+**/npm-debug.log.*
+
+## 排除rev文件干扰
+**/.vscode
+
+**/doc
+
+**/coverage
+
+**/export_sheet
+**/logs
+.cache-loader
+
+# 排除package-lock.json
+package-lock.json
+yarn-error.log
+

@@ -1,0 +1,41 @@
+.topology {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    &-templates {
+        padding: 10px;
+        padding-top: 0;
+        &-item {
+            width: 80px;
+            text-align: center;
+            border: 1px solid lightgray;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.topology-node {
+    padding: 10px;
+    .node-content {
+        margin-top: 10px;
+    }
+    .flow-node-branches-wrapper {
+        display: flex;
+        min-width: 200px;
+        margin-top: 10px;
+        justify-content: space-around;
+        .flow-node-branch {
+            display: inline-block;
+            background:rgb(205, 205, 236);
+            line-height: 22px;
+            padding: 0 5px;
+            margin-left: 10px;
+        }
+    }
+}
