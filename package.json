@@ -3,6 +3,14 @@
   "version": "0.0.1",
   "description": "拓扑图组件",
   "main": "dist/lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/byai/topology"
+  },
+  "bugs": {
+    "url": "https://github.com/byai/topology/issues"
+  },
+  "license": "MIT",
   "typings": "dist/lib/index.d.ts",
   "files": [
     "build",
