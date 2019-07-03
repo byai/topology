@@ -11,8 +11,10 @@ afterEach(cleanup);
 test('templateWrapper', () => {
     const BoxContext = wrapInTestContext(AnchorWrapper);
     const root = TestUtils.renderIntoDocument(<BoxContext />);
+    // @ts-ignore
     const backend = root.getManager().getBackend();
 
+    // @ts-ignore
     const box = TestUtils.findRenderedComponentWithType(root, AnchorWrapper);
     backend.simulateBeginDrag([box.getHandlerId()]);
     // expect ?

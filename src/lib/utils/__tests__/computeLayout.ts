@@ -5,7 +5,7 @@ import config from '../../config';
 describe('computeContentCenter', () => {
     const originDocumentGetElementById = document.getElementById;
     beforeEach(() => {
-        document.getElementById = (id: string) => ({
+        document.getElementById = () => ({
             getBoundingClientRect: () => ({
                 width: 100,
                 height: 100,
@@ -118,6 +118,7 @@ describe('computeContentCenter', () => {
                 { start: '1-1', end: '3' },
             ],
         };
+        // @ts-ignore
         const result = computeLayout(data, { sortChildren: (parent, nodes) => nodes.sort((x, y) => -(x.id - y.id)) });
         const child2 = result.find(item => item.id === '2');
         const child3 = result.find(item => item.id === '3');

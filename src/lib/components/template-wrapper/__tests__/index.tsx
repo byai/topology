@@ -12,8 +12,10 @@ test('templateWrapper', () => {
     const BoxContext = wrapInTestContext(TemplateWrapper);
     const mockGenerator = jest.fn(() => ({ id: '1' }));
     const root = TestUtils.renderIntoDocument(<BoxContext generator={mockGenerator} />);
+    // @ts-ignore
     const backend = root.getManager().getBackend();
 
+    // @ts-ignore
     const box = TestUtils.findRenderedComponentWithType(root, TemplateWrapper);
     backend.simulateBeginDrag([box.getHandlerId()]);
 
