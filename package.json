@@ -79,6 +79,7 @@
     "puppeteer-core": "^1.17.0",
     "react-app-polyfill": "^0.2.0",
     "react-dev-utils": "^7.0.1",
+    "react-dnd-html5-backend": "^9.4.0",
     "react-test-renderer": "^16.8.6",
     "resolve": "1.8.1",
     "shallow": "^1.0.0",
