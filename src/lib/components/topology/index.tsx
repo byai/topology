@@ -520,7 +520,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 id="scroll-canvas-to-center"
                 onClick={this.scrollCanvasToCenter}
             >
-                <img src="https://cdn.byai.com/static/topology/center.svg" alt="" />
+                <img src="/oss/robot/center.svg" alt="" />
                 <div className="tooltip">定位中心</div>
             </div>
             <div
@@ -528,7 +528,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 id="auto-layout"
                 onClick={this.autoLayout}
             >
-                <img src="https://cdn.byai.com/static/topology/layout.svg" alt="" />
+                <img src="/oss/robot/layout.svg" alt="" />
                 <div className="tooltip">自动布局</div>
             </div>
         </div>
