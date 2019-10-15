@@ -1,6 +1,6 @@
 {
   "name": "topology-byfe",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "拓扑图组件",
   "main": "dist/lib/index.js",
   "repository": {
@@ -17,9 +17,8 @@
     "dist"
   ],
   "scripts": {
-    "tsc": "node remove-dist.js && tsc && gulp",
+    "build": "node remove-dist.js && tsc && gulp",
     "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "lint": "eslint src --ext .tsx,.ts ",
     "lint-fix": "eslint --fix src --ext .tsx,.ts ",
