@@ -225,12 +225,16 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     selectNode = (node: ITopologyNode, mode: SelectMode) => {
-        const { data } = this.props;
+        const { data, onSelect } = this.props;
         const { context: { selectedData } } = this.state;
+        const selectNodesId = selectedData.nodes.map(item => item.id);
+        if (mode === SelectMode.RIGHT_NORMAL && selectNodesId.indexOf(node.id) !== -1) {
+            onSelect(selectedData);
+            return;
+        }
         this.setContext({
             selectedData: selectNodes({ data, selectedData })({ node, mode }),
         }, () => {
-            const { onSelect } = this.props;
             if (onSelect) {
                 onSelect(this.state.context.selectedData);
             }

@@ -83,6 +83,11 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         onSelect(data, SelectMode.NORMAL);
     }
 
+    handleRightClick = () => {
+        const { data, onSelect } = this.props;
+        onSelect(data, SelectMode.RIGHT_NORMAL);
+    }
+
     render() {
         const {
             connectDragSource,
@@ -100,6 +105,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
                 style={this.computeStyle()}
                 className="byai-topology-node-wrapper"
                 onClick={this.handleClick}
+                onContextMenu={this.handleRightClick}
             >
                 {connectDragPreview(<div className="topology-node-preview" />)}
                 <div

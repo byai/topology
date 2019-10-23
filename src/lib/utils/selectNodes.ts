@@ -11,6 +11,7 @@ export enum SelectMode {
     NORMAL,
     MUL_NORMAL,
     MULTI,
+    RIGHT_NORMAL,
 }
 
 export interface ProduceselectedDataFunc {
@@ -97,7 +98,7 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
         const selectedChildren = _.intersection(children, selectNodesId);
         const selectedParents = _.intersection(parents, selectNodesId);
 
-        if (mode === SelectMode.NORMAL) {
+        if (mode === SelectMode.NORMAL || mode === SelectMode.RIGHT_NORMAL) {
             return {
                 nodes: [node],
                 lines: [],
