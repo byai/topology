@@ -83,9 +83,16 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         onSelect(data, SelectMode.NORMAL);
     }
 
-    handleRightClick = () => {
-        const { data, onSelect } = this.props;
-        onSelect(data, SelectMode.RIGHT_NORMAL);
+    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        if (e.button === 2) {
+            e.preventDefault();
+            const { data, onSelect } = this.props;
+            onSelect(data, SelectMode.RIGHT_NORMAL);
+        }
+    }
+
+    handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        e.preventDefault();
     }
 
     render() {
@@ -106,6 +113,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
                 className="byai-topology-node-wrapper"
                 onClick={this.handleClick}
                 onContextMenu={this.handleRightClick}
+                onMouseDown={this.handleMouseDown}
             >
                 {connectDragPreview(<div className="topology-node-preview" />)}
                 <div
