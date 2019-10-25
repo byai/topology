@@ -48,7 +48,7 @@ class Flow extends React.Component<{}, FlowState> {
 
     onChange = (data: ITopologyData, type: string) => {
         this.setState({ data });
-        console.log(type, 'type11');
+        console.log(type, 'type');
     };
 
     render() {
