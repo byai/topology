@@ -398,6 +398,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         // @ts-ignore
         const { className } = e.target;
         if (typeof className === 'string' && className.includes('topology-canvas')) {
+            // 当按住cmd或者ctrl的时候，左键点击背景图层的时候，不会清楚选中的数据。
+            if (e.ctrlKey || e.metaKey) {
+                return;
+            }
             this.setContext({ selectedData: { nodes: [], lines: [] } }, () => {
                 const { onSelect } = this.props;
                 if (onSelect) {
