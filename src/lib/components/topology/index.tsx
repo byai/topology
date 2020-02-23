@@ -85,9 +85,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     componentDidMount() {
-        const { getInstance } = this.props;
+        const { getInstance, readOnly } = this.props;
         this.editLine = _.throttle(this.editLine, 40);
-        this.initDomEvents();
+        if (!readOnly) {
+            this.initDomEvents();
+        }
 
         if (this.$wrapper) {
             this.scrollCanvasToCenter();
