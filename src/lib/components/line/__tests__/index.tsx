@@ -10,57 +10,65 @@ afterEach(cleanup);
 
 describe('line', () => {
     test('正常render', () => {
-        const svg = document.createElement('svg');
+        const div = document.createElement('div');
         const { baseElement } = render(
-            <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
-            />,
+            <svg>
+                <Line
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 100, y: 100 }}
+                />
+            </svg>,
             {
-                container: document.body.appendChild(svg),
+                container: document.body.appendChild(div),
             },
         );
         expect(baseElement).toMatchSnapshot();
     });
     test('选中时', () => {
-        const svg = document.createElement('svg');
+        const div = document.createElement('div');
         const { baseElement } = render(
-            <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
-                selected
-            />,
+            <svg>
+                <Line
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 100, y: 100 }}
+                    selected
+                />
+            </svg>,
             {
-                container: document.body.appendChild(svg),
+                container: document.body.appendChild(div),
             },
         );
         expect(baseElement).toMatchSnapshot();
     });
     test('有数据时', () => {
-        const svg = document.createElement('svg');
+        const div = document.createElement('div');
         const { baseElement } = render(
-            <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
-                selected
-                data={{ start: '1-0', end: '2' }}
-            />,
+            <svg>
+                <Line
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 100, y: 100 }}
+                    selected
+                    data={{ start: '1-0', end: '2' }}
+                />
+            </svg>,
             {
-                container: document.body.appendChild(svg),
+                container: document.body.appendChild(div),
             },
         );
         expect(baseElement).toMatchSnapshot();
     });
     test('鼠标操作： 第一个path移入、移出、点击', () => {
-        const svg = document.createElement('svg');
+        const div = document.createElement('div');
         const { asFragment, container } = render(
-            <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
-                data={{ start: '1-0', end: '2' }}
-            />,
+            <svg>
+                <Line
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 100, y: 100 }}
+                    data={{ start: '1-0', end: '2' }}
+                />
+            </svg>,
             {
-                container: document.body.appendChild(svg),
+                container: document.body.appendChild(div),
             },
         );
         const firstRender = asFragment();
@@ -77,15 +85,17 @@ describe('line', () => {
     });
 
     test('鼠标操作： 第二个path移入、移出、点击', () => {
-        const svg = document.createElement('svg');
+        const div = document.createElement('div');
         const { asFragment, container } = render(
-            <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
-                data={{ start: '1-0', end: '2' }}
-            />,
+            <svg>
+                <Line
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 100, y: 100 }}
+                    data={{ start: '1-0', end: '2' }}
+                />
+            </svg>,
             {
-                container: document.body.appendChild(svg),
+                container: document.body.appendChild(div),
             },
         );
         const firstRender = asFragment();
@@ -98,16 +108,18 @@ describe('line', () => {
         expect(secondRender).toMatchDiffSnapshot(asFragment());
     });
     test('单选、多选', () => {
-        const svg = document.createElement('svg');
+        const div = document.createElement('div');
         const { container } = render(
-            <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
-                data={{ start: '1-0', end: '2' }}
-                onSelect={() => null}
-            />,
+            <svg>
+                <Line
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 100, y: 100 }}
+                    data={{ start: '1-0', end: '2' }}
+                    onSelect={() => null}
+                />
+            </svg>,
             {
-                container: document.body.appendChild(svg),
+                container: document.body.appendChild(div),
             },
         );
         fireEvent.click(container.firstElementChild);
@@ -120,17 +132,19 @@ describe('line', () => {
         );
     });
     test('取消选中', () => {
-        const svg = document.createElement('svg');
+        const div = document.createElement('div');
         const { container } = render(
-            <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
-                selected
-                data={{ start: '1-0', end: '2' }}
-                onSelect={() => null}
-            />,
+            <svg>
+                <Line
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 100, y: 100 }}
+                    selected
+                    data={{ start: '1-0', end: '2' }}
+                    onSelect={() => null}
+                />
+            </svg>,
             {
-                container: document.body.appendChild(svg),
+                container: document.body.appendChild(div),
             },
         );
         fireEvent.click(container.firstElementChild);

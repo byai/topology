@@ -12,12 +12,12 @@ exports[`topology basic render 1`] = `
       >
         <div
           class="topology-canvas"
-          style="width: 10000px; height: 10000px;"
+          style="width: 40000px; height: 40000px;"
         >
           <div
             class="byai-topology-node-wrapper"
             id="topology-node-1"
-            style="position: absolute; left: 5000px; top: 5000px; transition: .2s; z-index: 999;"
+            style="position: absolute; left: 20000px; top: 20000px; transition: .2s; z-index: 999;"
           >
             <div
               class="topology-node-preview"

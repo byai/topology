@@ -24,6 +24,11 @@
     "lint-fix": "eslint --fix src --ext .tsx,.ts ",
     "precommit": ""
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test"
+    }
+  },
   "peerDependencies": {
     "react": ">=16.0.0",
     "react-dnd": ">=2.5.4",
@@ -78,7 +83,7 @@
     "puppeteer-core": "^1.17.0",
     "react-app-polyfill": "^0.2.0",
     "react-dev-utils": "^7.0.1",
-    "react-dnd": "^2.5.4",
+    "react-dnd": "^8.0.0",
     "react-dnd-html5-backend": "^2.5.4",
     "react-test-renderer": "^16.8.6",
     "resolve": "1.8.1",
