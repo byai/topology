@@ -6,10 +6,41 @@ import './index.less';
 
 interface FlowState {
     data: ITopologyData;
+    readonly: boolean;
 }
 class Flow extends React.Component<{}, FlowState> {
     state: FlowState = {
-        data: { lines: [], nodes: [] },
+        data: {
+            lines: [
+                {
+                    start: '1585466878859-0',
+                    end: '1585466718867',
+                },
+            ],
+            nodes: [
+                {
+                    id: '1585466878859',
+                    name: '窄节点',
+                    content: '这是一个窄节点',
+                    branches: ['锚点1'],
+                    position: {
+                        x: 19726.906692504883,
+                        y: 19512.21832561493,
+                    },
+                },
+                {
+                    id: '1585466718867',
+                    name: '宽节点',
+                    content: '这是一个宽节点',
+                    branches: ['锚点1', '锚点2', '锚点3'],
+                    position: {
+                        x: 19629.79557800293,
+                        y: 19696.197512626648,
+                    },
+                },
+            ],
+        },
+        readonly: false,
     };
 
     generatorNodeData = (isBig: boolean) => ({
@@ -52,10 +83,17 @@ class Flow extends React.Component<{}, FlowState> {
     };
 
     render() {
-        const { data } = this.state;
+        const { data, readonly } = this.state;
         return (
             <div className="topology">
                 <div className="topology-templates">
+                    <button
+                        onClick={() => this.setState({ readonly: !readonly })}
+                        style={{ marginBottom: 20 }}
+                        type="button"
+                    >
+                        {readonly ? '只读' : '可编辑'}
+                    </button>
                     <TemplateWrapper generator={() => this.generatorNodeData(true)}>
                         <div className="topology-templates-item">宽节点</div>
                     </TemplateWrapper>
@@ -70,6 +108,7 @@ class Flow extends React.Component<{}, FlowState> {
                         onChange={this.onChange}
                         onSelect={this.handleSelect}
                         renderTreeNode={this.renderTreeNode}
+                        readOnly={readonly}
                     />
                 </div>
             </div>
