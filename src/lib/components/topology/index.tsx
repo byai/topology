@@ -111,11 +111,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         this.renderDomMap(nextProps);
         this.shouldAutoLayout = shouldAutoLayout(nextProps.data.nodes);
         if (readOnly && !nextReadOnly) {
-            console.log('add');
             this.initDomEvents();
         }
         if (!readOnly && nextReadOnly) {
-            console.log('remove');
             this.removeDomEvents();
         }
     }
