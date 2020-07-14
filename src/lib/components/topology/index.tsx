@@ -206,6 +206,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     handleKeydown = (e: KeyboardEvent) => {
+        const { classList = [] } = e.target as any;
+        // 左侧的搜索输入框回删事件不触发话术更改
+        if (classList[0] === 'ant-input') {
+            return;
+        }
         switch (e.keyCode) {
             case KeyCode.BACKSPACE:
             case KeyCode.DELETE:
