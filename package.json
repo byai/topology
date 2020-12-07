@@ -1,6 +1,6 @@
 {
   "name": "topology-byfe",
-  "version": "1.0.9-beta.0",
+  "version": "1.0.9-alpha.0",
   "description": "拓扑图组件",
   "main": "dist/lib/index.js",
   "repository": {
