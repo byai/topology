@@ -557,6 +557,17 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         </div>
     )
 
+    handleSelectAll = () => {
+        const { data, onSelect } = this.props;
+        this.setContext({
+            selectedData: data,
+        }, () => {
+            if (onSelect) {
+                onSelect(this.state.context.selectedData);
+            }
+        });
+    }
+
     render() {
         const { connectDropTarget } = this.props;
         const { context } = this.state;
@@ -642,10 +653,12 @@ export default DropTarget(
             }
             const item = monitor.getItem();
             const type = monitor.getItemType();
+            // 节点相对于窗口的位置
             const clientOffset = monitor.getSourceClientOffset();
             if (!clientOffset) {
                 return;
             }
+            // 节点相对于画布的位置
             const position = computeCanvasPo(clientOffset, component.$wrapper);
             switch (type) {
                 case NodeTypes.TEMPLATE_NODE:
