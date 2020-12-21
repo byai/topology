@@ -147,7 +147,7 @@ export default DragSource(
         },
     },
     connect => ({
-        connectDragSource: connect.dragSource(), // 用于包装需要拖动的组件
-        connectDragPreview: connect.dragPreview(), // 用于包装需要拖动跟随预览的组件
+        connectDragSource: connect.dragSource(),
+        connectDragPreview: connect.dragPreview(),
     }),
 )(WithContextNodeWrapper);
