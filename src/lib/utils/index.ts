@@ -1,3 +1,4 @@
+import { path } from 'd3-path';
 import {
     IPosition,
     ITopologyNode,
@@ -22,48 +23,19 @@ export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) =
 
 /** 计算连接线路径 */
 export const computeLinePath = (start: IPosition, end: IPosition)/* istanbul ignore next */ => {
-    const x = Math.abs(start.x - end.x);
-    const y = Math.abs(start.y - end.y);
-    if (x === 0 || y === 0) {
-        return `
-            M ${start.x} ${start.y}
-            L ${end.x} ${end.y}
-        `;
-    }
-    let dir: number;
-    let p1: string;
-    let p2: string;
-
-    if (end.y < start.y) {
-        const offsetY = 80;
-        const offsetX = 40;
-        dir = end.x - start.x > 0 ? 1 : -1;
-        p1 = `${start.x + dir * offsetX}, ${start.y + offsetY}`;
-        p2 = `${end.x - dir * offsetX}, ${end.y - offsetY}`;
-        return `
-            M ${start.x} ${start.y}
-            C ${p1} ${p2} ${end.x} ${end.y}
-        `;
-    }
-    const OffsetXP1 = +(1 / 12 * x).toFixed(0);
-    const OffsetXP2 = +(11 / 12 * x).toFixed(0);
-    const offsetYP1 = +(1 / 3 * y).toFixed(0);
-    const offsetYP2 = +(2 / 3 * y).toFixed(0);
-    dir = start.x - end.x > 0 ? -1 : 1;
-    p1 = `${start.x + dir * OffsetXP1}, ${start.y + offsetYP1}`;
-    p2 = `${start.x + dir * OffsetXP2}, ${start.y + offsetYP2}`;
-    return `
-        M ${start.x} ${start.y}
-        C ${p1} ${p2} ${end.x} ${end.y}
-    `;
+    const svgPath = path();
+    const distance = Math.abs(start.x - end.x) * 0.8;
+    svgPath.moveTo(start.x, start.y);
+    svgPath.bezierCurveTo(start.x + distance, start.y, end.x - distance, end.y, end.x, end.y);
+    return svgPath.toString();
 };
 
 /** 计算三角形路径 */
 export const computeTrianglePath = (start: IPosition, width: number) => `
     M ${start.x} ${start.y}
-    l ${width / 2} 0
-    l ${-width / 2} ${width}
-    l ${-width / 2} ${-width}
+    l 0 ${width / 2}
+    l ${width} ${width / -2}
+    l ${-width} ${width / -2}
     Z
 `;
 
@@ -101,8 +73,8 @@ export const computeAnchorPo = (anchor: string, parentNode: ITopologyNode) => {
     const dX = anchorSize.left - parentSize.left;
     const dY = anchorSize.top - parentSize.top;
     const po = {
-        x: parentPosition.x + dX + anchorSize.width / 2,
-        y: parentPosition.y + dY + anchorSize.height,
+        x: parentPosition.x + dX + anchorSize.width + 2,
+        y: parentPosition.y + dY + anchorSize.height / 2,
     };
     if (Number.isNaN(po.x) || Number.isNaN(po.y)) {
         return null;
@@ -140,12 +112,11 @@ export const computeNodeInputPo = (node: ITopologyNode) => {
     if (!$node) {
         return null;
     }
-    const nodeSize = getNodeSize($node);
     // eslint-disable-next-line no-param-reassign
     node.position = node.position || { x: 0, y: 0 };
     const po = {
-        x: node.position.x + nodeSize.width / 2,
-        y: node.position.y,
+        x: node.position.x - 14,
+        y: node.position.y + 28,
     };
     if (Number.isNaN(po.x) || Number.isNaN(po.y)) {
         return null;

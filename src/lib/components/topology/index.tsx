@@ -48,6 +48,7 @@ interface ITopologyProps {
     renderTreeNode?: (data: ITopologyNode, wrappers: IWrapperOptions) => React.ReactNode;
     sortChildren?: (parent: ITopologyNode, children: ITopologyNode[]) => ITopologyNode[];
     connectDropTarget?: ConnectDropTarget;
+    renderToolBars?: () => React.ReactNode;
 }
 
 interface ITopologyState {
@@ -536,26 +537,33 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         );
     }
 
-    renderToolBars = () => (
-        <div className="topology-tools">
-            <div
-                className="topology-tools-btn"
-                id="scroll-canvas-to-center"
-                onClick={this.scrollCanvasToCenter}
-            >
-                <img src="https://cdn.byai.com/static/topology/center.svg" alt="" />
-                <div className="tooltip">定位中心</div>
+    renderToolBars = () => {
+        if (this.props.renderToolBars === null) {
+            return null;
+        } else if (this.props.renderToolBars) {
+            return this.props.renderToolBars();
+        }
+        return (
+            <div className="topology-tools">
+                <div
+                    className="topology-tools-btn"
+                    id="scroll-canvas-to-center"
+                    onClick={this.scrollCanvasToCenter}
+                >
+                    <img src="https://cdn.byai.com/static/topology/center.svg" alt="" />
+                    <div className="tooltip">定位中心</div>
+                </div>
+                <div
+                    className="topology-tools-btn"
+                    id="auto-layout"
+                    onClick={this.autoLayout}
+                >
+                    <img src="https://cdn.byai.com/static/topology/layout.svg" alt="" />
+                    <div className="tooltip">自动布局</div>
+                </div>
             </div>
-            <div
-                className="topology-tools-btn"
-                id="auto-layout"
-                onClick={this.autoLayout}
-            >
-                <img src="https://cdn.byai.com/static/topology/layout.svg" alt="" />
-                <div className="tooltip">自动布局</div>
-            </div>
-        </div>
-    )
+        );
+    }
 
     handleSelectAll = () => {
         const { data, onSelect } = this.props;

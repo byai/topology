@@ -69,27 +69,25 @@ function computeContainerSize(node: TreeNode): RectSize {
     }
     return _.cloneDeep(node.containerRect);
 }
-
 function computePosition(node: TreeNode, containerPosition: IPosition, sortChildren?: SortChilren) {
-    const { containerRect } = node;
-    const nodeWidth = node.clientRect.width;
-    const nodeHeight = node.clientRect.height;
-
+    const { containerRect, clientRect } = node;
+    const nodeWidth = clientRect.width;
+    const nodeHeight = clientRect.height;
     node.position = {
         // 把节点移动到容器框的中间位置
-        x: containerPosition.x + (containerRect.width - nodeWidth) / 2,
-        y: containerPosition.y,
+        x: containerPosition.x,
+        y: containerPosition.y + (containerRect.height - nodeHeight) / 2,
     };
     if (Array.isArray(node.childrenList)) {
         if (sortChildren) {
             node.childrenList = sortChildren(node, node.childrenList);
         }
-        const childrenWidth = node.childrenList.reduce(
-            (pre, cur) => pre + cur.containerRect.width,
-            (node.childrenList.length - 1) * config.autoLayout.horizontalSpacing,
+        const childrenHeight = node.childrenList.reduce(
+            (pre, cur) => pre + cur.containerRect.height,
+            (node.childrenList.length - 1) * config.autoLayout.verticalSpacing,
         );
-        const childrenPositionY = node.position.y + nodeHeight + config.autoLayout.verticalSpacing;
-        let childrenPositionX = containerPosition.x + (containerRect.width - childrenWidth) / 2;
+        const childrenPositionX = node.position.x + nodeWidth + config.autoLayout.horizontalSpacing;
+        let childrenPositionY = containerPosition.y + (containerRect.height - childrenHeight) / 2;
         for (let i = 0; i < node.childrenList.length; i += 1) {
             const chlid = node.childrenList[i];
             computePosition(
@@ -97,7 +95,7 @@ function computePosition(node: TreeNode, containerPosition: IPosition, sortChild
                 { x: childrenPositionX, y: childrenPositionY },
                 sortChildren,
             );
-            childrenPositionX += (chlid.containerRect.width + config.autoLayout.horizontalSpacing);
+            childrenPositionY += (chlid.containerRect.height + config.autoLayout.verticalSpacing);
         }
     }
 }

@@ -2,7 +2,7 @@ const config = {
     transition: '.2s',
     autoLayout: {
         /** 节点间水平间距 */
-        horizontalSpacing: 20,
+        horizontalSpacing: 80,
         /** 节点间垂直间距 */
         verticalSpacing: 80,
     },

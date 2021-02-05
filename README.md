@@ -92,6 +92,12 @@ http://localhost:3000
             <td>-</td>
             <td>子节点排序回调，可选，默认无。</td>
         </tr>
+        <tr>
+            <td>renderToolBars</td>
+            <td>() => React.ReactNode</td>
+            <td>-</td>
+            <td>为null时不渲染，默认渲染。</td>
+        </tr>
     </tbody>
 </table>
 
@@ -174,3 +180,13 @@ anchorDecorator(options)(ReactNode)
         </tr>
     </tbody>
 </table>
+
+#### BAP 版本说明
+
+将纵向连接改为横向，修改函数如下：
+
+-   computeAnchorPo
+-   computeNodeInputPo
+-   computeLinePath,采用`d3-path`绘制贝塞尔连接线
+-   computeTrianglePath
+-   computePosition
