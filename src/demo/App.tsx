@@ -43,6 +43,8 @@ class Flow extends React.Component<{}, FlowState> {
         readonly: false,
     };
 
+    topology: any = null;
+
     generatorNodeData = (isBig: boolean) => ({
         id: `${Date.now()}`,
         name: isBig ? '宽节点' : '窄节点',
@@ -94,6 +96,15 @@ class Flow extends React.Component<{}, FlowState> {
                     >
                         {readonly ? '只读' : '可编辑'}
                     </button>
+                    <button
+                        onClick={() => {
+                            this.topology.handleSelectAll();
+                        }}
+                        style={{ marginBottom: 20 }}
+                        type="button"
+                    >
+                        全选
+                    </button>
                     <TemplateWrapper generator={() => this.generatorNodeData(true)}>
                         <div className="topology-templates-item">宽节点</div>
                     </TemplateWrapper>
@@ -109,6 +120,9 @@ class Flow extends React.Component<{}, FlowState> {
                         onSelect={this.handleSelect}
                         renderTreeNode={this.renderTreeNode}
                         readOnly={readonly}
+                        getInstance={(ins: any) => {
+                            this.topology = ins;
+                        }}
                     />
                 </div>
             </div>
