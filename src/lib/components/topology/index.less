@@ -39,12 +39,36 @@
                 z-index: 1;
             }
         }
+        .topology-zoom {
+            transform: scale(var(--scaleNum));
+        }
     }
     .topology-tools {
         position: absolute;
-        right: 30px;
+        left: 20px;
         bottom: 28px;
+        &-zoom {
+            float: left;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            img {
+                width: 16px;
+                height: 16px;
+            }
+        }
+        &-percent {
+            float: left;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+        }
         &-btn {
+            float: left;
             position: relative;
             width: 32px;
             height: 32px;
@@ -55,6 +79,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-right: 10px;
             img {
                 width: 16px;
                 height: 16px;
@@ -66,36 +91,18 @@
                     display: block;
                 }
             }
-            &:nth-child(n + 2) {
-                margin-top: 10px;
-            }
             .tooltip {
                 position: absolute;
                 display: none;
                 height: 30px;
                 line-height: 30px;
                 padding: 0 10px;
-                right: 42px;
-                top: 0;
+                top: -40px;
                 font-size: 12px;
                 word-break: keep-all;
                 background: #666666;
                 color: #fff;
                 border-radius: 3px;
-
-                &::after {
-                    display: block;
-                    transform: rotate(-45deg);
-                    position: absolute;
-                    content: '';
-                    width: 12px;
-                    height: 12px;
-                    background-color: inherit;
-                    top: 9px;
-                    right: -6px;
-                    border-left: none;
-                    border-top: none;
-                }
             }
         }
     }

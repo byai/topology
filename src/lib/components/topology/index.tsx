@@ -52,6 +52,7 @@ interface ITopologyProps {
 
 interface ITopologyState {
     context: ITopologyContext;
+    scaleNum: number;
 }
 
 interface NodeSizeCache {
@@ -60,6 +61,7 @@ interface NodeSizeCache {
 
 const initialTopologyState = {
     context: defaultContext,
+    scaleNum: 1,
 } as ITopologyState;
 
 class Topology extends React.Component<ITopologyProps, ITopologyState> {
@@ -143,6 +145,14 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         onChange(data, type);
     }
 
+    zoomIn = () => {
+        this.setState((prevState: ITopologyState) => ({ scaleNum: prevState.scaleNum > 0.2 ? prevState.scaleNum - 0.1 : 0.1 }));
+    }
+
+    zoomOut = () => {
+        this.setState((prevState: ITopologyState) => ({ scaleNum: prevState.scaleNum < 2 ? prevState.scaleNum + 0.1 : 2 }));
+    }
+
     scrollCanvasToCenter = () => {
         if (!this.$wrapper || !this.$canvas) {
             return;
@@ -206,6 +216,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     handleKeydown = (e: KeyboardEvent) => {
+        // eslint-disable-next-line
         const { classList = [] } = e.target as any;
         // 左侧的搜索输入框回删事件不触发话术更改
         if (classList[0] === 'ant-input') {
@@ -536,30 +547,45 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         );
     }
 
-    renderToolBars = () => (
-        <div className="topology-tools">
-            <div
-                className="topology-tools-btn"
-                id="scroll-canvas-to-center"
-                onClick={this.scrollCanvasToCenter}
-            >
-                <img src="https://cdn.byai.com/static/topology/center.svg" alt="" />
-                <div className="tooltip">定位中心</div>
+    renderToolBars = () => {
+        const { scaleNum } = this.state;
+        /* eslint-disable */
+        // @ts-ignore
+        const zoomPercent = `${parseInt(String(scaleNum.toFixed(1) * 100))}%`;
+        return (
+            <div className="topology-tools">
+                <div
+                    className="topology-tools-btn"
+                    id="scroll-canvas-to-center"
+                    onClick={this.scrollCanvasToCenter}
+                >
+                    <img src="https://cdn.byai.com/static/topology/center.svg" alt="" />
+                    <div className="tooltip">定位中心</div>
+                </div>
+                <div
+                    className="topology-tools-btn"
+                    id="auto-layout"
+                    onClick={this.autoLayout}
+                >
+                    <img src="https://cdn.byai.com/static/topology/layout.svg" alt="" />
+                    <div className="tooltip">自动布局</div>
+                </div>
+
+                <div className='topology-tools-zoom' onClick={this.zoomIn}>
+                    <img src="https://cdn.byai.com/static/oss-script/86e0beab7ddc653b754613005ed8b40a.svg" alt="" />
+                </div>
+
+                <div className='topology-tools-percent'>{zoomPercent}</div>
+                <div className='topology-tools-zoom' onClick={this.zoomOut}>
+                    <img src="https://cdn.byai.com/static/oss-script/f1419d479a9b370a540017cee64de7e7.svg" alt="" />
+                </div>
             </div>
-            <div
-                className="topology-tools-btn"
-                id="auto-layout"
-                onClick={this.autoLayout}
-            >
-                <img src="https://cdn.byai.com/static/topology/layout.svg" alt="" />
-                <div className="tooltip">自动布局</div>
-            </div>
-        </div>
-    )
+        )
+    }
 
     render() {
         const { connectDropTarget } = this.props;
-        const { context } = this.state;
+        const { context, scaleNum } = this.state;
         return connectDropTarget!((
             <div className="byai-topology">
                 <div
@@ -575,8 +601,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 >
                     <div
                         ref={(r) => { this.$canvas = r; }}
-                        className="topology-canvas"
-                        style={{ width: config.canvas.width, height: config.canvas.height }}
+                        className="topology-canvas topology-zoom"
+                        // @ts-ignore
+                        style={{ width: config.canvas.width, height: config.canvas.height, '--scaleNum': scaleNum }}
                         onClick={this.handleCanvasClick}
                     >
                         <Provider value={context}>
