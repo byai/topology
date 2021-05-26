@@ -583,6 +583,17 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         )
     }
 
+    handleSelectAll = () => {
+        const { data, onSelect } = this.props;
+        this.setContext({
+            selectedData: data,
+        }, () => {
+            if (onSelect) {
+                onSelect(this.state.context.selectedData);
+            }
+        });
+    }
+
     render() {
         const { connectDropTarget } = this.props;
         const { context, scaleNum } = this.state;
