@@ -53,6 +53,7 @@ export interface ITopologyNode {
 export interface ITopologyLine {
     start: string;
     end: string;
+    color?: string;
 }
 
 export interface ITopologyContext {

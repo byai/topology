@@ -15,6 +15,7 @@ class Flow extends React.Component<{}, FlowState> {
                 {
                     start: '1585466878859-0',
                     end: '1585466718867',
+                    color: '#b71522',
                 },
             ],
             nodes: [
