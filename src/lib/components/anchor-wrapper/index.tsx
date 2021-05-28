@@ -3,6 +3,7 @@ import { DragSource, DragElementWrapper } from 'react-dnd';
 import { Consumer } from '../context';
 import { NodeTypes, ITopologyContext } from '../../declare';
 
+/* eslint-disable */
 interface IAnchorWrapperProps {
     id: string;
     context?: ITopologyContext;
