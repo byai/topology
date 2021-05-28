@@ -42,6 +42,9 @@ interface ITopologyProps {
     data: ITopologyData;
     readOnly?: boolean;
     autoLayout?: boolean;
+    lineColor?: {
+        [x: string]: string;
+    };
     onChange?: (data: ITopologyData, type: ChangeType) => void;
     onSelect?: (data: ITopologyData) => void;
     getInstance?: (instance: Topology) => void;
@@ -398,15 +401,17 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     handleLineDraw = (startId: string) => {
-        const { data } = this.props;
+        const { data, lineColor = {} } = this.props;
         const { lines } = this.props.data;
         const { context: { impactNode } } = this.state;
         if (impactNode) {
             const newLine = { start: startId, end: impactNode };
             const alreadyExist = lines.find(item => _.isEqual(item, newLine));
-
+            const anchor = startId.split('-')[1] || '';
+            // eslint-disable-next-line
+            console.log('anchor', anchor);
             if (!alreadyExist) {
-                this.onChange({ ...data, lines: [...data.lines, newLine] }, ChangeType.ADD_LINE);
+                this.onChange({ ...data, lines: [...data.lines, { ...newLine, color: lineColor[anchor] }] }, ChangeType.ADD_LINE);
             }
         }
         this.clearMouseEventData();

@@ -82,11 +82,16 @@ class Flow extends React.Component<{}, FlowState> {
 
     onChange = (data: ITopologyData, type: string) => {
         this.setState({ data });
-        console.log(type, 'type111');
+        console.log('data => type', data, type);
     };
 
     render() {
         const { data, readonly } = this.state;
+        const mockLineColor = {
+            0: '#82BEFF',
+            1: '#FFA39E',
+            2: '#FFC89E',
+        };
         return (
             <div className="topology">
                 <div className="topology-templates">
@@ -117,6 +122,7 @@ class Flow extends React.Component<{}, FlowState> {
                     <Topology
                         data={data}
                         autoLayout
+                        lineColor={mockLineColor}
                         onChange={this.onChange}
                         onSelect={this.handleSelect}
                         renderTreeNode={this.renderTreeNode}

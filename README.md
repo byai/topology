@@ -50,6 +50,12 @@ http://localhost:3000
             <td>{ nodes: []; lines: [] }</td>
             <td>数据</td>
         </tr>
+         <tr>
+            <td>lineColor</td>
+            <td>object</td>
+            <td>{}</td>
+            <td>线条颜色映射对象 eg: {'锚点1': '#82BEFF', '锚点2': '#FFA39E'}</td>
+        </tr>
         <tr>
             <td>readOnly</td>
             <td>bool</td>
