@@ -14,6 +14,7 @@ import './index.less';
 
 
 const Colors = { ACTIVE: '#3C78B8', NORMAL: '#AAB7C4' };
+/* eslint-disable */
 interface ILineProps {
     start: IPosition;
     end: IPosition;
