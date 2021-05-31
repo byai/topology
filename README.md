@@ -3,7 +3,7 @@
 ## 安装
 
 ```bash
-yarn add topology-byfe
+yarn add @byai/topology
 ```
 
 ## 开发
