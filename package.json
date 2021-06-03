@@ -50,6 +50,7 @@
     "chalk": "^2.4.2",
     "classnames": "^2.2.6",
     "css-loader": "1.0.0",
+    "d3-path": "^2.0.0",
     "dotenv": "6.0.0",
     "dotenv-expand": "4.2.0",
     "file-loader": "2.0.0",
