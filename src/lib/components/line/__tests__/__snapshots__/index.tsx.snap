@@ -1,0 +1,236 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`line 有数据时 1`] = `
+<svg>
+  <path
+    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    fill="none"
+    stroke="transparent"
+    stroke-width="20"
+    style="pointer-events: all; transition: .2s;"
+  />
+  <path
+    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    fill="none"
+    stroke="#3C78B8"
+    stroke-width="2.5"
+    style="pointer-events: all; transition: .2s;"
+  />
+  <path
+    class="byai-topology-line-end-triangle"
+    d="
+    M 100 90
+    l 5 0
+    l -5 10
+    l -5 -10
+    Z
+"
+    data-json="{\\"origin\\":{\\"start\\":\\"1-0\\",\\"end\\":\\"2\\"},\\"po\\":{\\"start\\":{\\"x\\":0,\\"y\\":0},\\"end\\":{\\"x\\":100,\\"y\\":100}}}"
+    data-type="end"
+    fill="#3C78B8"
+    stroke="none"
+    style="pointer-events: all; transition: .2s;"
+  />
+</svg>
+`;
+
+exports[`line 正常render 1`] = `
+<svg>
+  <path
+    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    fill="none"
+    stroke="transparent"
+    stroke-width="20"
+    style="pointer-events: all; transition: .2s;"
+  />
+  <path
+    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    fill="none"
+    stroke="#AAB7C4"
+    stroke-width="2.5"
+    style="pointer-events: all; transition: .2s;"
+  />
+  <path
+    class="byai-topology-line-end-triangle"
+    d="
+    M 100 90
+    l 5 0
+    l -5 10
+    l -5 -10
+    Z
+"
+    data-json=""
+    data-type="end"
+    fill="#AAB7C4"
+    stroke="none"
+    style="pointer-events: all; transition: .2s;"
+  />
+</svg>
+`;
+
+exports[`line 选中时 1`] = `
+<svg>
+  <path
+    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    fill="none"
+    stroke="transparent"
+    stroke-width="20"
+    style="pointer-events: all; transition: .2s;"
+  />
+  <path
+    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    fill="none"
+    stroke="#3C78B8"
+    stroke-width="2.5"
+    style="pointer-events: all; transition: .2s;"
+  />
+  <path
+    class="byai-topology-line-end-triangle"
+    d="
+    M 100 90
+    l 5 0
+    l -5 10
+    l -5 -10
+    Z
+"
+    data-json=""
+    data-type="end"
+    fill="#3C78B8"
+    stroke="none"
+    style="pointer-events: all; transition: .2s;"
+  />
+</svg>
+`;
+
+exports[`line 鼠标操作： 第一个path移入、移出、点击 1`] = `
+"Snapshot Diff:
+- First value
++ Second value
+
+@@ -7,11 +7,11 @@
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+    <path
+      d=\\"M0,0L0,45M0,45L100,45M100,45L100,90\\"
+      fill=\\"none\\"
+-     stroke=\\"#AAB7C4\\"
++     stroke=\\"#3C78B8\\"
+      stroke-width=\\"2.5\\"
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+    <path
+      class=\\"byai-topology-line-end-triangle\\"
+@@ -22,10 +22,10 @@
+      l -5 -10
+      Z
+  \\"
+      data-json=\\"{\\\\\\"origin\\\\\\":{\\\\\\"start\\\\\\":\\\\\\"1-0\\\\\\",\\\\\\"end\\\\\\":\\\\\\"2\\\\\\"},\\\\\\"po\\\\\\":{\\\\\\"start\\\\\\":{\\\\\\"x\\\\\\":0,\\\\\\"y\\\\\\":0},\\\\\\"end\\\\\\":{\\\\\\"x\\\\\\":100,\\\\\\"y\\\\\\":100}}}\\"
+      data-type=\\"end\\"
+-     fill=\\"#AAB7C4\\"
++     fill=\\"#3C78B8\\"
+      stroke=\\"none\\"
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+  </DocumentFragment>"
+`;
+
+exports[`line 鼠标操作： 第一个path移入、移出、点击 2`] = `
+"Snapshot Diff:
+- First value
++ Second value
+
+@@ -7,11 +7,11 @@
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+    <path
+      d=\\"M0,0L0,45M0,45L100,45M100,45L100,90\\"
+      fill=\\"none\\"
+-     stroke=\\"#3C78B8\\"
++     stroke=\\"#AAB7C4\\"
+      stroke-width=\\"2.5\\"
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+    <path
+      class=\\"byai-topology-line-end-triangle\\"
+@@ -22,10 +22,10 @@
+      l -5 -10
+      Z
+  \\"
+      data-json=\\"{\\\\\\"origin\\\\\\":{\\\\\\"start\\\\\\":\\\\\\"1-0\\\\\\",\\\\\\"end\\\\\\":\\\\\\"2\\\\\\"},\\\\\\"po\\\\\\":{\\\\\\"start\\\\\\":{\\\\\\"x\\\\\\":0,\\\\\\"y\\\\\\":0},\\\\\\"end\\\\\\":{\\\\\\"x\\\\\\":100,\\\\\\"y\\\\\\":100}}}\\"
+      data-type=\\"end\\"
+-     fill=\\"#3C78B8\\"
++     fill=\\"#AAB7C4\\"
+      stroke=\\"none\\"
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+  </DocumentFragment>"
+`;
+
+exports[`line 鼠标操作： 第一个path移入、移出、点击 3`] = `
+"Snapshot Diff:
+Compared values have no visual difference."
+`;
+
+exports[`line 鼠标操作： 第二个path移入、移出、点击 1`] = `
+"Snapshot Diff:
+- First value
++ Second value
+
+@@ -7,11 +7,11 @@
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+    <path
+      d=\\"M0,0L0,45M0,45L100,45M100,45L100,90\\"
+      fill=\\"none\\"
+-     stroke=\\"#AAB7C4\\"
++     stroke=\\"#3C78B8\\"
+      stroke-width=\\"2.5\\"
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+    <path
+      class=\\"byai-topology-line-end-triangle\\"
+@@ -22,10 +22,10 @@
+      l -5 -10
+      Z
+  \\"
+      data-json=\\"{\\\\\\"origin\\\\\\":{\\\\\\"start\\\\\\":\\\\\\"1-0\\\\\\",\\\\\\"end\\\\\\":\\\\\\"2\\\\\\"},\\\\\\"po\\\\\\":{\\\\\\"start\\\\\\":{\\\\\\"x\\\\\\":0,\\\\\\"y\\\\\\":0},\\\\\\"end\\\\\\":{\\\\\\"x\\\\\\":100,\\\\\\"y\\\\\\":100}}}\\"
+      data-type=\\"end\\"
+-     fill=\\"#AAB7C4\\"
++     fill=\\"#3C78B8\\"
+      stroke=\\"none\\"
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+  </DocumentFragment>"
+`;
+
+exports[`line 鼠标操作： 第二个path移入、移出、点击 2`] = `
+"Snapshot Diff:
+- First value
++ Second value
+
+@@ -7,11 +7,11 @@
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+    <path
+      d=\\"M0,0L0,45M0,45L100,45M100,45L100,90\\"
+      fill=\\"none\\"
+-     stroke=\\"#3C78B8\\"
++     stroke=\\"#AAB7C4\\"
+      stroke-width=\\"2.5\\"
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+    <path
+      class=\\"byai-topology-line-end-triangle\\"
+@@ -22,10 +22,10 @@
+      l -5 -10
+      Z
+  \\"
+      data-json=\\"{\\\\\\"origin\\\\\\":{\\\\\\"start\\\\\\":\\\\\\"1-0\\\\\\",\\\\\\"end\\\\\\":\\\\\\"2\\\\\\"},\\\\\\"po\\\\\\":{\\\\\\"start\\\\\\":{\\\\\\"x\\\\\\":0,\\\\\\"y\\\\\\":0},\\\\\\"end\\\\\\":{\\\\\\"x\\\\\\":100,\\\\\\"y\\\\\\":100}}}\\"
+      data-type=\\"end\\"
+-     fill=\\"#3C78B8\\"
++     fill=\\"#AAB7C4\\"
+      stroke=\\"none\\"
+      style=\\"pointer-events: all; transition: .2s;\\"
+    />
+  </DocumentFragment>"
+`;

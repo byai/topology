@@ -19,7 +19,7 @@
   "scripts": {
     "build": "node remove-dist.js && tsc && gulp",
     "start": "node scripts/start.js",
-    "test": "node scripts/test.js",
+    "test": "jest --no-cache",
     "lint": "eslint src --ext .tsx,.ts ",
     "lint-fix": "eslint --fix src --ext .tsx,.ts ",
     "precommit": ""
