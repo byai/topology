@@ -3,14 +3,20 @@
 exports[`line 有数据时 1`] = `
 <svg>
   <path
-    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    d="
+        M 0 0
+        C 8, 30 92, 60 100 90
+    "
     fill="none"
     stroke="transparent"
     stroke-width="20"
     style="pointer-events: all; transition: .2s;"
   />
   <path
-    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    d="
+        M 0 0
+        C 8, 30 92, 60 100 90
+    "
     fill="none"
     stroke="#3C78B8"
     stroke-width="2.5"
@@ -37,14 +43,20 @@ exports[`line 有数据时 1`] = `
 exports[`line 正常render 1`] = `
 <svg>
   <path
-    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    d="
+        M 0 0
+        C 8, 30 92, 60 100 90
+    "
     fill="none"
     stroke="transparent"
     stroke-width="20"
     style="pointer-events: all; transition: .2s;"
   />
   <path
-    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    d="
+        M 0 0
+        C 8, 30 92, 60 100 90
+    "
     fill="none"
     stroke="#AAB7C4"
     stroke-width="2.5"
@@ -71,14 +83,20 @@ exports[`line 正常render 1`] = `
 exports[`line 选中时 1`] = `
 <svg>
   <path
-    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    d="
+        M 0 0
+        C 8, 30 92, 60 100 90
+    "
     fill="none"
     stroke="transparent"
     stroke-width="20"
     style="pointer-events: all; transition: .2s;"
   />
   <path
-    d="M0,0L0,45M0,45L100,45M100,45L100,90"
+    d="
+        M 0 0
+        C 8, 30 92, 60 100 90
+    "
     fill="none"
     stroke="#3C78B8"
     stroke-width="2.5"
@@ -107,11 +125,11 @@ exports[`line 鼠标操作： 第一个path移入、移出、点击 1`] = `
 - First value
 + Second value
 
-@@ -7,11 +7,11 @@
-      style=\\"pointer-events: all; transition: .2s;\\"
-    />
-    <path
-      d=\\"M0,0L0,45M0,45L100,45M100,45L100,90\\"
+@@ -13,11 +13,11 @@
+      d=\\"
+          M 0 0
+          C 8, 30 92, 60 100 90
+      \\"
       fill=\\"none\\"
 -     stroke=\\"#AAB7C4\\"
 +     stroke=\\"#3C78B8\\"
@@ -120,7 +138,7 @@ exports[`line 鼠标操作： 第一个path移入、移出、点击 1`] = `
     />
     <path
       class=\\"byai-topology-line-end-triangle\\"
-@@ -22,10 +22,10 @@
+@@ -28,10 +28,10 @@
       l -5 -10
       Z
   \\"
@@ -139,11 +157,11 @@ exports[`line 鼠标操作： 第一个path移入、移出、点击 2`] = `
 - First value
 + Second value
 
-@@ -7,11 +7,11 @@
-      style=\\"pointer-events: all; transition: .2s;\\"
-    />
-    <path
-      d=\\"M0,0L0,45M0,45L100,45M100,45L100,90\\"
+@@ -13,11 +13,11 @@
+      d=\\"
+          M 0 0
+          C 8, 30 92, 60 100 90
+      \\"
       fill=\\"none\\"
 -     stroke=\\"#3C78B8\\"
 +     stroke=\\"#AAB7C4\\"
@@ -152,7 +170,7 @@ exports[`line 鼠标操作： 第一个path移入、移出、点击 2`] = `
     />
     <path
       class=\\"byai-topology-line-end-triangle\\"
-@@ -22,10 +22,10 @@
+@@ -28,10 +28,10 @@
       l -5 -10
       Z
   \\"
@@ -176,11 +194,11 @@ exports[`line 鼠标操作： 第二个path移入、移出、点击 1`] = `
 - First value
 + Second value
 
-@@ -7,11 +7,11 @@
-      style=\\"pointer-events: all; transition: .2s;\\"
-    />
-    <path
-      d=\\"M0,0L0,45M0,45L100,45M100,45L100,90\\"
+@@ -13,11 +13,11 @@
+      d=\\"
+          M 0 0
+          C 8, 30 92, 60 100 90
+      \\"
       fill=\\"none\\"
 -     stroke=\\"#AAB7C4\\"
 +     stroke=\\"#3C78B8\\"
@@ -189,7 +207,7 @@ exports[`line 鼠标操作： 第二个path移入、移出、点击 1`] = `
     />
     <path
       class=\\"byai-topology-line-end-triangle\\"
-@@ -22,10 +22,10 @@
+@@ -28,10 +28,10 @@
       l -5 -10
       Z
   \\"
@@ -208,11 +226,11 @@ exports[`line 鼠标操作： 第二个path移入、移出、点击 2`] = `
 - First value
 + Second value
 
-@@ -7,11 +7,11 @@
-      style=\\"pointer-events: all; transition: .2s;\\"
-    />
-    <path
-      d=\\"M0,0L0,45M0,45L100,45M100,45L100,90\\"
+@@ -13,11 +13,11 @@
+      d=\\"
+          M 0 0
+          C 8, 30 92, 60 100 90
+      \\"
       fill=\\"none\\"
 -     stroke=\\"#3C78B8\\"
 +     stroke=\\"#AAB7C4\\"
@@ -221,7 +239,7 @@ exports[`line 鼠标操作： 第二个path移入、移出、点击 2`] = `
     />
     <path
       class=\\"byai-topology-line-end-triangle\\"
-@@ -22,10 +22,10 @@
+@@ -28,10 +28,10 @@
       l -5 -10
       Z
   \\"
