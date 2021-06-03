@@ -1,0 +1,108 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`topology basic render 1`] = `
+<body>
+  <div />
+  <div>
+    <div
+      class="byai-topology"
+    >
+      <div
+        class="topology-wrapper"
+      >
+        <div
+          class="topology-canvas topology-zoom"
+          style="width: 40000px; height: 40000px;"
+        >
+          <div
+            class="byai-topology-node-wrapper"
+            id="topology-node-1"
+            style="position: absolute; left: 0px; top: 0px; transition: .2s; z-index: 999;"
+          >
+            <div
+              class="topology-node-preview"
+            />
+            <div
+              class="topology-node-content"
+            >
+              <div>
+                1
+              </div>
+            </div>
+          </div>
+          <svg
+            class="topology-svg"
+          />
+        </div>
+      </div>
+      <div
+        class="topology-tools"
+      >
+        <div
+          class="topology-tools-btn"
+          id="scroll-canvas-to-center"
+        >
+          <img
+            alt=""
+            src="https://cdn.byai.com/static/topology/center.svg"
+          />
+          <div
+            class="tooltip"
+          >
+            定位中心
+          </div>
+        </div>
+        <div
+          class="topology-tools-btn"
+          id="auto-layout"
+        >
+          <img
+            alt=""
+            src="https://cdn.byai.com/static/topology/layout.svg"
+          />
+          <div
+            class="tooltip"
+          >
+            自动布局
+          </div>
+        </div>
+        <div
+          class="topology-tools-zoom"
+        >
+          <img
+            alt=""
+            src="https://cdn.byai.com/static/oss-script/86e0beab7ddc653b754613005ed8b40a.svg"
+          />
+        </div>
+        <div
+          class="topology-tools-percent"
+        >
+          100%
+        </div>
+        <div
+          class="topology-tools-zoom"
+        >
+          <img
+            alt=""
+            src="https://cdn.byai.com/static/oss-script/f1419d479a9b370a540017cee64de7e7.svg"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    id="topology-dom-map"
+  >
+    <div>
+      <div
+        class="dom-map-wrapper"
+        id="dom-map-1"
+      >
+        <div>
+          1
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

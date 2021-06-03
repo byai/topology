@@ -1,4 +1,4 @@
-import { path } from 'd3-path';
+// import { path } from 'd3-path';
 import {
     IPosition,
     ITopologyNode,
@@ -23,29 +23,65 @@ export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) =
 
 /** 计算连接线路径 */
 export const computeLinePath = (start: IPosition, end: IPosition)/* istanbul ignore next */ => {
-    const svgPath = path();
-    const distance = Math.abs(start.y - end.y) * 0.5 + start.y;
-    const polyLineY = end.y - start.y < 0 ? end.y - 40 : distance;
-    const verticalPolyPoint = {
-        x: start.x,
-        y: polyLineY,
-    };
-    const horizontalPolyPoint = {
-        x: end.x,
-        y: polyLineY,
-    };
-    // A collection of points for drawing a line
-    const linePoints = [
-        [{ ...start, y: end.y - start.y < 0 ? start.y - 20 : start.y }, verticalPolyPoint],
-        [verticalPolyPoint, horizontalPolyPoint],
-        [horizontalPolyPoint, end],
-    ];
-    // eslint-disable-next-line
-    for (let [startPoint, endPoint] of linePoints) {
-        svgPath.moveTo(startPoint.x, startPoint.y);
-        svgPath.lineTo(endPoint.x, endPoint.y);
+    // const svgPath = path();
+    // // 直线绘制方式（代码暂时保留）
+    // const distance = Math.abs(start.y - end.y) * 0.5 + start.y;
+    // const polyLineY = end.y - start.y < 0 ? end.y - 40 : distance;
+    // const verticalPolyPoint = {
+    //     x: start.x,
+    //     y: polyLineY,
+    // };
+    // const horizontalPolyPoint = {
+    //     x: end.x,
+    //     y: polyLineY,
+    // };
+    // // A collection of points for drawing a line
+    // const linePoints = [
+    //     [{ ...start, y: end.y - start.y < 0 ? start.y - 20 : start.y }, verticalPolyPoint],
+    //     [verticalPolyPoint, horizontalPolyPoint],
+    //     [horizontalPolyPoint, end],
+    // ];
+    // // eslint-disable-next-line
+    // for (let [startPoint, endPoint] of linePoints) {
+    //     svgPath.moveTo(startPoint.x, startPoint.y);
+    //     svgPath.lineTo(endPoint.x, endPoint.y);
+    // }
+
+    // 弧线绘制方式
+    const x = Math.abs(start.x - end.x);
+    const y = Math.abs(start.y - end.y);
+    if (x === 0 || y === 0) {
+        return `
+            M ${start.x} ${start.y}
+            L ${end.x} ${end.y}
+        `;
     }
-    return svgPath.toString();
+    let dir: number;
+    let p1: string;
+    let p2: string;
+
+    if (end.y < start.y) {
+        const offsetY = 80;
+        const offsetX = 40;
+        dir = end.x - start.x > 0 ? 1 : -1;
+        p1 = `${start.x + dir * offsetX}, ${start.y + offsetY}`;
+        p2 = `${end.x - dir * offsetX}, ${end.y - offsetY}`;
+        return `
+            M ${start.x} ${start.y}
+            C ${p1} ${p2} ${end.x} ${end.y}
+        `;
+    }
+    const OffsetXP1 = +(1 / 12 * x).toFixed(0);
+    const OffsetXP2 = +(11 / 12 * x).toFixed(0);
+    const offsetYP1 = +(1 / 3 * y).toFixed(0);
+    const offsetYP2 = +(2 / 3 * y).toFixed(0);
+    dir = start.x - end.x > 0 ? -1 : 1;
+    p1 = `${start.x + dir * OffsetXP1}, ${start.y + offsetYP1}`;
+    p2 = `${start.x + dir * OffsetXP2}, ${start.y + offsetYP2}`;
+    return `
+        M ${start.x} ${start.y}
+        C ${p1} ${p2} ${end.x} ${end.y}
+    `;
 };
 
 /** 计算三角形路径 */
