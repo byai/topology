@@ -59,6 +59,7 @@ describe('nodeWrapper', () => {
 
     test('click', () => {
         const identity = el => el;
+        // eslint-disable-next-line
         const mockOnSelect = jest.fn((data, selectMode) => null);
         const div = document.createElement('div');
         const BoxContext = wrapInTestContext(NodeWrapper);

@@ -43,7 +43,7 @@ class Flow extends React.Component<{}, FlowState> {
         },
         readonly: false,
     };
-
+    // eslint-disable-next-line
     topology: any = null;
 
     generatorNodeData = (isBig: boolean) => ({
@@ -127,9 +127,9 @@ class Flow extends React.Component<{}, FlowState> {
                         onSelect={this.handleSelect}
                         renderTreeNode={this.renderTreeNode}
                         readOnly={readonly}
-                        getInstance={(ins: any) => {
-                            this.topology = ins;
-                        }}
+                        getInstance={
+                            // eslint-disable-next-line
+                            (ins: any) => { this.topology = ins; }}
                     />
                 </div>
             </div>
