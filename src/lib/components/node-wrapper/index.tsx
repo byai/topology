@@ -14,10 +14,11 @@ import './index.less';
 import { SelectMode } from '../../utils/selectNodes';
 import config from '../../config';
 
-
+// @ts-ignore
 export interface INodeWrapperProps {
     id?: string;
     data?: ITopologyNode;
+    scaleNum?: number;
     context?: ITopologyContext;
     onSelect: (node: ITopologyNode, mode: SelectMode) => void;
     children: (wrapperOptions: IWrapperOptions) => React.ReactNode;
@@ -45,7 +46,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             transition: config.transition,
             zIndex: isolated ? 999 : undefined,
         } as React.CSSProperties;
-    }
+    };
 
     anchorDecorator = (options: { anchorId?: string }) => {
         const { id, readOnly } = this.props;
@@ -59,7 +60,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
                 {item}
             </AnchorWrapper>
         );
-    }
+    };
 
     impactCheck = () => {
         const { context, data, id } = this.props;
@@ -68,7 +69,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             return false;
         }
         return id === impactNode;
-    }
+    };
 
     handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         const { onSelect, data } = this.props;
@@ -81,7 +82,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             return;
         }
         onSelect(data, SelectMode.NORMAL);
-    }
+    };
 
     handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if (e.button === 2) {
@@ -89,11 +90,27 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             const { data, onSelect } = this.props;
             onSelect(data, SelectMode.RIGHT_NORMAL);
         }
-    }
+    };
 
     handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
-    }
+    };
+
+    /**
+     * set preview Dom width height style
+     */
+    /* eslint-disable */
+    getPreviewNodeStyle = () => {
+        const { data, scaleNum } = this.props;
+        const realNodeDom = document.getElementById(`topology-node-${data.id}`);
+        if (!realNodeDom) return null;
+        const previewNodeWidth = scaleNum * realNodeDom.offsetWidth - 2; // border
+        const previewNodeHeight = scaleNum * realNodeDom.offsetHeight - 2;
+        return {
+            width: previewNodeWidth,
+            height: previewNodeHeight
+        };
+    };
 
     render() {
         const {
@@ -101,32 +118,37 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             connectDragPreview,
             children,
             data,
-            context,
+            context
         } = this.props;
         const { selectedData, activeLine } = context;
-        const isSelected = selectedData.nodes.find(item => item.id === data.id) !== undefined;
-
-        return connectDragSource((
+        const isSelected =
+            selectedData.nodes.find(item => item.id === data.id) !== undefined;
+        return connectDragSource(
             <div
-                id={data ? `topology-node-${data.id}` : ''}
+                id={data ? `topology-node-${data.id}` : ""}
                 style={this.computeStyle()}
                 className="byai-topology-node-wrapper"
                 onClick={this.handleClick}
                 onContextMenu={this.handleRightClick}
                 onMouseDown={this.handleMouseDown}
             >
-                {connectDragPreview(<div className="topology-node-preview" />)}
+                {connectDragPreview(
+                    <div
+                        style={this.getPreviewNodeStyle()}
+                        className="topology-node-preview"
+                    />
+                )}
                 <div
                     className={classnames({
-                        'topology-node-content': true,
-                        'topology-node-selected': isSelected,
-                        'topology-node-impact': activeLine && this.impactCheck(),
+                        "topology-node-content": true,
+                        "topology-node-selected": isSelected,
+                        "topology-node-impact": activeLine && this.impactCheck()
                     })}
                 >
                     {children({ anchorDecorator: this.anchorDecorator })}
                 </div>
             </div>
-        ));
+        );
     }
 }
 

@@ -458,11 +458,15 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 key={item.id}
                 id={`${item.id}`}
                 data={item}
+                scaleNum={this.state.scaleNum}
                 readOnly={readOnly}
                 isolated={!lineHash[item.id]}
                 onSelect={this.selectNode}
             >
-                {(wrapperOptions: IWrapperOptions) => renderTreeNode(item, wrapperOptions)}
+                {(wrapperOptions: IWrapperOptions) =>
+                    /* eslint-disable */
+                    renderTreeNode(item, wrapperOptions)
+                }
             </NodeWrapper>
         ));
     }
