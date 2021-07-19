@@ -56,6 +56,7 @@ interface ITopologyProps {
 interface ITopologyState {
     context: ITopologyContext;
     scaleNum: number;
+    draggingId: string;
 }
 
 interface NodeSizeCache {
@@ -68,6 +69,7 @@ const MIN_SCALE = 0.1;
 const initialTopologyState = {
     context: defaultContext,
     scaleNum: 1,
+    draggingId: null
 } as ITopologyState;
 
 class Topology extends React.Component<ITopologyProps, ITopologyState> {
@@ -159,6 +161,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             this.scaleNum = scaleNum;
             return { scaleNum };
         });
+        this.setDraggingId(null);
     };
 
     zoomOut = () => {
@@ -167,6 +170,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             this.scaleNum = scaleNum;
             return { scaleNum };
         });
+        this.setDraggingId(null);
     };
 
     scrollCanvasToCenter = () => {
@@ -280,6 +284,12 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             ChangeType.DELETE
         );
     };
+
+    setDraggingId = (id) => {
+        this.setState({
+            draggingId: id,
+        });
+    }
 
     setContext = (values: ValuesOf<ITopologyContext>, callback?: Function) => {
         const { context } = this.state;
@@ -532,6 +542,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 }
             });
         }
+        this.setDraggingId(null);
     };
 
     renderNodes = () => {
@@ -541,7 +552,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             readOnly
         } = this.props;
         const {
-            scaleNum
+            scaleNum,
+            draggingId,
         } = this.state;
         if (!renderTreeNode) {
             return null;
@@ -558,6 +570,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 id={`${item.id}`}
                 data={item}
                 scaleNum={scaleNum}
+                draggingId={draggingId}
+                setDraggingId={this.setDraggingId}
                 readOnly={readOnly}
                 isolated={!lineHash[item.id]}
                 onSelect={this.selectNode}
@@ -816,6 +830,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
             }
             break;
         default: {
+            component.setDraggingId(id)
         }
             break;
     }

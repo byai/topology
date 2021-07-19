@@ -19,7 +19,9 @@ export interface INodeWrapperProps {
     id?: string;
     data?: ITopologyNode;
     scaleNum?: number;
+    draggingId?: string;
     context?: ITopologyContext;
+    setDraggingId?: (id: string) => void;
     onSelect: (node: ITopologyNode, mode: SelectMode) => void;
     children: (wrapperOptions: IWrapperOptions) => React.ReactNode;
     readOnly?: boolean;
@@ -101,13 +103,14 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
      */
     /* eslint-disable */
     getPreviewNodeStyle = () => {
-        const { data, scaleNum } = this.props;
+        const { data, scaleNum, id, draggingId } = this.props;
         const realNodeDom = document.getElementById(`topology-node-${data && data.id}`);
         if (!realNodeDom) return null;
         const previewNodeWidth = scaleNum * realNodeDom.offsetWidth - 2; // border
         const previewNodeHeight = scaleNum * realNodeDom.offsetHeight - 2;
         let previewStyle;
-        if(this.impactCheck()) {
+        // 连线触发节点或者放大时对 previewNode 样式做特殊处理
+        if(this.impactCheck() || (scaleNum > 1 && draggingId !== id)) {
             previewStyle = {
                 background: 'transparent',
                 border: 'none'
@@ -173,8 +176,13 @@ export default DragSource(
             return !props.readOnly;
         },
         beginDrag(props: INodeWrapperProps) {
-            return { id: props.data ? props.data.id : null };
-        }
+            const id = props.data ? props.data.id : null
+            props.setDraggingId(id);
+            return { id };
+        },
+        endDrag(props: INodeWrapperProps) {
+            props.setDraggingId(null);
+        },
     },
     connect => ({
         connectDragSource: connect.dragSource(),
