@@ -102,13 +102,21 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     /* eslint-disable */
     getPreviewNodeStyle = () => {
         const { data, scaleNum } = this.props;
-        const realNodeDom = document.getElementById(`topology-node-${data.id}`);
+        const realNodeDom = document.getElementById(`topology-node-${data && data.id}`);
         if (!realNodeDom) return null;
         const previewNodeWidth = scaleNum * realNodeDom.offsetWidth - 2; // border
         const previewNodeHeight = scaleNum * realNodeDom.offsetHeight - 2;
+        let previewStyle;
+        if(this.impactCheck()) {
+            previewStyle = {
+                background: 'transparent',
+                border: 'none'
+            }
+        }
         return {
             width: previewNodeWidth,
-            height: previewNodeHeight
+            height: previewNodeHeight,
+            ...previewStyle
         };
     };
 
@@ -166,7 +174,7 @@ export default DragSource(
         },
         beginDrag(props: INodeWrapperProps) {
             return { id: props.data ? props.data.id : null };
-        },
+        }
     },
     connect => ({
         connectDragSource: connect.dragSource(),
