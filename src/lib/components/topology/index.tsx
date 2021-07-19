@@ -390,6 +390,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const getClickType = () => {
             // @ts-ignore
             if (
+                // @ts-ignore
                 [LineEditType.EDIT_START, LineEditType.EDIT_END].includes(
                     itemType || ""
                 )
@@ -441,6 +442,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const { activeLine } = this.state.context;
         // @ts-ignore
         const isEditingLine = activeLine
+        // @ts-ignore
             && [LineEditType.EDIT_START, LineEditType.EDIT_END].includes(
                 activeLine.type
             );
@@ -776,6 +778,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         style={{
                             width: config.canvas.width,
                             height: config.canvas.height,
+                            // @ts-ignore
                             "--scaleNum": scaleNum
                         }}
                         onClick={this.handleCanvasClick}
