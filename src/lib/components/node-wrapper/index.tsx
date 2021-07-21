@@ -109,7 +109,16 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         const previewNodeWidth = scaleNum * realNodeDom.offsetWidth - 2; // border
         const previewNodeHeight = scaleNum * realNodeDom.offsetHeight - 2;
         let previewStyle;
-        // 连线触发节点或者放大时对 previewNode 样式做特殊处理
+        // 放大模式下拖动中 previewNode 样式处理
+        if (scaleNum > 1 && draggingId === id) {
+            const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${draggingId}']`);
+            if (!draggingPreviewNode) return;
+            setTimeout(() => {
+                draggingPreviewNode.style.background = 'transparent';
+                draggingPreviewNode.style.border = 'none';
+            }, 0);
+        }
+        // 连线触发节点或者放大时对未拖动中 previewNode 样式处理
         if(this.impactCheck() || (scaleNum > 1 && draggingId !== id)) {
             previewStyle = {
                 background: 'transparent',
@@ -129,7 +138,8 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             connectDragPreview,
             children,
             data,
-            context
+            context,
+            id
         } = this.props;
         const { selectedData, activeLine } = context;
         const isSelected =
@@ -145,6 +155,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             >
                 {connectDragPreview(
                     <div
+                        data-id={`${id}`}
                         style={this.getPreviewNodeStyle()}
                         className="topology-node-preview"
                     />
