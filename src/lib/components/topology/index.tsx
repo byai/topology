@@ -832,9 +832,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
                 });
             }
             break;
-        default: {
-            component.setDraggingId(id)
-        }
+        default:
             break;
     }
 }
@@ -859,11 +857,11 @@ export default DropTarget(
             }
 
             let position;
-            let nodeDom = document.getElementById(`topology-node-${item.id}`);
+            let nodeDom: HTMLElement = document.getElementById(`topology-node-${item.id}`);
             if (nodeDom) {
                 const nodePosition = {
-                    top: nodeDom && nodeDom.style && nodeDom.style.top,
-                    left: nodeDom && nodeDom.style && nodeDom.style.left
+                    top: nodeDom.style.top,
+                    left: nodeDom.style.left
                 };
 
                 position = {
