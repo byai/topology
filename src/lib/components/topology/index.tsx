@@ -41,6 +41,8 @@ import './index.less';
 interface ITopologyProps {
     data: ITopologyData;
     readOnly?: boolean;
+    showBar?: boolean;
+    canConnectMultiLines?: boolean;
     autoLayout?: boolean;
     lineColor?: {
         [x: string]: string;
@@ -209,9 +211,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         );
     };
 
-    impactCheck = (endPo: IPosition, startPo: IPosition) => {
+    impactCheck = (endPo: IPosition, startPo: IPosition, id?: string) => {
         const {
-            data: { nodes }
+            data: { nodes, lines }
         } = this.props;
         const impactNode = nodes.find((item) => {
             if (!this.nodeSizeCache[item.id]) {
@@ -237,6 +239,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         ) {
             return null;
         }
+
+        // 线已存在情况下
+        const hasExistSameLine = impactNode && lines.find(item => item.start === id && item.end === impactNode.id);
+        if (hasExistSameLine) return null;
+
         return impactNode ? impactNode.id : null;
     };
 
@@ -630,7 +637,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     renderLines = () => {
         const {
-            data: { lines, nodes }
+            data: { lines, nodes },
+            readOnly,
+            lineColor
         } = this.props;
         const { activeLine, selectedData } = this.state.context;
         const nodeHash = createHashFromObjectArray(nodes, "id") as {
@@ -678,7 +687,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                             end={end}
                             onSelect={this.selectLine}
                             selected={isSelected(line)}
-                            readOnly={this.props.readOnly}
+                            readOnly={readOnly}
                         />
                     );
                 })}
@@ -752,7 +761,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     };
 
     render() {
-        const { connectDropTarget } = this.props;
+        const { connectDropTarget, showBar } = this.props;
         const { context, scaleNum } = this.state;
         return connectDropTarget!(
             <div className="byai-topology">
@@ -789,7 +798,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         </Provider>
                     </div>
                 </div>
-                {this.renderToolBars()}
+                {showBar && this.renderToolBars()}
             </div>
         );
     }
@@ -807,9 +816,8 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
             if (clientOffset) {
                 const nodeId = id.split('-')[0];
                 const parentNode = props.data.nodes.find(item => item.id === nodeId);
-                const hasExist = props.data.lines.find(item => item.start === id);
-
-                if (hasExist || !parentNode || !component.$wrapper) { return; }
+                const hasAnchorExistLine = !props.canConnectMultiLines && props.data.lines.find(item => item.start === id);
+                if (hasAnchorExistLine || !parentNode || !component.$wrapper) { return; }
 
                 const startPo = context.activeLine ? context.activeLine.start : computeAnchorPo(`dom-map-${id}`, parentNode);
                 const endPo = computeCanvasPo(
@@ -819,7 +827,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
                 if (!startPo || !endPo) {
                      return;
                 }
-                const impactNode = component.impactCheck(endPo, startPo);
+                const impactNode = component.impactCheck(endPo, startPo, id);
                 component.setContext({
                     impactNode,
                     linking: true,

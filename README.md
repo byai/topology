@@ -50,11 +50,23 @@ http://localhost:3000
             <td>{ nodes: []; lines: [] }</td>
             <td>数据</td>
         </tr>
-         <tr>
+        <tr>
             <td>lineColor</td>
             <td>object</td>
             <td>{}</td>
             <td>线条颜色映射对象 eg: {'锚点1': '#82BEFF', '锚点2': '#FFA39E'}</td>
+        </tr>
+        <tr>
+            <td>showBar</td>
+            <td>bool</td>
+            <td>true</td>
+            <td>是否显示工具栏</td>
+        </tr>
+        <tr>
+            <td>canConnectMultiLines</td>
+            <td>bool</td>
+            <td>false</td>
+            <td>控制一个锚点是否可以连接多条线</td>
         </tr>
         <tr>
             <td>readOnly</td>
