@@ -7,6 +7,8 @@ import './index.less';
 interface FlowState {
     data: ITopologyData;
     readonly: boolean;
+    showBar?: boolean;
+    canConnectMultiLines?: boolean;
 }
 class Flow extends React.Component<{}, FlowState> {
     state: FlowState = {
@@ -42,6 +44,8 @@ class Flow extends React.Component<{}, FlowState> {
             ],
         },
         readonly: false,
+        showBar: true,
+        canConnectMultiLines: false
     };
     // eslint-disable-next-line
     topology: any = null;
@@ -86,7 +90,10 @@ class Flow extends React.Component<{}, FlowState> {
     };
 
     render() {
-        const { data, readonly } = this.state;
+        const {
+            data, readonly, showBar,
+            canConnectMultiLines
+        } = this.state;
         const mockLineColor = {
             0: '#82BEFF',
             1: '#FFA39E',
@@ -111,6 +118,20 @@ class Flow extends React.Component<{}, FlowState> {
                     >
                         全选
                     </button>
+                    <button
+                        onClick={() => this.setState({ showBar: !showBar })}
+                        style={{ marginBottom: 20 }}
+                        type="button"
+                    >
+                        {`${showBar ? '隐藏' : '显示'}工具栏`}
+                    </button>
+                    <button
+                        onClick={() => this.setState({ canConnectMultiLines: !canConnectMultiLines })}
+                        style={{ marginBottom: 20 }}
+                        type="button"
+                    >
+                        {`锚点${canConnectMultiLines ? '不可' : '可'}连接多条线`}
+                    </button>
                     <TemplateWrapper generator={() => this.generatorNodeData(true)}>
                         <div className="topology-templates-item">宽节点</div>
                     </TemplateWrapper>
@@ -127,6 +148,8 @@ class Flow extends React.Component<{}, FlowState> {
                         onSelect={this.handleSelect}
                         renderTreeNode={this.renderTreeNode}
                         readOnly={readonly}
+                        showBar={showBar}
+                        canConnectMultiLines={canConnectMultiLines}
                         getInstance={
                             // eslint-disable-next-line
                             (ins: any) => { this.topology = ins; }}

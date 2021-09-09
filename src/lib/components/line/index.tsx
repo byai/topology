@@ -13,7 +13,7 @@ import config from '../../config';
 import './index.less';
 
 
-const Colors = { ACTIVE: '#3C78B8', NORMAL: '#AAB7C4' };
+const Colors = { ACTIVE: '#2F82F8', NORMAL: '#AAB7C4' };
 /* eslint-disable */
 interface ILineProps {
     start: IPosition;
@@ -77,15 +77,14 @@ class Line extends React.Component<ILineProps, ILineState> {
             selected,
             data,
             readOnly,
-            context,
+            context: { linking },
         } = this.props;
 
         const { hover } = this.state;
         const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';
         const getTriangleStart = () => ({ ...end, y: end.y - config.line.triangleWidth });
-        const lineColor = selected || hover ? Colors.ACTIVE : (data && data.color) || Colors.NORMAL;
-        const transition = context.linking ? 'none' : config.transition;
-
+        const lColor = selected || hover || linking ? Colors.ACTIVE : (data && data.color || Colors.NORMAL);
+        const transition = linking ? 'none' : config.transition;
         return (
             <React.Fragment>
                 <path
@@ -101,7 +100,7 @@ class Line extends React.Component<ILineProps, ILineState> {
                 <path
                     onClick={this.handleClick}
                     strokeWidth={config.line.strokeWidth}
-                    stroke={lineColor}
+                    stroke={lColor}
                     fill="none"
                     style={{ pointerEvents: 'all', transition }}
                     d={computeLinePath(start, getTriangleStart())}
@@ -110,7 +109,7 @@ class Line extends React.Component<ILineProps, ILineState> {
                 />
                 <path
                     className={readOnly ? '' : 'byai-topology-line-end-triangle'}
-                    fill={lineColor}
+                    fill={lColor}
                     stroke="none"
                     data-type={LineEditType.EDIT_END}
                     data-json={dataJson}
