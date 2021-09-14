@@ -77,13 +77,15 @@ class Line extends React.Component<ILineProps, ILineState> {
             selected,
             data,
             readOnly,
-            context: { linking },
+            context: { linking, activeLine },
         } = this.props;
 
         const { hover } = this.state;
         const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';
         const getTriangleStart = () => ({ ...end, y: end.y - config.line.triangleWidth });
-        const lColor = selected || hover || linking ? Colors.ACTIVE : (data && data.color || Colors.NORMAL);
+        // 只高亮新增或者编辑的当前线
+        const curLinking = linking && !activeLine.origin && !data;
+        const lColor = selected || hover || curLinking ? Colors.ACTIVE : (data && data.color || Colors.NORMAL);
         const transition = linking ? 'none' : config.transition;
         return (
             <React.Fragment>
