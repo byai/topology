@@ -638,8 +638,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     renderLines = () => {
         const {
             data: { lines, nodes },
-            readOnly,
-            lineColor
+            readOnly
         } = this.props;
         const { activeLine, selectedData } = this.state.context;
         const nodeHash = createHashFromObjectArray(nodes, "id") as {
@@ -798,7 +797,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         </Provider>
                     </div>
                 </div>
-                {showBar && this.renderToolBars()}
+                {showBar !== false && this.renderToolBars()}
             </div>
         );
     }
