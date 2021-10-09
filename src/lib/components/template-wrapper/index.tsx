@@ -7,6 +7,7 @@ export interface ITemplateWrapperProps {
     generator: () => ITopologyNode;
     connectDragSource?: DragElementWrapper<React.ReactNode>;
     connectDragPreview?: DragElementWrapper<React.ReactNode>;
+    disabled?: boolean;
 }
 
 class TemplateWrapper extends React.Component<ITemplateWrapperProps> {
@@ -29,8 +30,8 @@ class TemplateWrapper extends React.Component<ITemplateWrapperProps> {
 export default DragSource(
     NodeTypes.TEMPLATE_NODE,
     {
-        canDrag() {
-            return true;
+        canDrag(props) {
+            return !props.disabled;
         },
         beginDrag(props: ITemplateWrapperProps) {
             return { data: props.generator() };
