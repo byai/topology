@@ -244,6 +244,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const hasExistSameLine = impactNode && lines.find(item => item.start === id && item.end === impactNode.id);
         if (hasExistSameLine) return null;
 
+        // 节点不可被连接
+        if (impactNode && impactNode.canConnect === false) return null;
+
         return impactNode ? impactNode.id : null;
     };
 
