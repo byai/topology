@@ -22,7 +22,7 @@ export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) =
 };
 
 /** 计算连接线路径 */
-export const computeLinePath = (start: IPosition, end: IPosition)/* istanbul ignore next */ => {
+export const computeLinePath = (start: IPosition, end: IPosition, lineOffsetY: number = 0)/* istanbul ignore next */ => {
     // const svgPath = path();
     // // 直线绘制方式（代码暂时保留）
     // const distance = Math.abs(start.y - end.y) * 0.5 + start.y;
@@ -46,7 +46,6 @@ export const computeLinePath = (start: IPosition, end: IPosition)/* istanbul ign
     //     svgPath.moveTo(startPoint.x, startPoint.y);
     //     svgPath.lineTo(endPoint.x, endPoint.y);
     // }
-
     // 弧线绘制方式
     const x = Math.abs(start.x - end.x);
     const y = Math.abs(start.y - end.y);
@@ -67,7 +66,7 @@ export const computeLinePath = (start: IPosition, end: IPosition)/* istanbul ign
         p1 = `${start.x + dir * offsetX}, ${start.y + offsetY}`;
         p2 = `${end.x - dir * offsetX}, ${end.y - offsetY}`;
         return `
-            M ${start.x} ${start.y}
+            M ${start.x} ${start.y - lineOffsetY}
             C ${p1} ${p2} ${end.x} ${end.y}
         `;
     }
@@ -79,7 +78,7 @@ export const computeLinePath = (start: IPosition, end: IPosition)/* istanbul ign
     p1 = `${start.x + dir * OffsetXP1}, ${start.y + offsetYP1}`;
     p2 = `${start.x + dir * OffsetXP2}, ${start.y + offsetYP2}`;
     return `
-        M ${start.x} ${start.y}
+        M ${start.x} ${start.y - lineOffsetY}
         C ${p1} ${p2} ${end.x} ${end.y}
     `;
 };

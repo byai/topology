@@ -47,6 +47,7 @@ interface ITopologyProps {
     lineColor?: {
         [x: string]: string;
     };
+    lineOffsetY?: number;
     onChange?: (data: ITopologyData, type: ChangeType) => void;
     onSelect?: (data: ITopologyData) => void;
     getInstance?: (instance: Topology) => void;
@@ -641,6 +642,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     renderLines = () => {
         const {
             data: { lines, nodes },
+            lineOffsetY,
             readOnly
         } = this.props;
         const { activeLine, selectedData } = this.state.context;
@@ -684,6 +686,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     return (
                         <Line
                             key={`${line.start}-${line.end}`}
+                            lineOffsetY={lineOffsetY}
                             data={line}
                             start={start}
                             end={end}

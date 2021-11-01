@@ -19,6 +19,7 @@ interface ILineProps {
     start: IPosition;
     end: IPosition;
     color?: string;
+    lineOffsetY?: number;
     data?: ITopologyLine;
     arrow?: boolean;
     readOnly?: boolean;
@@ -77,6 +78,7 @@ class Line extends React.Component<ILineProps, ILineState> {
             selected,
             data,
             readOnly,
+            lineOffsetY,
             context: { linking, activeLine },
         } = this.props;
 
@@ -95,7 +97,7 @@ class Line extends React.Component<ILineProps, ILineState> {
                     stroke="transparent"
                     fill="none"
                     style={{ pointerEvents: 'all', transition }}
-                    d={computeLinePath(start, getTriangleStart())}
+                    d={computeLinePath(start, getTriangleStart(), lineOffsetY)}
                     onMouseEnter={this.handleMouseEnter}
                     onMouseLeave={this.handleMouseLeave}
                 />
@@ -105,7 +107,7 @@ class Line extends React.Component<ILineProps, ILineState> {
                     stroke={lColor}
                     fill="none"
                     style={{ pointerEvents: 'all', transition }}
-                    d={computeLinePath(start, getTriangleStart())}
+                    d={computeLinePath(start, getTriangleStart(), lineOffsetY)}
                     onMouseEnter={this.handleMouseEnter}
                     onMouseLeave={this.handleMouseLeave}
                 />

@@ -57,6 +57,12 @@ http://localhost:3000
             <td>线条颜色映射对象 eg: {'锚点1': '#82BEFF', '锚点2': '#FFA39E'}</td>
         </tr>
         <tr>
+            <td>lineOffsetY</td>
+            <td>number</td>
+            <td>0</td>
+            <td>线条起始点向上偏移量</td>
+        </tr>
+        <tr>
             <td>showBar</td>
             <td>bool</td>
             <td>true</td>
