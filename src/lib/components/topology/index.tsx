@@ -671,6 +671,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const isSelected = (line: ITopologyLine) =>
             isEditing(line) || _.some(selectedData.lines, line);
 
+        // @ts-ignore
         const isHighLight = (line: ITopologyLine) => {
             if(!hoverCurrentNode) return false;
             const { id } = hoverCurrentNode;
