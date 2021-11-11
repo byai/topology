@@ -24,6 +24,8 @@ export interface INodeWrapperProps {
     setDraggingId?: (id: string) => void;
     onSelect: (node: ITopologyNode, mode: SelectMode) => void;
     children: (wrapperOptions: IWrapperOptions) => React.ReactNode;
+    onMouseEnter?: (node: ITopologyNode) => void;
+    onMouseLeave?: () => void;
     readOnly?: boolean;
     /** 是否孤立节点 */
     isolated?: boolean;
@@ -139,7 +141,9 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             children,
             data,
             context,
-            id
+            id,
+            onMouseEnter,
+            onMouseLeave
         } = this.props;
         const { selectedData, activeLine } = context;
         const isSelected =
@@ -152,6 +156,8 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
                 onClick={this.handleClick}
                 onContextMenu={this.handleRightClick}
                 onMouseDown={this.handleMouseDown}
+                onMouseEnter={() => { onMouseEnter(data) }}
+                onMouseLeave={() => { onMouseLeave() }}
             >
                 {connectDragPreview(
                     <div
