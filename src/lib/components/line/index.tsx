@@ -25,6 +25,7 @@ interface ILineProps {
     readOnly?: boolean;
     context?: ITopologyContext;
     selected?: boolean;
+    highLight?: boolean;
     onSelect?: (data: ITopologyData) => void;
 }
 
@@ -76,6 +77,7 @@ class Line extends React.Component<ILineProps, ILineState> {
             start,
             end,
             selected,
+            highLight,
             data,
             readOnly,
             lineOffsetY,
@@ -87,7 +89,7 @@ class Line extends React.Component<ILineProps, ILineState> {
         const getTriangleStart = () => ({ ...end, y: end.y - config.line.triangleWidth });
         // 只高亮新增或者编辑的当前线
         const curLinking = linking && !activeLine.origin && !data;
-        const lColor = selected || hover || curLinking ? Colors.ACTIVE : (data && data.color || Colors.NORMAL);
+        const lColor = highLight || selected || hover || curLinking ? Colors.ACTIVE : (data && data.color || Colors.NORMAL);
         const transition = linking ? 'none' : config.transition;
         return (
             <React.Fragment>

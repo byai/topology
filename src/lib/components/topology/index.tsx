@@ -391,6 +391,18 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         });
     };
 
+    handleHoverCurrentNode = (node) => {
+        this.setContext({
+            hoverCurrentNode: node
+        });
+    }
+
+    clearHoverCurrentNode = () => {
+        this.setContext({
+            hoverCurrentNode: null
+        });
+    }
+
     handleMouseDown = (
         e: React.MouseEvent<HTMLDivElement | SVGCircleElement>
     ) => {
@@ -579,6 +591,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         return nodes.map(item => (
             <NodeWrapper
+                onMouseEnter={this.handleHoverCurrentNode}
+                onMouseLeave={this.clearHoverCurrentNode}
                 key={item.id}
                 id={`${item.id}`}
                 data={item}
@@ -645,7 +659,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             lineOffsetY,
             readOnly
         } = this.props;
-        const { activeLine, selectedData } = this.state.context;
+        const { activeLine, selectedData, hoverCurrentNode } = this.state.context;
         const nodeHash = createHashFromObjectArray(nodes, "id") as {
             [id: string]: ITopologyNode;
         };
@@ -656,6 +670,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             _.isEqual(line, activeLine.origin);
         const isSelected = (line: ITopologyLine) =>
             isEditing(line) || _.some(selectedData.lines, line);
+
+        const isHighLight = (line: ITopologyLine) => {
+            if(!hoverCurrentNode) return false;
+            const { id } = hoverCurrentNode;
+            if(line.start.split("-")[0] === id || line.end === id) return true;
+        }
+
         const getLineStartPo = (line: ITopologyLine) => {
             if (
                 isEditing(line) &&
@@ -692,6 +713,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                             end={end}
                             onSelect={this.selectLine}
                             selected={isSelected(line)}
+                            highLight={isHighLight(line)}
                             readOnly={readOnly}
                         />
                     );
