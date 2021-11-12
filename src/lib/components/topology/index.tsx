@@ -600,6 +600,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 draggingId={draggingId}
                 setDraggingId={this.setDraggingId}
                 readOnly={readOnly}
+                canDrag={item.canDrag}
                 isolated={!lineHash[item.id]}
                 onSelect={this.selectNode}
             >

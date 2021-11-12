@@ -27,6 +27,7 @@ export interface INodeWrapperProps {
     onMouseEnter?: (node: ITopologyNode) => void;
     onMouseLeave?: () => void;
     readOnly?: boolean;
+    canDrag?: boolean;
     /** 是否孤立节点 */
     isolated?: boolean;
     connectDragSource?: DragElementWrapper<React.ReactNode>;
@@ -190,7 +191,7 @@ export default DragSource(
     NodeTypes.NORMAL_NODE,
     {
         canDrag(props: INodeWrapperProps) {
-            return !props.readOnly;
+            return props.canDrag === false ?  props.canDrag : (props.readOnly ? !props.readOnly: !props.canDrag);
         },
         beginDrag(props: INodeWrapperProps) {
             const id = props.data ? props.data.id : null
