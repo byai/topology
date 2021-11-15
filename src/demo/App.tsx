@@ -56,6 +56,7 @@ class Flow extends React.Component<{}, FlowState> {
         name: isBig ? '宽节点' : '窄节点',
         content: isBig ? '这是一个宽节点' : '这是一个窄节点',
         branches: isBig ? ['锚点1', '锚点2', '锚点3'] : ['锚点1'],
+        dragChild: isBig
     });
 
     handleSelect = (data: ITopologyData) => {
