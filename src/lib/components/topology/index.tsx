@@ -874,6 +874,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
     }
 }
 
+
 export default DropTarget(
     [NodeTypes.NORMAL_NODE, NodeTypes.TEMPLATE_NODE, NodeTypes.ANCHOR],
     {
@@ -893,14 +894,11 @@ export default DropTarget(
                 return;
             }
 
-            let position;
-            let nodeDom: HTMLElement = document.getElementById(`topology-node-${item.id}`);
-            if (nodeDom) {
+            const getNodePosition = (nodeDom) => {
                 const nodePosition = {
                     top: nodeDom.style.top,
                     left: nodeDom.style.left
                 };
-
                 position = {
                     x:
                         Number(nodePosition.left.replace(/[px]+/g, "")) +
@@ -909,6 +907,31 @@ export default DropTarget(
                         Number(nodePosition.top.replace(/[px]+/g, "")) +
                         clientOffset.y / component.scaleNum
                 };
+                return position;
+            }
+
+            /**
+             * Get the mapping relationship between the id and position of all child nodes of the current dragging node
+             * @returns
+             */
+            const getChildPosMap = () => {
+                const { lines, nodes } = props.data;
+                const dragChild = nodes.find(n => n.id === item.id).dragChild;
+                if(!dragChild) return null;
+                const childIds = lines.filter(n => n.start.split('-')[0] === item.id).map(n => n.end);
+                let childPosMap = {};
+                for (let childId of childIds) {
+                    let childNodeDom: HTMLElement = document.getElementById(`topology-node-${childId}`);
+                    if(!childNodeDom) return null;
+                    childPosMap[childId] = getNodePosition(childNodeDom);
+                }
+                return childPosMap;
+            }
+
+            let position;
+            let nodeDom: HTMLElement = document.getElementById(`topology-node-${item.id}`);
+            if (nodeDom) {
+                position = getNodePosition(nodeDom);
             } else {
                 position = computeCanvasPo(
                     monitor.getSourceClientOffset(),
@@ -928,6 +951,13 @@ export default DropTarget(
                     break;
                 case NodeTypes.NORMAL_NODE:
                     component.handleNodeDraw((item as ITopologyNode).id, position);
+                    const childPosMap = getChildPosMap();
+                    // Determine whether the child nodes are dragged together
+                    if(childPosMap) {
+                        for (let child in childPosMap) {
+                            component.handleNodeDraw(child, childPosMap[child]);
+                        }
+                    }
                     break;
                 case NodeTypes.ANCHOR:
                     component.handleLineDraw((item as { id: string }).id);
