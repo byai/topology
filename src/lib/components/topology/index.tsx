@@ -538,12 +538,22 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         this.clearMouseEventData();
     };
 
-    handleNodeDraw = (nodeId: string, position: IPosition) => {
+    handleNodeDraw = (nodeId: string, position: IPosition, childPosMap?: {
+        [key: string]: {
+            x: number;
+            y: number;
+        };
+    }) => {
         const { data } = this.props;
+        const posMaps = {
+            [nodeId]: position,
+            ...childPosMap
+        };
         this.onChange(
             {
                 ...data,
-                nodes: data.nodes.map(item => (item.id === nodeId ? { ...item, position } : item))
+                // @ts-ignore
+                nodes: data.nodes.map(item => (Object.keys(posMaps).includes(item.id) ? { ...item, position: posMaps[item.id] } : item))
             },
             ChangeType.LAYOUT
         );
@@ -916,7 +926,8 @@ export default DropTarget(
              */
             const getChildPosMap = () => {
                 const { lines, nodes } = props.data;
-                const dragChild = nodes.find(n => n.id === item.id).dragChild;
+                const curNode = nodes.find(n => n.id === item.id);
+                const dragChild = curNode.dragChild || _.findKey(curNode, { dragChild: true });
                 if(!dragChild) return null;
                 const childIds = lines.filter(n => n.start.split('-')[0] === item.id).map(n => n.end);
                 let childPosMap = {};
@@ -950,14 +961,7 @@ export default DropTarget(
                     }, ChangeType.ADD_NODE);
                     break;
                 case NodeTypes.NORMAL_NODE:
-                    component.handleNodeDraw((item as ITopologyNode).id, position);
-                    const childPosMap = getChildPosMap();
-                    // Determine whether the child nodes are dragged together
-                    if(childPosMap) {
-                        for (let child in childPosMap) {
-                            component.handleNodeDraw(child, childPosMap[child]);
-                        }
-                    }
+                    component.handleNodeDraw((item as ITopologyNode).id, position, getChildPosMap());
                     break;
                 case NodeTypes.ANCHOR:
                     component.handleLineDraw((item as { id: string }).id);
