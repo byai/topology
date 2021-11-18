@@ -909,7 +909,7 @@ export default DropTarget(
                     top: nodeDom.style.top,
                     left: nodeDom.style.left
                 };
-                position = {
+                const scalePosition = {
                     x:
                         Number(nodePosition.left.replace(/[px]+/g, "")) +
                         clientOffset.x / component.scaleNum,
@@ -917,6 +917,11 @@ export default DropTarget(
                         Number(nodePosition.top.replace(/[px]+/g, "")) +
                         clientOffset.y / component.scaleNum
                 };
+                // TODO： scaleNum 缩放与窗口滚动时有冲突
+                const position = component.scaleNum === 1 ? computeCanvasPo(
+                    monitor.getSourceClientOffset(),
+                    component.$wrapper
+                ) : scalePosition
                 return position;
             }
 
@@ -943,11 +948,6 @@ export default DropTarget(
             let nodeDom: HTMLElement = document.getElementById(`topology-node-${item.id}`);
             if (nodeDom) {
                 position = getNodePosition(nodeDom);
-            } else {
-                position = computeCanvasPo(
-                    monitor.getSourceClientOffset(),
-                    component.$wrapper
-                );
             }
 
             switch (type) {
