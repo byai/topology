@@ -904,7 +904,7 @@ export default DropTarget(
                 return;
             }
 
-            const getNodePosition = (nodeDom) => {
+            const getNodePosition = (nodeDom, isChild?) => {
                 const nodePosition = {
                     top: nodeDom.style.top,
                     left: nodeDom.style.left
@@ -917,11 +917,17 @@ export default DropTarget(
                         Number(nodePosition.top.replace(/[px]+/g, "")) +
                         clientOffset.y / component.scaleNum
                 };
-                // TODO： scaleNum 缩放与窗口滚动时有冲突
-                const position = component.scaleNum === 1 ? computeCanvasPo(
+
+                const scrollPosition = computeCanvasPo(
                     monitor.getSourceClientOffset(),
                     component.$wrapper
-                ) : scalePosition
+                )
+                /**
+                 * TODO： scaleNum 缩放与窗口滚动时有冲突, isChild 为子节点联动时使用 scalePosition 定位
+                 */
+                 const position = component.scaleNum === 1 ? (
+                     isChild ? scalePosition : scrollPosition
+                 ) : scalePosition
                 return position;
             }
 
@@ -939,7 +945,7 @@ export default DropTarget(
                 for (let childId of childIds) {
                     let childNodeDom: HTMLElement = document.getElementById(`topology-node-${childId}`);
                     if(!childNodeDom) return null;
-                    childPosMap[childId] = getNodePosition(childNodeDom);
+                    childPosMap[childId] = getNodePosition(childNodeDom, true);
                 }
                 return childPosMap;
             }
