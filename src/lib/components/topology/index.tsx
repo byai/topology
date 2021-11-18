@@ -948,6 +948,11 @@ export default DropTarget(
             let nodeDom: HTMLElement = document.getElementById(`topology-node-${item.id}`);
             if (nodeDom) {
                 position = getNodePosition(nodeDom);
+            } else {
+                position = computeCanvasPo(
+                    monitor.getSourceClientOffset(),
+                    component.$wrapper
+                )
             }
 
             switch (type) {
