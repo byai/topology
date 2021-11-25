@@ -119,6 +119,36 @@ http://localhost:3000
     </tbody>
 </table>
 
+node options 中 一些可配置参数
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th style="width: 100px;">name</th>
+            <th style="width: 150px;">type</th>
+            <th style="width: 150px;">default</th>
+            <th>description</th>
+        </tr>
+    </thead>
+    <tr>
+        <td>id</td>
+        <td>string</td>
+        <td>-</td>
+        <td>节点id</td>
+    </tr>
+    <tr>
+        <td>canDrag</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td>控制节点是否可拖拽</td>
+    </tr>
+    <tr>
+        <td>dragChild</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td>设置当前节点下的子节点是否需要联动拖动</td>
+    </tr>
+</table>
+
 ### getInstance
 
 返回topology组件的实例，可通过实例调用组件内部的方法：
@@ -170,9 +200,9 @@ anchorDecorator(options)(ReactNode)
 模板装饰器，用于包装模板组件
 
 #### 用法
-
+disabled 字段控制 TemplateNode 是否启用
 ```javascript
-<TemplateWrapper generator={this.generatorNodeData}>
+<TemplateWrapper disabled generator={this.generatorNodeData}>
     <div>模板节点</div>
 </TemplateWrapper>
 
