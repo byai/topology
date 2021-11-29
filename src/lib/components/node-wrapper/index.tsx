@@ -1,5 +1,6 @@
 import React from 'react';
 import { DragSource, DragElementWrapper } from 'react-dnd';
+import _ from 'lodash';
 import classnames from 'classnames';
 import { JsxElement } from 'typescript';
 import AnchorWrapper from '../anchor-wrapper';
@@ -191,7 +192,8 @@ export default DragSource(
     NodeTypes.NORMAL_NODE,
     {
         canDrag(props: INodeWrapperProps) {
-            return props.canDrag === false ?  props.canDrag : (props.readOnly ? !props.readOnly: !props.canDrag);
+            const canDragNode = Boolean(_.findKey(props, { canDrag: false }));
+            return canDragNode ? !canDragNode : (props.readOnly ? !props.readOnly: !canDragNode);
         },
         beginDrag(props: INodeWrapperProps) {
             const id = props.data ? props.data.id : null
