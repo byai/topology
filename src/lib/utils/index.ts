@@ -197,3 +197,30 @@ export const createHashFromObjectArray = (arr: object[], field: string | GetFiel
     },
     {},
 );
+
+
+/**
+ * 判断对象是否存在一组 matchKey: matchValue
+ * @param obj
+ * @param matchKey
+ * @param matchValue
+ * @returns
+ */
+export const isMatchKeyValue = (obj, matchKey?, matchValue?) => {
+    let isMatch = false;
+    const loop = (param) => {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const key in param) {
+            if (Object.prototype.toString.call(param[key]) === '[object Object]' && param[key] !== null) {
+                loop(param[key]);
+            } else {
+                // eslint-disable-next-line no-lonely-if
+                if (key === matchKey) {
+                    isMatch = (param[key] === matchValue);
+                }
+            }
+        }
+    };
+    loop(obj);
+    return isMatch;
+};

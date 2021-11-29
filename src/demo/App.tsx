@@ -40,7 +40,7 @@ class Flow extends React.Component<{}, FlowState> {
                         x: 19629.79557800293,
                         y: 19696.197512626648,
                     },
-                    canDrag: false
+                    canDrag: false,
                 },
             ],
         },

@@ -31,6 +31,7 @@ import {
     createHashFromObjectArray,
     getNodeSize,
     shouldAutoLayout,
+    isMatchKeyValue
 } from '../../utils';
 // import layoutCalculation from '../../utils/layoutCalculation';
 import computeLayout from '../../utils/computeLayout';
@@ -610,7 +611,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 draggingId={draggingId}
                 setDraggingId={this.setDraggingId}
                 readOnly={readOnly}
-                canDrag={item.canDrag}
                 isolated={!lineHash[item.id]}
                 onSelect={this.selectNode}
             >
@@ -938,7 +938,7 @@ export default DropTarget(
             const getChildPosMap = () => {
                 const { lines, nodes } = props.data;
                 const curNode = nodes.find(n => n.id === item.id);
-                const dragChild = curNode.dragChild || _.findKey(curNode, { dragChild: true });
+                const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
                 if(!dragChild) return null;
                 const childIds = lines.filter(n => n.start.split('-')[0] === item.id).map(n => n.end);
                 let childPosMap = {};

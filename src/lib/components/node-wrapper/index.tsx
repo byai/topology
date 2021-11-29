@@ -1,6 +1,5 @@
 import React from 'react';
 import { DragSource, DragElementWrapper } from 'react-dnd';
-import _ from 'lodash';
 import classnames from 'classnames';
 import { JsxElement } from 'typescript';
 import AnchorWrapper from '../anchor-wrapper';
@@ -13,6 +12,9 @@ import {
 } from '../../declare';
 import './index.less';
 import { SelectMode } from '../../utils/selectNodes';
+import {
+    isMatchKeyValue
+} from '../../utils';
 import config from '../../config';
 
 // @ts-ignore
@@ -192,7 +194,7 @@ export default DragSource(
     NodeTypes.NORMAL_NODE,
     {
         canDrag(props: INodeWrapperProps) {
-            const canDragNode = Boolean(_.findKey(props, { canDrag: false }));
+            const canDragNode = props.canDrag === false || isMatchKeyValue(props, 'canDrag', false);
             return canDragNode ? !canDragNode : (props.readOnly ? !props.readOnly: !canDragNode);
         },
         beginDrag(props: INodeWrapperProps) {
