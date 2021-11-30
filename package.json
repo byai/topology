@@ -1,6 +1,6 @@
 {
   "name": "@byai/topology",
-  "version": "1.2.0",
+  "version": "1.1.5-beta13",
   "description": "拓扑图组件",
   "main": "dist/lib/index.js",
   "repository": {
@@ -19,6 +19,8 @@
   "scripts": {
     "build": "node remove-dist.js && tsc && gulp",
     "start": "node scripts/start.js",
+    "release": "./scripts/release.sh",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
     "test": "jest --no-cache",
     "lint": "eslint src --ext .tsx,.ts ",
     "lint-fix": "eslint --fix src --ext .tsx,.ts ",
@@ -92,6 +94,8 @@
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/plugin-transform-modules-commonjs": "^7.4.4",
+    "@commitlint/cli": "^15.0.0",
+    "@commitlint/config-conventional": "^15.0.0",
     "@svgr/webpack": "2.4.1",
     "@testing-library/react": "^8.0.1",
     "@types/classnames": "^2.2.7",
@@ -198,6 +202,11 @@
     "presets": [
       "react-app"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   },
   "config": {
     "commitizen": {
