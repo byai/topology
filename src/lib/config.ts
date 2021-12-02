@@ -14,7 +14,8 @@ const config = {
     },
     line: {
         /** 线条宽度 */
-        strokeWidth: 2.5,
+        strokeWidth: 1,
+        strokeLargeWidth: 2,
         /** 箭头宽度 */
         triangleWidth: 10,
         /** 触发区域宽度 */
