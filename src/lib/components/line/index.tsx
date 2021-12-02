@@ -105,7 +105,7 @@ class Line extends React.Component<ILineProps, ILineState> {
                 />
                 <path
                     onClick={this.handleClick}
-                    strokeWidth={config.line.strokeWidth}
+                    strokeWidth={highLight || selected || hover ? config.line.strokeLargeWidth : config.line.strokeWidth}
                     stroke={lColor}
                     fill="none"
                     style={{ pointerEvents: 'all', transition }}
