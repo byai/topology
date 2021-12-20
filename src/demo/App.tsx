@@ -151,6 +151,7 @@ class Flow extends React.Component<{}, FlowState> {
                         renderTreeNode={this.renderTreeNode}
                         readOnly={readonly}
                         showBar={showBar}
+                        customPostionHeight={20}
                         canConnectMultiLines={canConnectMultiLines}
                         getInstance={
                             // eslint-disable-next-line
