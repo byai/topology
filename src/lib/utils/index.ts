@@ -159,6 +159,34 @@ export const computeContentCenter = (nodes: ITopologyNode[]) => {
     };
 };
 
+
+/**
+ * 滚动 Y 轴距离顶部距离
+ */
+
+export const computeContentPostionY = (nodes: ITopologyNode[]) => {
+    // @ts-ignore
+    if (!nodes.length || nodes.find(item => !item.position || [item.position.x, item.position.y].includes(undefined))) {
+        return null;
+    }
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    nodes.forEach(({ position, id }) => {
+        const nodeSize = getNodeSize(id);
+        const { x, y } = position;
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x + nodeSize.width);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y + nodeSize.height);
+    });
+    return {
+        x: (minX + maxX) / 2,
+        y: minY,
+    };
+};
+
 /** 计算节点连接处 */
 export const computeNodeInputPo = (node: ITopologyNode) => {
     const $node = document.getElementById(`dom-map-${node.id}`);

@@ -28,6 +28,7 @@ import {
     computeNodeInputPo,
     computeMouseClientToCanvas,
     computeContentCenter,
+    computeContentPostionY,
     createHashFromObjectArray,
     getNodeSize,
     shouldAutoLayout,
@@ -109,7 +110,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         if (this.$wrapper) {
             // 自定义节点距离画布顶部高度
             if (customPostionHeight) {
-                this.scrollCanvasToPosition();
+                this.scrollCanvasToPositionY();
             } else {
                 this.scrollCanvasToCenter();
             }
@@ -209,25 +210,25 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
      *  定位至画布顶部距离
      * @returns
      */
-    scrollCanvasToPosition = () => {
+    scrollCanvasToPositionY = () => {
         if (!this.$wrapper || !this.$canvas) {
             return;
         }
         const canvasSize = getNodeSize(this.$canvas);
         const wrapperSize = getNodeSize(this.$wrapper);
-        const contentCenter = computeContentCenter(this.props.data.nodes);
+        const contentPosition = computeContentPostionY(this.props.data.nodes);
         const canvasCenter = {
             x: canvasSize.width / 2,
             y: canvasSize.height / 2
         };
         const defaultScrollTop = (canvasSize.height - wrapperSize.height) / 2;
         const defaultScrollLeft = (canvasSize.width - wrapperSize.width) / 2;
-        if (!contentCenter) {
+        if (!contentPosition) {
             this.$wrapper.scrollTop = defaultScrollTop;
             this.$wrapper.scrollLeft = defaultScrollLeft;
         } else {
-            this.$wrapper.scrollTop = defaultScrollTop - this.props.customPostionHeight;
-            this.$wrapper.scrollLeft = defaultScrollLeft + (contentCenter.x - canvasCenter.x);
+            this.$wrapper.scrollTop = contentPosition.y - this.props.customPostionHeight;
+            this.$wrapper.scrollLeft = defaultScrollLeft + (contentPosition.x - canvasCenter.x);
         }
     };
 
