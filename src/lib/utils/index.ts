@@ -162,6 +162,7 @@ export const computeMaxAndMin = (nodes: ITopologyNode[]) => {
 };
 
 export const computeContentCenter = (nodes: ITopologyNode[]) => {
+    if (!computeMaxAndMin(nodes)) return null;
     const {
         minX, maxX, minY, maxY
     } = computeMaxAndMin(nodes);
@@ -176,6 +177,7 @@ export const computeContentCenter = (nodes: ITopologyNode[]) => {
  * 滚动 Y 轴距离顶部距离
  */
 export const computeContentPostionY = (nodes: ITopologyNode[]) => {
+    if (!computeMaxAndMin(nodes)) return null;
     const {
         minX, maxX, minY
     } = computeMaxAndMin(nodes);
