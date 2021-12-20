@@ -1,6 +1,6 @@
 {
   "name": "@byai/topology",
-  "version": "1.1.5-beta14",
+  "version": "1.1.5-beta15",
   "description": "拓扑图组件",
   "main": "dist/lib/index.js",
   "repository": {
