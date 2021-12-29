@@ -1,6 +1,6 @@
 {
   "name": "@byai/topology",
-  "version": "1.1.5-beta13",
+  "version": "1.1.5-beta19",
   "description": "拓扑图组件",
   "main": "dist/lib/index.js",
   "repository": {
@@ -80,7 +80,7 @@
     "postcss-safe-parser": "4.0.1",
     "puppeteer-core": "^1.17.0",
     "react-app-polyfill": "^0.2.0",
-    "react-dev-utils": "^7.0.1",
+    "react-dev-utils": "^11.0.4",
     "react-dnd": "^2.5.4",
     "react-dnd-html5-backend": "^2.5.4",
     "react-test-renderer": "^16.8.6",

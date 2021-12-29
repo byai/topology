@@ -136,7 +136,7 @@ export const computeAnchorPo = (anchor: string, parentNode: ITopologyNode) => {
     return po;
 };
 
-export const computeContentCenter = (nodes: ITopologyNode[]) => {
+export const computeMaxAndMin = (nodes: ITopologyNode[]) => {
     // @ts-ignore
     if (!nodes.length || nodes.find(item => !item.position || [item.position.x, item.position.y].includes(undefined))) {
         return null;
@@ -154,8 +154,36 @@ export const computeContentCenter = (nodes: ITopologyNode[]) => {
         maxY = Math.max(maxY, y + nodeSize.height);
     });
     return {
+        minX,
+        maxX,
+        minY,
+        maxY
+    };
+};
+
+export const computeContentCenter = (nodes: ITopologyNode[]) => {
+    if (!computeMaxAndMin(nodes)) return null;
+    const {
+        minX, maxX, minY, maxY
+    } = computeMaxAndMin(nodes);
+    return {
         x: (minX + maxX) / 2,
         y: (minY + maxY) / 2,
+    };
+};
+
+
+/**
+ * 滚动 Y 轴距离顶部距离
+ */
+export const computeContentPostionY = (nodes: ITopologyNode[]) => {
+    if (!computeMaxAndMin(nodes)) return null;
+    const {
+        minX, maxX, minY
+    } = computeMaxAndMin(nodes);
+    return {
+        x: (minX + maxX) / 2,
+        y: minY,
     };
 };
 

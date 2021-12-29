@@ -28,6 +28,7 @@ import {
     computeNodeInputPo,
     computeMouseClientToCanvas,
     computeContentCenter,
+    computeContentPostionY,
     createHashFromObjectArray,
     getNodeSize,
     shouldAutoLayout,
@@ -45,6 +46,7 @@ interface ITopologyProps {
     showBar?: boolean;
     canConnectMultiLines?: boolean;
     autoLayout?: boolean;
+    customPostionHeight?: number;
     lineColor?: {
         [x: string]: string;
     };
@@ -99,14 +101,19 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     componentDidMount() {
-        const { getInstance, readOnly } = this.props;
+        const { getInstance, readOnly, customPostionHeight } = this.props;
         this.editLine = _.throttle(this.editLine, 40);
         if (!readOnly) {
             this.initDomEvents();
         }
 
         if (this.$wrapper) {
-            this.scrollCanvasToCenter();
+            // 自定义节点距离画布顶部高度
+            if (customPostionHeight) {
+                this.scrollCanvasToPositionY();
+            } else {
+                this.scrollCanvasToCenter();
+            }
         }
 
         if (this.shouldAutoLayout) {
@@ -196,6 +203,32 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         } else {
             this.$wrapper.scrollTop = defaultScrollTop + (contentCenter.y - canvasCenter.y);
             this.$wrapper.scrollLeft = defaultScrollLeft + (contentCenter.x - canvasCenter.x);
+        }
+    };
+
+    /**
+     *  定位至画布顶部距离
+     * @returns
+     */
+    scrollCanvasToPositionY = () => {
+        if (!this.$wrapper || !this.$canvas) {
+            return;
+        }
+        const canvasSize = getNodeSize(this.$canvas);
+        const wrapperSize = getNodeSize(this.$wrapper);
+        const contentPosition = computeContentPostionY(this.props.data.nodes);
+        const canvasCenter = {
+            x: canvasSize.width / 2,
+            y: canvasSize.height / 2
+        };
+        const defaultScrollTop = (canvasSize.height - wrapperSize.height) / 2;
+        const defaultScrollLeft = (canvasSize.width - wrapperSize.width) / 2;
+        if (!contentPosition) {
+            this.$wrapper.scrollTop = defaultScrollTop;
+            this.$wrapper.scrollLeft = defaultScrollLeft;
+        } else {
+            this.$wrapper.scrollTop = contentPosition.y - this.props.customPostionHeight;
+            this.$wrapper.scrollLeft = defaultScrollLeft + (contentPosition.x - canvasCenter.x);
         }
     };
 
