@@ -98,7 +98,8 @@ module.exports = function(proxy, allowedHost) {
       // We do this in development to avoid hitting the production cache if
       // it used the same host and port.
       // https://github.com/facebook/create-react-app/issues/2272#issuecomment-302832432
-      app.use(noopServiceWorkerMiddleware());
+      //stackoverflow.com/questions/60234640/typeerror-err-invalid-arg-type-the-path-argument-must-be-of-type-string-re/62287792#62287792
+      https: app.use(noopServiceWorkerMiddleware(""));
     },
   };
 };
