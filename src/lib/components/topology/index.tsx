@@ -45,6 +45,7 @@ interface ITopologyProps {
     readOnly?: boolean;
     showBar?: boolean;
     canConnectMultiLines?: boolean;
+    overlap?: boolean;
     autoLayout?: boolean;
     customPostionHeight?: number;
     lineColor?: {
@@ -67,6 +68,17 @@ interface ITopologyState {
 
 interface NodeSizeCache {
     [id: string]: { width: number; height: number };
+}
+
+interface IPosMap {
+    T1: {
+        x: number;
+        y: number;
+    };
+    T2: {
+        x: number;
+        y: number;
+    };
 }
 
 const MAX_SCALE = 2;
@@ -832,6 +844,44 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         );
     };
 
+    /**
+     * Check whether the drag node overlaps
+     * @param drawId
+     * @param pos
+     * @returns
+     */
+    validateIsOverlap = (drawId, pos): boolean => {
+        const {
+            data: { nodes },
+            overlap
+        } = this.props;
+
+        if(!overlap) return false;
+
+        let S1 = {
+            x: pos.x,
+            y: pos.y
+        }
+        let S2 = {
+            x: pos.x + getNodeSize(drawId).width,
+            y: pos.y+ getNodeSize(drawId).height,
+        }
+        const posMap: IPosMap[] = nodes && nodes.filter(n => n.id !== drawId).map(n => {
+            return {
+                T1: {
+                    x: n.position.x,
+                    y: n.position.y,
+                },
+                T2: {
+                    x: n.position.x + getNodeSize(n.id).width,
+                    y: n.position.y + getNodeSize(n.id).height,
+                },
+            }
+        })
+        const isOverlap = posMap.some((p: IPosMap) => !(S2.y < p.T1.y || S1.y > p.T2.y || S2.x < p.T1.x || S1.x > p.T2.x) === true);
+        return isOverlap;
+    }
+
     render() {
         const { connectDropTarget, showBar } = this.props;
         const { context, scaleNum } = this.state;
@@ -994,17 +1044,33 @@ export default DropTarget(
                 )
             }
 
+            const isOverlap = (id, position) => {
+                return component.validateIsOverlap(id, position);
+            }
+
             switch (type) {
                 case NodeTypes.TEMPLATE_NODE:
                     if (!item.data) {
                         return;
                     }
+                    /**
+                     * TODO：Here first render the newly added node, if it overlaps, delete the node
+                     * The main reason is that there is currently no good unified method to get the default width and height of the newly added nodes in the upper layer.
+                     */
                     component.onChange({
                         ...props.data,
                         nodes: [...props.data.nodes, { ...item.data, position }],
                     }, ChangeType.ADD_NODE);
+
+                    if(isOverlap(item.data.id, position)) {
+                         component.onChange({
+                            ...props.data,
+                            nodes: [...props.data.nodes],
+                        }, ChangeType.ADD_NODE);
+                    };
                     break;
                 case NodeTypes.NORMAL_NODE:
+                    if(isOverlap((item as ITopologyNode).id, position)) return;
                     component.handleNodeDraw((item as ITopologyNode).id, position, getChildPosMap());
                     break;
                 case NodeTypes.ANCHOR:

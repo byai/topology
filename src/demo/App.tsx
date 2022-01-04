@@ -7,6 +7,7 @@ import './index.less';
 interface FlowState {
     data: ITopologyData;
     readonly: boolean;
+    overlap?: boolean;
     showBar?: boolean;
     canConnectMultiLines?: boolean;
 }
@@ -45,6 +46,7 @@ class Flow extends React.Component<{}, FlowState> {
             ],
         },
         readonly: false,
+        overlap: false,
         showBar: true,
         canConnectMultiLines: false
     };
@@ -93,7 +95,7 @@ class Flow extends React.Component<{}, FlowState> {
 
     render() {
         const {
-            data, readonly, showBar,
+            data, readonly, showBar, overlap,
             canConnectMultiLines
         } = this.state;
         const mockLineColor = {
@@ -110,6 +112,13 @@ class Flow extends React.Component<{}, FlowState> {
                         type="button"
                     >
                         {readonly ? '只读' : '可编辑'}
+                    </button>
+                    <button
+                        onClick={() => this.setState({ overlap: !overlap })}
+                        style={{ marginBottom: 20 }}
+                        type="button"
+                    >
+                        {overlap ? '不允许节点覆盖' : '允许节点覆盖'}
                     </button>
                     <button
                         onClick={() => {
@@ -153,6 +162,7 @@ class Flow extends React.Component<{}, FlowState> {
                         showBar={showBar}
                         customPostionHeight={20}
                         canConnectMultiLines={canConnectMultiLines}
+                        overlap={overlap}
                         getInstance={
                             // eslint-disable-next-line
                             (ins: any) => { this.topology = ins; }}

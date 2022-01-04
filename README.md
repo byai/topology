@@ -75,6 +75,12 @@ http://localhost:3000
             <td>控制一个锚点是否可以连接多条线</td>
         </tr>
         <tr>
+            <td>overlap</td>
+            <td>bool</td>
+            <td>false</td>
+            <td>是否允许节点覆盖，默认允许，设置 true 时不允许</td>
+        </tr>
+        <tr>
             <td>readOnly</td>
             <td>bool</td>
             <td>false</td>
