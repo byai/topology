@@ -81,6 +81,12 @@ http://localhost:3000
             <td>是否允许节点覆盖，默认允许，设置 true 时不允许</td>
         </tr>
         <tr>
+            <td>customPostionHeight</td>
+            <td>number</td>
+            <td>0</td>
+            <td>未设置 customPostionHeight 画布默认居中展示，当设置 customPostionHeight 时，画布距离顶部 customPostionHeight</td>
+        </tr>
+        <tr>
             <td>readOnly</td>
             <td>bool</td>
             <td>false</td>

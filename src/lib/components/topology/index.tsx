@@ -40,21 +40,21 @@ import deleteSelectedData from '../../utils/deleteSelectedData';
 import config from '../../config';
 import './index.less';
 
-interface ITopologyProps {
-    data: ITopologyData;
-    readOnly?: boolean;
-    showBar?: boolean;
-    canConnectMultiLines?: boolean;
-    overlap?: boolean;
-    autoLayout?: boolean;
-    customPostionHeight?: number;
+export interface ITopologyProps {
+    data: ITopologyData; // 数据 { nodes: []; lines: [] }
+    readOnly?: boolean; // 只读模式，为true时不可编辑
+    showBar?: boolean; // 是否显示工具栏
+    canConnectMultiLines?: boolean; // 控制一个锚点是否可以连接多条线
+    overlap?: boolean; // 是否允许节点覆盖，默认允许，设置 true 时不允许
+    autoLayout?: boolean; // 自动布局，当数据中没有position属性时将自动计算布局。
+    customPostionHeight?: number; // 当设置 customPostionHeight 时，画布距离顶部 customPostionHeight
     lineColor?: {
         [x: string]: string;
-    };
-    lineOffsetY?: number;
+    }; // 线条颜色映射对象 eg: {'锚点1': '#82BEFF', '锚点2': '#FFA39E'}
+    lineOffsetY?: number; // 线条起始点向上偏移量
     onChange?: (data: ITopologyData, type: ChangeType) => void;
     onSelect?: (data: ITopologyData) => void;
-    getInstance?: (instance: Topology) => void;
+    getInstance?: (instance: Topology) => void; // 返回组件实例，用于调用组件内部的方法。
     renderTreeNode?: (data: ITopologyNode, wrappers: IWrapperOptions) => React.ReactNode;
     sortChildren?: (parent: ITopologyNode, children: ITopologyNode[]) => ITopologyNode[];
     connectDropTarget?: ConnectDropTarget;

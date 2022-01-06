@@ -46,6 +46,8 @@ export interface IPosition {
 export interface ITopologyNode {
     id: string;
     position?: IPosition;
+    canDrag?: boolean; // 控制节点是否可拖拽
+    dragChild?: boolean; // 设置当前节点下的子节点是否需要联动拖动
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [prop: string]: any;
 }
