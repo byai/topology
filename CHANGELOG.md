@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.5-beta21](https://github.com/byai/topology/compare/v1.1.5-beta20...v1.1.5-beta21) (2022-01-11)
+
+
+### Features
+
+* add filterOverlap configuration item ([5724951](https://github.com/byai/topology/commit/57249519a126ae4b4a3f305278dc6a7060c67353))
+
 ### 1.1.5-beta20 (2022-01-04)
 
 
