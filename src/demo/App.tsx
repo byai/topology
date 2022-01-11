@@ -31,6 +31,7 @@ class Flow extends React.Component<{}, FlowState> {
                         x: 19726.906692504883,
                         y: 19512.21832561493,
                     },
+                    filterOverlap: true
                 },
                 {
                     id: '1585466718867',

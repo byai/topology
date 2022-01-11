@@ -866,7 +866,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             x: pos.x + getNodeSize(drawId).width,
             y: pos.y+ getNodeSize(drawId).height,
         }
-        const posMap: IPosMap[] = nodes && nodes.filter(n => n.id !== drawId).map(n => {
+        const posMap: IPosMap[] = nodes && nodes.filter(n => n.id !== drawId && !n.filterOverlap).map(n => {
             return {
                 T1: {
                     x: n.position.x,

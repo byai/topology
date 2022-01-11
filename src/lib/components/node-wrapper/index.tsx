@@ -31,6 +31,7 @@ export interface INodeWrapperProps {
     onMouseLeave?: () => void;
     readOnly?: boolean;
     canDrag?: boolean;
+    filterOverlap?: boolean;
     /** 是否孤立节点 */
     isolated?: boolean;
     connectDragSource?: DragElementWrapper<React.ReactNode>;

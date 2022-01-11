@@ -159,6 +159,12 @@ node options 中 一些可配置参数
         <td>false</td>
         <td>设置当前节点下的子节点是否需要联动拖动</td>
     </tr>
+    <tr>
+        <td>filterOverlap</td>
+        <td>boolean</td>
+        <td>false</td>
+        <td>控制节点在设置 overlap 为 true 时是否仍允许被覆盖</td>
+    </tr>
 </table>
 
 ### getInstance

@@ -48,6 +48,7 @@ export interface ITopologyNode {
     position?: IPosition;
     canDrag?: boolean; // 控制节点是否可拖拽
     dragChild?: boolean; // 设置当前节点下的子节点是否需要联动拖动
+    filterOverlap?: boolean; // 控制节点在设置 overlap 为 true 时是否仍允许被覆盖
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [prop: string]: any;
 }
