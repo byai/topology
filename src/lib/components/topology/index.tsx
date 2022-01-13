@@ -46,6 +46,7 @@ export interface ITopologyProps {
     showBar?: boolean; // 是否显示工具栏
     canConnectMultiLines?: boolean; // 控制一个锚点是否可以连接多条线
     overlap?: boolean; // 是否允许节点覆盖，默认允许，设置 true 时不允许
+    overlapCallback?: () => void; // overlap 回调
     autoLayout?: boolean; // 自动布局，当数据中没有position属性时将自动计算布局。
     customPostionHeight?: number; // 当设置 customPostionHeight 时，画布距离顶部 customPostionHeight
     lineColor?: {
@@ -1067,10 +1068,14 @@ export default DropTarget(
                             ...props.data,
                             nodes: [...props.data.nodes],
                         }, ChangeType.ADD_NODE);
+                        props.overlapCallback && props.overlapCallback();
                     };
                     break;
                 case NodeTypes.NORMAL_NODE:
-                    if(isOverlap((item as ITopologyNode).id, position)) return;
+                    if(isOverlap((item as ITopologyNode).id, position)) {
+                        props.overlapCallback && props.overlapCallback();
+                        return;
+                    };
                     component.handleNodeDraw((item as ITopologyNode).id, position, getChildPosMap());
                     break;
                 case NodeTypes.ANCHOR:
