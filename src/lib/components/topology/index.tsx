@@ -864,10 +864,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         if(!overlap) return false;
 
-        const getNodeOffsetPos = (pos: IPosition): IPosition => {
+        const getNodeOffsetPos = (position: IPosition, id: string): IPosition => {
             return {
-                x: pos.x + getNodeSize(drawId).width + overlapOffset.offsetX || 0,
-                y: pos.y+ getNodeSize(drawId).height + overlapOffset.offsetY || 0,
+                x: position.x + getNodeSize(id).width + overlapOffset.offsetX || 0,
+                y: position.y+ getNodeSize(id).height + overlapOffset.offsetY || 0,
             }
         }
 
@@ -875,14 +875,14 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             x: pos.x,
             y: pos.y
         }
-        const S2 = getNodeOffsetPos(pos);
+        const S2 = getNodeOffsetPos(pos, drawId);
         const posMap: IPosMap[] = nodes && nodes.filter(n => n.id !== drawId && !n.filterOverlap).map(n => {
             return {
                 T1: {
                     x: n.position.x,
                     y: n.position.y,
                 },
-                T2:  getNodeOffsetPos(n.position)
+                T2:  getNodeOffsetPos(n.position, n.id)
             }
         })
         const isOverlap = posMap.some((p: IPosMap) => !(S2.y < p.T1.y || S1.y > p.T2.y || S2.x < p.T1.x || S1.x > p.T2.x) === true);
