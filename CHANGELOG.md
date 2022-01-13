@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.7](https://github.com/byai/topology/compare/v1.1.6...v1.1.7) (2022-01-13)
+
+
+### Bug Fixes
+
+* fix getNodeOffsetPos function ([c13bd43](https://github.com/byai/topology/commit/c13bd43c24755ab77d6830d2e17f51624a2f320e))
+
 ### [1.1.6](https://github.com/byai/topology/compare/v1.1.5...v1.1.6) (2022-01-13)
 
 
