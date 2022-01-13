@@ -164,6 +164,10 @@ class Flow extends React.Component<{}, FlowState> {
                         customPostionHeight={20}
                         canConnectMultiLines={canConnectMultiLines}
                         overlap={overlap}
+                        overlapOffset={{
+                            offsetX: 30,
+                            offsetY: 30
+                        }}
                         getInstance={
                             // eslint-disable-next-line
                             (ins: any) => { this.topology = ins; }}

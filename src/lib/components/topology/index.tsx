@@ -47,6 +47,10 @@ export interface ITopologyProps {
     canConnectMultiLines?: boolean; // 控制一个锚点是否可以连接多条线
     overlap?: boolean; // 是否允许节点覆盖，默认允许，设置 true 时不允许
     overlapCallback?: () => void; // overlap 回调
+    overlapOffset?: {
+        offsetX?: number;
+        offsetY?: number;
+    };
     autoLayout?: boolean; // 自动布局，当数据中没有position属性时将自动计算布局。
     customPostionHeight?: number; // 当设置 customPostionHeight 时，画布距离顶部 customPostionHeight
     lineColor?: {
@@ -854,7 +858,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     validateIsOverlap = (drawId, pos): boolean => {
         const {
             data: { nodes },
-            overlap
+            overlap,
+            overlapOffset = {}
         } = this.props;
 
         if(!overlap) return false;
@@ -874,8 +879,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     y: n.position.y,
                 },
                 T2: {
-                    x: n.position.x + getNodeSize(n.id).width,
-                    y: n.position.y + getNodeSize(n.id).height,
+                    x: n.position.x + getNodeSize(n.id).width + overlapOffset.offsetX || 0,
+                    y: n.position.y + getNodeSize(n.id).height + overlapOffset.offsetY || 0,
                 },
             }
         })

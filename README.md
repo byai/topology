@@ -81,6 +81,18 @@ http://localhost:3000
             <td>是否允许节点覆盖，默认允许，设置 true 时不允许</td>
         </tr>
         <tr>
+            <td>overlapCallback</td>
+            <td>() => void</td>
+            <td></td>
+            <td>overlap 为 true 时的回调</td>
+        </tr>
+        <tr>
+            <td>overlapOffset</td>
+            <td>{}</td>
+            <td>{offsetX: 0, offsetY: 0}</td>
+            <td>overlap 为 true 时，节点的 x，y 偏移量</td>
+        </tr>
+        <tr>
             <td>customPostionHeight</td>
             <td>number</td>
             <td>0</td>
