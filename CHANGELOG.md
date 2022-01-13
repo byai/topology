@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.6](https://github.com/byai/topology/compare/v1.1.5...v1.1.6) (2022-01-13)
+
+
+### Bug Fixes
+
+* fix overlapOffset logic ([87a11c1](https://github.com/byai/topology/commit/87a11c18cefe30776380203dbda67c14a4f7842c))
+
 ### [1.1.5](https://github.com/byai/topology/compare/v1.1.5-beta22...v1.1.5) (2022-01-13)
 
 
