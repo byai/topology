@@ -56,6 +56,9 @@ export interface ITopologyProps {
     lineColor?: {
         [x: string]: string;
     }; // 线条颜色映射对象 eg: {'锚点1': '#82BEFF', '锚点2': '#FFA39E'}
+    lineTextColor?: {
+        [x: string]: string;
+    }; // 线条上文字颜色映射对象 eg: {'锚点1': '#82BEFF', '锚点2': '#FFA39E'}
     lineOffsetY?: number; // 线条起始点向上偏移量
     onChange?: (data: ITopologyData, type: ChangeType) => void;
     onSelect?: (data: ITopologyData) => void;
@@ -718,7 +721,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const {
             data: { lines, nodes },
             lineOffsetY,
-            readOnly
+            readOnly,
+            lineTextColor
         } = this.props;
         const { activeLine, selectedData, hoverCurrentNode } = this.state.context;
         const nodeHash = createHashFromObjectArray(nodes, "id") as {
@@ -766,18 +770,41 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     if (!start || !end) {
                         return null;
                     }
+
+                    const key = `${line.start}-${line.end}`;
+                    const anchorId = line.start.split("-")[1];
+
+                    const getTextXY = () => {
+                        const minX = Math.min(start.x, end.x);
+                        const minY = Math.min(start.y, end.y);
+                        const x = minX + Math.abs((start.x - end.x)/2);
+                        const y = minY + Math.abs((start.y - end.y)/2)
+                        return {
+                            x,
+                            y
+                        }
+                    }
+
                     return (
-                        <Line
-                            key={`${line.start}-${line.end}`}
-                            lineOffsetY={lineOffsetY}
-                            data={line}
-                            start={start}
-                            end={end}
-                            onSelect={this.selectLine}
-                            selected={isSelected(line)}
-                            highLight={isHighLight(line)}
-                            readOnly={readOnly}
-                        />
+                        <>
+                            {lineTextColor && (
+                                <text x={getTextXY().x} y={getTextXY().y} key={key} style={{
+                                    fill: lineTextColor[anchorId]
+                                }}>{anchorId}</text>
+                            )}
+                            <Line
+                                key={key}
+                                lineOffsetY={lineOffsetY}
+                                data={line}
+                                start={start}
+                                end={end}
+                                onSelect={this.selectLine}
+                                selected={isSelected(line)}
+                                highLight={isHighLight(line)}
+                                readOnly={readOnly}
+                            />
+                        </>
+
                     );
                 })}
                 {activeLine && activeLine.type === LineEditType.ADD && (
