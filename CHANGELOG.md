@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.9](https://github.com/byai/topology/compare/v1.1.8...v1.1.9) (2022-03-07)
+
+
+### Features
+
+* add startPointAnchorId api ([eadebd5](https://github.com/byai/topology/commit/eadebd5822c62202898e3b497b132520cd688133))
+
 ### [1.1.8](https://github.com/byai/topology/compare/v1.1.7...v1.1.8) (2022-02-28)
 
 
