@@ -769,7 +769,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         return (
             <svg className="topology-svg">
-                {lines.map(line => {
+                {lines.map((line, index) => {
                     const start = getLineStartPo(line);
                     const end = getLineEndPo(line);
                     if (!start || !end) {
@@ -792,7 +792,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     return (
                         <>
                             {lineTextColor && (
-                                <text x={getTextXY().x} y={getTextXY().y} key={key} style={{
+                                <text x={getTextXY().x} y={getTextXY().y} key={index} style={{
                                     fill: lineTextColor[anchorId]
                                 }}>{anchorId === startPointAnchorId ? null : anchorId}</text>
                             )}
