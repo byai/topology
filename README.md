@@ -68,6 +68,12 @@ http://localhost:3000
             <td>0</td>
             <td>线条起始点向上偏移量</td>
         </tr>
+         <tr>
+            <td>startPointAnchorId</td>
+            <td>string</td>
+            <td></td>
+            <td>保持所有线条起始点与 startPointAnchorId 线条一致</td>
+        </tr>
         <tr>
             <td>showBar</td>
             <td>bool</td>
