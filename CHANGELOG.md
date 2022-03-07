@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.10](https://github.com/byai/topology/compare/v1.1.9...v1.1.10) (2022-03-07)
+
+
+### Bug Fixes
+
+* modify lineText key ([888f6f0](https://github.com/byai/topology/commit/888f6f020c0701c415adb323efb599fcbc489401))
+
 ### [1.1.9](https://github.com/byai/topology/compare/v1.1.8...v1.1.9) (2022-03-07)
 
 
