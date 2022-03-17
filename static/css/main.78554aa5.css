@@ -173,5 +173,45 @@
   z-index: -1;
 }
 
+.topology {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.topology-templates {
+  padding: 10px;
+  padding-top: 0;
+}
+.topology-templates-item {
+  width: 80px;
+  text-align: center;
+  border: 1px solid lightgray;
+  border-radius: 3px;
+  margin-bottom: 20px;
+}
+.topology-templates-item:hover {
+  cursor: pointer;
+}
+.topology-node {
+  padding: 10px;
+}
+.topology-node .node-content {
+  margin-top: 10px;
+}
+.topology-node .flow-node-branches-wrapper {
+  display: flex;
+  min-width: 200px;
+  margin-top: 10px;
+  justify-content: space-around;
+}
+.topology-node .flow-node-branches-wrapper .flow-node-branch {
+  display: inline-block;
+  background: #cdcdec;
+  line-height: 22px;
+  padding: 0 5px;
+  margin-left: 10px;
+}
 
-/*# sourceMappingURL=main.7eafdfc6.css.map*/
+
+/*# sourceMappingURL=main.78554aa5.css.map*/
