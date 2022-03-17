@@ -1,7 +1,0 @@
-build/
-config/
-dist/
-*.js
-*.d.ts
-*.test.tsx
-react-app-env.d.ts
