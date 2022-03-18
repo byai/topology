@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.11](https://github.com/byai/topology/compare/v1.1.10...v1.1.11) (2022-03-18)
+
+
+### Features
+
+* add lineTextMap conf ([efe53ca](https://github.com/byai/topology/commit/efe53ca62d73da4e0b5524dec9bb65e0876f045d))
+
 ### [1.1.10](https://github.com/byai/topology/compare/v1.1.9...v1.1.10) (2022-03-07)
 
 
