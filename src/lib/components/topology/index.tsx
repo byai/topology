@@ -61,6 +61,9 @@ export interface ITopologyProps {
     }; // 线条上文字颜色映射对象 eg: {'锚点1': '#82BEFF', '锚点2': '#FFA39E'}
     lineOffsetY?: number; // 线条起始点向上偏移量
     startPointAnchorId?: string; // 保持所有线条起始点与 startPointAnchorId 线条一致
+    lineTextMap?: {
+        [x: string]: string; // 线条上文字与 anchorId 映射对象 eg: {'anchorId1': '锚点1', 'anchorId2': '锚点2'}
+    };
     onChange?: (data: ITopologyData, type: ChangeType) => void;
     onSelect?: (data: ITopologyData) => void;
     getInstance?: (instance: Topology) => void; // 返回组件实例，用于调用组件内部的方法。
@@ -722,6 +725,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const {
             data: { lines, nodes },
             startPointAnchorId,
+            lineTextMap,
             lineOffsetY,
             readOnly,
             lineTextColor
@@ -794,7 +798,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                             {lineTextColor && (
                                 <text x={getTextXY().x} y={getTextXY().y} key={index} style={{
                                     fill: lineTextColor[anchorId]
-                                }}>{anchorId === startPointAnchorId ? null : anchorId}</text>
+                                }}>{anchorId === startPointAnchorId ? null : lineTextMap[anchorId]}</text>
                             )}
                             <Line
                                 key={key}

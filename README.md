@@ -68,11 +68,17 @@ http://localhost:3000
             <td>0</td>
             <td>线条起始点向上偏移量</td>
         </tr>
-         <tr>
+        <tr>
             <td>startPointAnchorId</td>
             <td>string</td>
             <td></td>
             <td>保持所有线条起始点与 startPointAnchorId 线条一致</td>
+        </tr>
+        <tr>
+            <td>lineTextMap</td>
+            <td>object</td>
+            <td>{}</td>
+            <td>线条上文字与 anchorId 映射对象 eg: {'anchorId1': '锚点1', 'anchorId2': '锚点2'}</td>
         </tr>
         <tr>
             <td>showBar</td>
