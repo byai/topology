@@ -569,7 +569,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     };
 
     handleLineDraw = (startId: string) => {
-        const { data, lineColor = {} } = this.props;
+        const { data, lineColor } = this.props;
         const { lines } = this.props.data;
         const {
             context: { impactNode }
@@ -581,12 +581,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             // eslint-disable-next-line
             console.log("anchor", anchor);
             if (!alreadyExist) {
+                const colorMap = lineColor ? { color: lineColor[anchor] } : {};
                 this.onChange(
                     {
                         ...data,
                         lines: [
                             ...data.lines,
-                            { ...newLine, color: lineColor[anchor] }
+                            { ...newLine, ...colorMap }
                         ]
                     },
                     ChangeType.ADD_LINE
