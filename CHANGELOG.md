@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.12](https://github.com/byai/topology/compare/v1.1.11...v1.1.12) (2022-03-22)
+
+
+### Features
+
+* add lineLinkageHighlight conf ([c6d6c74](https://github.com/byai/topology/commit/c6d6c7496c50907bfd91f335a2734cb771f2cf03))
+
+
+### Bug Fixes
+
+* fix can't edit color line ([9235939](https://github.com/byai/topology/commit/9235939c393bf32c3d61741e3a64a57c5b1c4026))
+
 ### [1.1.11](https://github.com/byai/topology/compare/v1.1.10...v1.1.11) (2022-03-18)
 
 
