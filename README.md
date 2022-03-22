@@ -51,6 +51,12 @@ http://localhost:3000
             <td>数据</td>
         </tr>
         <tr>
+            <td>lineLinkageHighlight</td>
+            <td>boolean</td>
+            <td>false</td>
+            <td>hover 节点线条是否联动高亮</td>
+        </tr>
+        <tr>
             <td>lineColor</td>
             <td>object</td>
             <td>{}</td>

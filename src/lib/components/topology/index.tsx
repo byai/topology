@@ -53,6 +53,7 @@ export interface ITopologyProps {
     };
     autoLayout?: boolean; // 自动布局，当数据中没有position属性时将自动计算布局。
     customPostionHeight?: number; // 当设置 customPostionHeight 时，画布距离顶部 customPostionHeight
+    lineLinkageHighlight?: boolean; // hover 节点线条是否联动高亮
     lineColor?: {
         [x: string]: string;
     }; // 线条颜色映射对象 eg: {'锚点1': '#82BEFF', '锚点2': '#FFA39E'}
@@ -729,7 +730,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             lineTextMap,
             lineOffsetY,
             readOnly,
-            lineTextColor
+            lineTextColor,
+            lineLinkageHighlight
         } = this.props;
         const { activeLine, selectedData, hoverCurrentNode } = this.state.context;
         const nodeHash = createHashFromObjectArray(nodes, "id") as {
@@ -745,7 +747,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         // @ts-ignore
         const isHighLight = (line: ITopologyLine) => {
-            if(!hoverCurrentNode) return false;
+            if(!hoverCurrentNode || !lineLinkageHighlight) return false;
             const { id } = hoverCurrentNode;
             if(line.start.split("-")[0] === id || line.end === id) return true;
         }

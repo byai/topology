@@ -159,6 +159,7 @@ class Flow extends React.Component<{}, FlowState> {
                         onChange={this.onChange}
                         onSelect={this.handleSelect}
                         renderTreeNode={this.renderTreeNode}
+                        lineLinkageHighlight
                         readOnly={readonly}
                         showBar={showBar}
                         customPostionHeight={20}
