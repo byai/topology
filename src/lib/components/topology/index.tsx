@@ -887,6 +887,20 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         );
     };
 
+    handleDeselectAll = () => {
+        const { onSelect } = this.props;
+        this.setContext(
+            {
+                selectedData: { nodes: [], lines: [] }
+            },
+            () => {
+                if (onSelect) {
+                    onSelect(this.state.context.selectedData);
+                }
+            }
+        );
+    };
+
     /**
      * Check whether the drag node overlaps
      * @param drawId
