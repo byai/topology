@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.13](https://github.com/byai/topology/compare/v1.1.12...v1.1.13) (2022-04-07)
+
+
+### Features
+
+* add handleDeselectAll function ([849b222](https://github.com/byai/topology/commit/849b22259ad0ac8c86e3d31c1ec5a246a98bbb71))
+
 ### [1.1.12](https://github.com/byai/topology/compare/v1.1.11...v1.1.12) (2022-03-22)
 
 
