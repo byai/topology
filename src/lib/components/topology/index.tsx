@@ -65,6 +65,7 @@ export interface ITopologyProps {
     lineTextMap?: {
         [x: string]: string; // 线条上文字与 anchorId 映射对象 eg: {'anchorId1': '锚点1', 'anchorId2': '锚点2'}
     };
+    lineTextDecorator?: (text: React.ReactNode, line: ITopologyLine) => React.ReactNode;
     onChange?: (data: ITopologyData, type: ChangeType) => void;
     onSelect?: (data: ITopologyData) => void;
     getInstance?: (instance: Topology) => void; // 返回组件实例，用于调用组件内部的方法。
@@ -731,7 +732,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             lineOffsetY,
             readOnly,
             lineTextColor,
-            lineLinkageHighlight
+            lineLinkageHighlight,
+            lineTextDecorator
         } = this.props;
         const { activeLine, selectedData, hoverCurrentNode } = this.state.context;
         const nodeHash = createHashFromObjectArray(nodes, "id") as {
@@ -796,13 +798,16 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         }
                     }
 
+                    const textEl = lineTextColor && (
+                        <text x={getTextXY().x} y={getTextXY().y} key={index} style={{
+                            fill: lineTextColor[anchorId]
+                        }}>{anchorId === startPointAnchorId ? null : lineTextMap[anchorId]}</text>);
+
                     return (
                         <>
-                            {lineTextColor && (
-                                <text x={getTextXY().x} y={getTextXY().y} key={index} style={{
-                                    fill: lineTextColor[anchorId]
-                                }}>{anchorId === startPointAnchorId ? null : lineTextMap[anchorId]}</text>
-                            )}
+                            {
+                                lineTextDecorator ? lineTextDecorator(textEl, line) : textEl
+                            }
                             <Line
                                 key={key}
                                 lineOffsetY={lineOffsetY}

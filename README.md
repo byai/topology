@@ -87,6 +87,12 @@ http://localhost:3000
             <td>线条上文字与 anchorId 映射对象 eg: {'anchorId1': '锚点1', 'anchorId2': '锚点2'}</td>
         </tr>
         <tr>
+            <td>lineTextDecorator</td>
+            <td>(text: React.ReactNode, line: ITopologyLine)</td>
+            <td>-</td>
+            <td>线条上文字装饰器</td>
+        </tr>
+        <tr>
             <td>showBar</td>
             <td>bool</td>
             <td>true</td>
