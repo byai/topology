@@ -93,6 +93,12 @@ http://localhost:3000
             <td>线条上文字装饰器</td>
         </tr>
         <tr>
+            <td>showText</td>
+            <td>(start: string) => boolean</td>
+            <td>-</td>
+            <td>当 anchorId 为 startPointAnchorId 时， 是否显示线条文字</td>
+        </tr>
+        <tr>
             <td>showBar</td>
             <td>bool</td>
             <td>true</td>

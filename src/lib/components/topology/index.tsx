@@ -65,6 +65,7 @@ export interface ITopologyProps {
     lineTextMap?: {
         [x: string]: string; // 线条上文字与 anchorId 映射对象 eg: {'anchorId1': '锚点1', 'anchorId2': '锚点2'}
     };
+    showText?: (start: string) => boolean;
     lineTextDecorator?: (text: React.ReactNode, line: ITopologyLine) => React.ReactNode;
     onChange?: (data: ITopologyData, type: ChangeType) => void;
     onSelect?: (data: ITopologyData) => void;
@@ -733,7 +734,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             readOnly,
             lineTextColor,
             lineLinkageHighlight,
-            lineTextDecorator
+            lineTextDecorator,
+            showText
         } = this.props;
         const { activeLine, selectedData, hoverCurrentNode } = this.state.context;
         const nodeHash = createHashFromObjectArray(nodes, "id") as {
@@ -801,7 +803,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     const textEl = lineTextColor && (
                         <text x={getTextXY().x} y={getTextXY().y} key={index} style={{
                             fill: lineTextColor[anchorId]
-                        }}>{anchorId === startPointAnchorId ? null : lineTextMap[anchorId]}</text>);
+                        }}>{anchorId === startPointAnchorId && !showText(line.start.split("-")[0]) ? null : lineTextMap[anchorId]}</text>);
 
                     return (
                         <>
@@ -819,6 +821,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                                 highLight={isHighLight(line)}
                                 readOnly={readOnly}
                             />
+
                         </>
 
                     );
