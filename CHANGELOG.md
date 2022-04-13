@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.15](https://github.com/byai/topology/compare/v1.1.14...v1.1.15) (2022-04-13)
+
+
+### Features
+
+* add showText conf ([bb65305](https://github.com/byai/topology/commit/bb653052fc1aaa7d5a0cdb0cd46b17654998a8e0))
+
 ### [1.1.14](https://github.com/byai/topology/compare/v1.1.13...v1.1.14) (2022-04-13)
 
 
