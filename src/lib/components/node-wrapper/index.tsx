@@ -12,9 +12,9 @@ import {
 } from '../../declare';
 import './index.less';
 import { SelectMode } from '../../utils/selectNodes';
-import {
-    isMatchKeyValue
-} from '../../utils';
+// import {
+//     isMatchKeyValue
+// } from '../../utils';
 import config from '../../config';
 
 // @ts-ignore
@@ -195,7 +195,8 @@ export default DragSource(
     NodeTypes.NORMAL_NODE,
     {
         canDrag(props: INodeWrapperProps) {
-            const canDragNode = props.canDrag === false || isMatchKeyValue(props, 'canDrag', false);
+            // const canDragNode = props.canDrag === false || isMatchKeyValue(props, 'canDrag', false);
+            const canDragNode = props.canDrag === false || (props && props.data && props.data.extra && props.data.extra.canDrag === false);
             return canDragNode ? !canDragNode : (props.readOnly ? !props.readOnly: !canDragNode);
         },
         beginDrag(props: INodeWrapperProps) {

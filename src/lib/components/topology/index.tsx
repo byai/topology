@@ -31,8 +31,7 @@ import {
     computeContentPostionY,
     createHashFromObjectArray,
     getNodeSize,
-    shouldAutoLayout,
-    isMatchKeyValue
+    shouldAutoLayout
 } from '../../utils';
 // import layoutCalculation from '../../utils/layoutCalculation';
 import computeLayout from '../../utils/computeLayout';
@@ -1088,7 +1087,9 @@ export default DropTarget(
             const getChildPosMap = () => {
                 const { lines, nodes } = props.data;
                 const curNode = nodes.find(n => n.id === item.id);
-                const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
+                // const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
+                // TODO: 测试下 isMatchKeyValue 性能
+                const dragChild = curNode.dragChild || curNode && curNode.extra && curNode.extra.dragChild;
                 if(!dragChild) return null;
                 const childIds = lines.filter(n => n.start.split('-')[0] === item.id).map(n => n.end);
                 let childPosMap = {};
