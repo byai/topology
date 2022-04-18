@@ -42,6 +42,13 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     /** 锚点自增id */
     private increaseAnchorId: number = 0;
 
+    shouldComponentUpdate(nextprops) {
+        if (nextprops.data === this.props.data) {
+            return false;
+        }
+        return true;
+    }
+
     computeStyle = () => {
         const { data, isolated } = this.props;
         if (!data) {

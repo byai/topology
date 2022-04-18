@@ -580,8 +580,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             const newLine = { start: startId, end: impactNode };
             const alreadyExist = lines.find(item => _.isEqual(item, newLine));
             const anchor = startId.split("-")[1] || "";
-            // eslint-disable-next-line
-            console.log("anchor", anchor);
             if (!alreadyExist) {
                 const colorMap = lineColor ? { color: lineColor[anchor] } : {};
                 this.onChange(
