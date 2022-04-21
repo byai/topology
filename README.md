@@ -141,6 +141,12 @@ http://localhost:3000
             <td>只读模式，为true时不可编辑</td>
         </tr>
         <tr>
+            <td>isReduceRender</td>
+            <td>bool</td>
+            <td>false</td>
+            <td>控制节点 shouldComponentUpdate 生命周期的返回值</td>
+        </tr>
+        <tr>
             <td>autoLayout</td>
             <td>bool</td>
             <td>false</td>

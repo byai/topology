@@ -30,6 +30,7 @@ export interface INodeWrapperProps {
     onMouseEnter?: (node: ITopologyNode) => void;
     onMouseLeave?: () => void;
     readOnly?: boolean;
+    isReduceRender?: boolean;
     canDrag?: boolean;
     filterOverlap?: boolean;
     /** 是否孤立节点 */
@@ -43,9 +44,13 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     private increaseAnchorId: number = 0;
 
     shouldComponentUpdate(nextprops) {
-        if (nextprops.data === this.props.data) {
+        const { data: nextData, context: { selectedData: nextSelectedData }, isReduceRender } = nextprops;
+        const { data, context: { selectedData } } = this.props;
+
+        if (isReduceRender && nextData === data && nextSelectedData === selectedData) {
             return false;
         }
+
         return true;
     }
 

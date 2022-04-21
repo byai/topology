@@ -50,6 +50,7 @@ export interface ITopologyProps {
         offsetX?: number;
         offsetY?: number;
     };
+    isReduceRender?: boolean;
     autoLayout?: boolean; // 自动布局，当数据中没有position属性时将自动计算布局。
     customPostionHeight?: number; // 当设置 customPostionHeight 时，画布距离顶部 customPostionHeight
     lineLinkageHighlight?: boolean; // hover 节点线条是否联动高亮
@@ -643,7 +644,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const {
             data: { nodes, lines },
             renderTreeNode,
-            readOnly
+            readOnly,
+            isReduceRender
         } = this.props;
         const {
             scaleNum,
@@ -668,6 +670,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 scaleNum={scaleNum}
                 draggingId={draggingId}
                 setDraggingId={this.setDraggingId}
+                isReduceRender={isReduceRender}
                 readOnly={readOnly}
                 isolated={!lineHash[item.id]}
                 onSelect={this.selectNode}
