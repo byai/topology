@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.18](https://github.com/byai/topology/compare/v1.1.17...v1.1.18) (2022-04-21)
+
+
+### Features
+
+* perf optimize ([91a1504](https://github.com/byai/topology/commit/91a150471169d09261360aa6b3c0cb95cb70be68))
+
 ### [1.1.17](https://github.com/byai/topology/compare/v1.1.16...v1.1.17) (2022-04-18)
 
 ### [1.1.16](https://github.com/byai/topology/compare/v1.1.15...v1.1.16) (2022-04-14)
