@@ -88,7 +88,7 @@ http://localhost:3000
         </tr>
         <tr>
             <td>lineTextDecorator</td>
-            <td>(text: React.ReactNode, line: ITopologyLine)</td>
+            <td>(text: textPosition, line: ITopologyLine)</td>
             <td>-</td>
             <td>线条上文字装饰器</td>
         </tr>
