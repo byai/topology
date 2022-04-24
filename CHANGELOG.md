@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.19](https://github.com/byai/topology/compare/v1.1.18...v1.1.19) (2022-04-24)
+
+
+### Features
+
+* replace lineTextDecorator params ([20fb56d](https://github.com/byai/topology/commit/20fb56d54ba571b16eed551ed1eba1bf8a27ea50))
+
 ### [1.1.18](https://github.com/byai/topology/compare/v1.1.17...v1.1.18) (2022-04-21)
 
 
