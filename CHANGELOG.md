@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.20](https://github.com/byai/topology/compare/v1.1.19...v1.1.20) (2022-05-05)
+
+
+### Features
+
+* add data deps ([e77513f](https://github.com/byai/topology/commit/e77513f467345d85c51f15cea42874d828002e3c))
+* optimize render ([0ef8855](https://github.com/byai/topology/commit/0ef8855ca4edf66ce94a72f8bd4ba1fcd7587b3c))
+
 ### [1.1.19](https://github.com/byai/topology/compare/v1.1.18...v1.1.19) (2022-04-24)
 
 
