@@ -823,7 +823,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                                 readOnly={readOnly}
                             />
                             {
-                                lineTextDecorator ? <LineText lineTextDecorator={lineTextDecorator}  position={getTextXY()} line={line} /> : defaultTextEl
+                                lineTextDecorator ? <LineText data={this.props.data} lineTextDecorator={lineTextDecorator}  position={getTextXY()} line={line} /> : defaultTextEl
                             }
                         </>
 
