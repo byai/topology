@@ -7,6 +7,7 @@ import selectNodes, { SelectMode } from '../../utils/selectNodes';
 import { Provider, defaultContext } from '../context';
 import NodeWrapper from '../node-wrapper';
 import Line from '../line';
+import LineText from '../line/lineText';
 import {
     KeyCode,
     NodeTypes,
@@ -822,7 +823,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                                 readOnly={readOnly}
                             />
                             {
-                                lineTextDecorator ? lineTextDecorator(getTextXY(), line) : defaultTextEl
+                                lineTextDecorator ? <LineText lineTextDecorator={lineTextDecorator}  position={getTextXY()} line={line} /> : defaultTextEl
                             }
                         </>
 
