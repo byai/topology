@@ -43,11 +43,24 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     /** 锚点自增id */
     private increaseAnchorId: number = 0;
 
+    private updateNumber: number = 0;
+
     shouldComponentUpdate(nextprops) {
-        const { data: nextData, context: { selectedData: nextSelectedData }, isReduceRender } = nextprops;
+        const { data: nextData, context: { selectedData: nextSelectedData, impactNode: nextImpactNode }, isReduceRender } = nextprops;
         const { data, context: { selectedData, impactNode } } = this.props;
 
+        if (impactNode && impactNode === nextImpactNode) {
+            this.updateNumber += 1;
+        } else {
+            this.updateNumber = 0;
+        }
+
+        // 避免节点多次无用渲染
         if (isReduceRender && !impactNode && nextData === data && nextSelectedData === selectedData) {
+            return false;
+        }
+
+        if (this.updateNumber >= 2) {
             return false;
         }
 
