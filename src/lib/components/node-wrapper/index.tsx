@@ -45,9 +45,9 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
 
     shouldComponentUpdate(nextprops) {
         const { data: nextData, context: { selectedData: nextSelectedData }, isReduceRender } = nextprops;
-        const { data, context: { selectedData } } = this.props;
+        const { data, context: { selectedData, impactNode } } = this.props;
 
-        if (isReduceRender && nextData === data && nextSelectedData === selectedData) {
+        if (isReduceRender && !impactNode && nextData === data && nextSelectedData === selectedData) {
             return false;
         }
 
