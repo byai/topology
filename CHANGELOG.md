@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.21](https://github.com/byai/topology/compare/v1.1.20...v1.1.21) (2022-05-06)
+
+
+### Bug Fixes
+
+* node can render when impact ([d6888bd](https://github.com/byai/topology/commit/d6888bd8e122088af32a09b70093b31c6fda1b43))
+
 ### [1.1.20](https://github.com/byai/topology/compare/v1.1.19...v1.1.20) (2022-05-05)
 
 
