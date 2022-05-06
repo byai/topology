@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.22](https://github.com/byai/topology/compare/v1.1.21...v1.1.22) (2022-05-06)
+
+
+### Features
+
+* add updateNumber var ([3e30679](https://github.com/byai/topology/commit/3e30679d91f7be946a4ceca3c9760a7e0ac39507))
+
 ### [1.1.21](https://github.com/byai/topology/compare/v1.1.20...v1.1.21) (2022-05-06)
 
 
