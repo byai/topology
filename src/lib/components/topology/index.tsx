@@ -446,7 +446,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 activeLine.type === LineEditType.EDIT_START ? "end" : "start"
             ]
         );
-
         this.setContext({
             impactNode,
             activeLine: {
@@ -546,6 +545,24 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         }
     };
 
+    samePostionLinesLength = (curLine: ITopologyLine): number => {
+        const {
+            data: { lines },
+        } = this.props;
+        return lines.filter(item => item.start.split('-')[0] === curLine.start.split('-')[0] && item.end === curLine.end).length;
+    }
+
+    getLineRepeatIndex = (curLine): {
+        index?: number;
+    } => {
+        const {
+            startPointAnchorId,
+        } = this.props;
+        // 所有线条起始点与 startPointAnchorId 线条一致情况下，增加线条位置重复次数属性
+        const index = startPointAnchorId !== undefined && this.samePostionLinesLength(curLine) ? { index: this.samePostionLinesLength(curLine) } : {};
+        return index;
+    }
+
     handleMouseUp = () => {
         const {
             data: { lines },
@@ -556,11 +573,21 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         if (isLineEdit && impactNode && !readOnly) {
             const { type, origin } = activeLine!;
             if (type === LineEditType.EDIT_END) {
+                const editLine = { start: origin.start, end: impactNode };
+                const repeatIndex = this.getLineRepeatIndex(editLine);
+                const getNewline = (item: ITopologyLine) => {
+                    if (!this.samePostionLinesLength(editLine)) {
+                        // eslint-disable-next-line no-param-reassign
+                        delete item.index;
+                    }
+                    return { ...item, end: impactNode, ...repeatIndex };
+                };
+
                 this.onChange(
                     {
                         ...this.props.data,
                         lines: lines.map(item => (_.isEqual(item, origin!)
-                            ? { ...item, end: impactNode }
+                            ? getNewline(item)
                             : item))
                     },
                     ChangeType.EDIT_LINE
@@ -587,12 +614,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             const anchor = startId.split("-")[1] || "";
             if (!alreadyExist) {
                 const colorMap = lineColor ? { color: lineColor[anchor] } : {};
+                const repeatIndex = this.getLineRepeatIndex(newLine);
                 this.onChange(
                     {
                         ...data,
                         lines: [
                             ...data.lines,
-                            { ...newLine, ...colorMap }
+                            { ...newLine, ...colorMap, ...repeatIndex }
                         ]
                     },
                     ChangeType.ADD_LINE

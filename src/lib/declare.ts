@@ -57,6 +57,7 @@ export interface ITopologyLine {
     start: string;
     end: string;
     color?: string;
+    index?: number; // 线条重复次数
 }
 
 export interface ITopologyContext {
