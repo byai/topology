@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.23](https://github.com/byai/topology/compare/v1.1.22...v1.1.23) (2022-06-09)
+
+
+### Features
+
+* add line index attr ([b7bb2cb](https://github.com/byai/topology/commit/b7bb2cb461ebb7b93cb9e17286c071c07e26b916))
+
 ### [1.1.22](https://github.com/byai/topology/compare/v1.1.21...v1.1.22) (2022-05-06)
 
 
