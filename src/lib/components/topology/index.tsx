@@ -549,7 +549,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const {
             data: { lines },
         } = this.props;
-        return lines.filter(item => item.start.split('-')[0] === curLine.start.split('-')[0] && item.end === curLine.end).length;
+        return lines && lines.filter(item => item.start.split('-')[0] === curLine.start.split('-')[0] && item.end === curLine.end).length;
     }
 
     getLineRepeatIndex = (curLine): {
@@ -574,7 +574,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             const { type, origin } = activeLine!;
             if (type === LineEditType.EDIT_END) {
                 const editLine = { start: origin.start, end: impactNode };
-                const repeatIndex = this.getLineRepeatIndex(editLine);
+                const repeatIndex = this.getLineRepeatIndex(editLine) || {};
                 const getNewline = (item: ITopologyLine) => {
                     if (!this.samePostionLinesLength(editLine)) {
                         // eslint-disable-next-line no-param-reassign
@@ -614,7 +614,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             const anchor = startId.split("-")[1] || "";
             if (!alreadyExist) {
                 const colorMap = lineColor ? { color: lineColor[anchor] } : {};
-                const repeatIndex = this.getLineRepeatIndex(newLine);
+                const repeatIndex = this.getLineRepeatIndex(newLine) || {};
                 this.onChange(
                     {
                         ...data,
