@@ -215,10 +215,19 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         this.setDraggingId(null);
     };
 
+    resetScale = () => {
+        this.setState(() => {
+            this.scaleNum = 1;
+            return { scaleNum: 1 };
+        });
+        this.setDraggingId(null);
+    }
+
     scrollCanvasToCenter = () => {
         if (!this.$wrapper || !this.$canvas) {
             return;
         }
+        this.resetScale();
         const canvasSize = getNodeSize(this.$canvas);
         const wrapperSize = getNodeSize(this.$wrapper);
         const contentCenter = computeContentCenter(this.props.data.nodes);
@@ -245,6 +254,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         if (!this.$wrapper || !this.$canvas) {
             return;
         }
+        this.resetScale();
         const canvasSize = getNodeSize(this.$canvas);
         const wrapperSize = getNodeSize(this.$wrapper);
         const contentPosition = computeContentPostionY(this.props.data.nodes);
@@ -318,6 +328,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     autoLayout = () => {
         const { data, sortChildren } = this.props;
+        this.resetScale();
         this.onChange(
             {
                 ...data,
@@ -874,7 +885,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 <div
                     className="topology-tools-btn"
                     id="scroll-canvas-to-center"
-                    onClick={this.scrollCanvasToCenter}
+                    onClick={this.props.customPostionHeight ? this.scrollCanvasToPositionY : this.scrollCanvasToCenter}
                 >
                     <img
                         src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTYwMzI3NjY4NDk5IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjExMzciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj48L3N0eWxlPjwvZGVmcz48cGF0aCBkPSJNNTEzLjc5OTY0OSAyOTUuNzQyMjM4Yy0xMTguMTc2OTE5IDAtMjE0LjE1ODE3MiA5Ni4xODEyMTUtMjE0LjE1ODE3MyAyMTQuMTU4MTcyIDAgMTE4LjE3NjkxOSA5Ni4xODEyMTUgMjE0LjE1ODE3MiAyMTQuMTU4MTczIDIxNC4xNTgxNzIgMTE3Ljk3Njk1OCAwIDIxNC4xNTgxNzItOTUuNzgxMjkzIDIxNC4xNTgxNzItMjEzLjk1ODIxMXMtOTYuMTgxMjE1LTIxNC4zNTgxMzMtMjE0LjE1ODE3Mi0yMTQuMzU4MTMzeiBtMCAzNjcuMzI4MjU2Yy04NC4zODM1MTkgMC0xNTIuOTcwMTIzLTY4LjU4NjYwNC0xNTIuOTcwMTI0LTE1Mi45NzAxMjNzNjguNTg2NjA0LTE1Mi45NzAxMjMgMTUyLjk3MDEyNC0xNTIuOTcwMTIzIDE1Mi45NzAxMjMgNjguNTg2NjA0IDE1Mi45NzAxMjMgMTUyLjk3MDEyMy02OC41ODY2MDQgMTUyLjk3MDEyMy0xNTIuOTcwMTIzIDE1Mi45NzAxMjN6IiBmaWxsPSIjMzMzMzMzIiBwLWlkPSIxMTM4Ij48L3BhdGg+PHBhdGggZD0iTTk5MS4zMDYzODUgNDgwLjUwNjE1MUg5MTMuOTIxNWMtNy4xOTg1OTQtOTYuNTgxMTM2LTQ4LjE5MDU4OC0xODYuMzYzNjAxLTExNy4zNzcwNzUtMjU1LjU1MDA4OHMtMTU4Ljk2ODk1MS0xMTAuMTc4NDgxLTI1NS41NTAwODgtMTE3LjM3NzA3NVYzMC41OTQwMjVjMC0xNi43OTY3MTktMTMuNzk3MzA1LTMwLjU5NDAyNS0zMC41OTQwMjUtMzAuNTk0MDI1cy0zMC41OTQwMjUgMTMuNzk3MzA1LTMwLjU5NDAyNCAzMC41OTQwMjV2NzYuOTg0OTYzYy05Ni4zODExNzYgNy4xOTg1OTQtMTg2LjM2MzYwMSA0OC4xOTA1ODgtMjU1LjU1MDA4OCAxMTcuMzc3MDc1UzExNC4wNzc3MTkgMzgzLjcyNTA1NCAxMDYuODc5MTI1IDQ4MC41MDYxNTFIMzAuNjk0MDA1Yy0xNi43OTY3MTkgMC0zMC41OTQwMjUgMTMuNzk3MzA1LTMwLjU5NDAyNSAzMC41OTQwMjVzMTMuNzk3MzA1IDMwLjU5NDAyNSAzMC41OTQwMjUgMzAuNTk0MDI0aDc2LjE4NTEyYzcuMTk4NTk0IDk2LjU4MTEzNiA0OC4xOTA1ODggMTg2LjM2MzYwMSAxMTcuMzc3MDc1IDI1NS41NTAwODhzMTU4Ljk2ODk1MSAxMTAuMTc4NDgxIDI1NS41NTAwODggMTE3LjM3NzA3NXY3OC43ODQ2MTJjMCAxNi43OTY3MTkgMTMuNzk3MzA1IDMwLjU5NDAyNSAzMC41OTQwMjQgMzAuNTk0MDI1czMwLjU5NDAyNS0xMy43OTczMDUgMzAuNTk0MDI1LTMwLjU5NDAyNXYtNzguNzg0NjEyYzk2LjM4MTE3Ni03LjE5ODU5NCAxODYuMzYzNjAxLTQ4LjE5MDU4OCAyNTUuNTUwMDg4LTExNy4zNzcwNzVzMTEwLjE3ODQ4MS0xNTguOTY4OTUxIDExNy4zNzcwNzUtMjU1LjU1MDA4OGg3Ny4zODQ4ODVjMTYuNzk2NzE5IDAgMzAuNTk0MDI1LTEzLjc5NzMwNSAzMC41OTQwMjUtMzAuNTk0MDI0IDAtMTYuOTk2NjgtMTMuNzk3MzA1LTMwLjU5NDAyNS0zMC41OTQwMjUtMzAuNTk0MDI1ek03NTMuMTUyOSA3NTMuODUyNzYzYy02NC43ODczNDYgNjQuNzg3MzQ2LTE1MS4xNzA0NzUgMTAwLjU4MDM1NS0yNDIuNzUyNTg4IDEwMC41ODAzNTYtOTEuNzgyMDc0IDAtMTc3Ljk2NTI0MS0zNS43OTMwMDktMjQyLjc1MjU4Ny0xMDAuNTgwMzU2LTY0Ljc4NzM0Ni02NC43ODczNDYtMTAwLjU4MDM1NS0xNTEuMTcwNDc1LTEwMC41ODAzNTUtMjQyLjc1MjU4N3MzNS43OTMwMDktMTc3Ljk2NTI0MSAxMDAuNTgwMzU1LTI0Mi43NTI1ODhjNjQuNzg3MzQ2LTY0Ljc4NzM0NiAxNTEuMTcwNDc1LTEwMC41ODAzNTUgMjQyLjc1MjU4Ny0xMDAuNTgwMzU1IDkxLjc4MjA3NCAwIDE3Ny45NjUyNDEgMzUuNzkzMDA5IDI0Mi43NTI1ODggMTAwLjU4MDM1NSA2NC43ODczNDYgNjQuNzg3MzQ2IDEwMC41ODAzNTUgMTUxLjE3MDQ3NSAxMDAuNTgwMzU1IDI0Mi43NTI1ODhzLTM1LjU5MzA0OCAxNzcuOTY1MjQxLTEwMC41ODAzNTUgMjQyLjc1MjU4N3oiIGZpbGw9IiMzMzMzMzMiIHAtaWQ9IjExMzkiPjwvcGF0aD48L3N2Zz4="
