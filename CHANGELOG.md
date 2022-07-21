@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.26](https://github.com/byai/topology/compare/v1.1.25...v1.1.26) (2022-07-21)
+
+
+### Features
+
+* optimize preview node style and add add prevNodeStyle conf ([1100752](https://github.com/byai/topology/commit/1100752a424b4972152f6e65cde58a118e519ae3))
+
 ### [1.1.25](https://github.com/byai/topology/compare/v1.1.24...v1.1.25) (2022-07-20)
 
 
