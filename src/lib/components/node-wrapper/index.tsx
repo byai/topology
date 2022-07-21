@@ -12,9 +12,9 @@ import {
 } from '../../declare';
 import './index.less';
 import { SelectMode } from '../../utils/selectNodes';
-// import {
-//     isMatchKeyValue
-// } from '../../utils';
+import {
+    isMatchKeyValue
+} from '../../utils';
 import config from '../../config';
 
 // @ts-ignore
@@ -31,6 +31,11 @@ export interface INodeWrapperProps {
     onMouseLeave?: () => void;
     readOnly?: boolean;
     isReduceRender?: boolean;
+    prevNodeStyle?: {
+        // 暂时支持这两个属性
+        border?: string;
+        background?: string;
+    };
     canDrag?: boolean;
     filterOverlap?: boolean;
     /** 是否孤立节点 */
@@ -59,7 +64,6 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         if (isReduceRender && !impactNode && nextData === data && nextSelectedData === selectedData) {
             return false;
         }
-
         if (this.updateNumber >= 2) {
             return false;
         }
@@ -137,14 +141,14 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     getPreviewNodeStyle = () => {
         const { data, scaleNum, id, draggingId } = this.props;
         const realNodeDom = document.getElementById(`topology-node-${data && data.id}`);
-        if (!realNodeDom) return null;
+        if (!realNodeDom) return null
         const previewNodeWidth = scaleNum * realNodeDom.offsetWidth - 2; // border
         const previewNodeHeight = scaleNum * realNodeDom.offsetHeight - 2;
-        let previewStyle;
+        let previewStyle = {};
         // 放大模式下拖动中 previewNode 样式处理
         if (scaleNum > 1 && draggingId === id) {
             const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${draggingId}']`);
-            if (!draggingPreviewNode) return;
+            if (!draggingPreviewNode) return null;
             setTimeout(() => {
                 draggingPreviewNode.style.background = 'transparent';
                 draggingPreviewNode.style.border = 'none';
@@ -220,13 +224,32 @@ export default DragSource(
     NodeTypes.NORMAL_NODE,
     {
         canDrag(props: INodeWrapperProps) {
-            // const canDragNode = props.canDrag === false || isMatchKeyValue(props, 'canDrag', false);
-            const canDragNode = props.canDrag === false || (props && props.data && props.data.extra && props.data.extra.canDrag === false);
+            const canDragNode = props.canDrag === false || isMatchKeyValue(props, 'canDrag', false);
+            // const canDragNode = props.canDrag === false || (props && props.data && props.data.extra && props.data.extra.canDrag === false);
             return canDragNode ? !canDragNode : (props.readOnly ? !props.readOnly: !canDragNode);
         },
         beginDrag(props: INodeWrapperProps) {
-            const id = props.data ? props.data.id : null
+            const id = props.data ? props.data.id : null;
+            const { scaleNum, prevNodeStyle = {} } = props;
             props.setDraggingId(id);
+
+            // beginDrag 时机 处理预览节点样式问题
+            const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
+            if (!draggingPreviewNode) return null;
+            const realNodeDom = document.getElementById(`topology-node-${id}`);
+            if (!realNodeDom) return null;
+
+            const previewNodeWidth = scaleNum * realNodeDom.offsetWidth - 2; // border
+            const previewNodeHeight = scaleNum * realNodeDom.offsetHeight - 2;
+            draggingPreviewNode.style.background = prevNodeStyle.background || '#6f6fc7';
+            draggingPreviewNode.style.border = prevNodeStyle.border || '1px dashed #1F8CEC';
+            draggingPreviewNode.style.width = previewNodeWidth + 'px';
+            draggingPreviewNode.style.height = previewNodeHeight + 'px';
+            // 恢复
+            setTimeout(() => {
+                draggingPreviewNode.style.background = 'transparent';
+                draggingPreviewNode.style.border = 'none';
+            }, 0);
             return { id };
         },
         endDrag(props: INodeWrapperProps) {

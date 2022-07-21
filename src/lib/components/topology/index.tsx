@@ -32,7 +32,8 @@ import {
     computeContentPostionY,
     createHashFromObjectArray,
     getNodeSize,
-    shouldAutoLayout
+    shouldAutoLayout,
+    isMatchKeyValue
 } from '../../utils';
 // import layoutCalculation from '../../utils/layoutCalculation';
 import computeLayout from '../../utils/computeLayout';
@@ -50,6 +51,11 @@ export interface ITopologyProps {
     overlapOffset?: {
         offsetX?: number;
         offsetY?: number;
+    };
+    prevNodeStyle?: {
+        // 暂时支持这两个属性
+        border?: string;
+        background?: string;
     };
     isReduceRender?: boolean;
     autoLayout?: boolean; // 自动布局，当数据中没有position属性时将自动计算布局。
@@ -326,6 +332,15 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return impactNode ? impactNode.id : null;
     };
 
+    clearSelectData = () => {
+        this.setContext({ selectedData: { nodes: [], lines: [] } }, () => {
+            const { onSelect } = this.props;
+            if (onSelect) {
+                onSelect(this.state.context.selectedData);
+            }
+        });
+    }
+
     autoLayout = () => {
         const { data, sortChildren } = this.props;
         this.resetScale();
@@ -336,6 +351,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             },
             ChangeType.LAYOUT
         );
+        this.clearSelectData(); // refresh
     };
 
     initDomEvents = () => {
@@ -673,12 +689,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             if (e.ctrlKey || e.metaKey) {
                 return;
             }
-            this.setContext({ selectedData: { nodes: [], lines: [] } }, () => {
-                const { onSelect } = this.props;
-                if (onSelect) {
-                    onSelect(this.state.context.selectedData);
-                }
-            });
+            this.clearSelectData();
         }
         this.setDraggingId(null);
     };
@@ -688,7 +699,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             data: { nodes, lines },
             renderTreeNode,
             readOnly,
-            isReduceRender
+            isReduceRender,
+            prevNodeStyle,
         } = this.props;
         const {
             scaleNum,
@@ -715,6 +727,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 setDraggingId={this.setDraggingId}
                 isReduceRender={isReduceRender}
                 readOnly={readOnly}
+                prevNodeStyle={prevNodeStyle}
                 isolated={!lineHash[item.id]}
                 onSelect={this.selectNode}
             >
@@ -1130,9 +1143,9 @@ export default DropTarget(
             const getChildPosMap = () => {
                 const { lines, nodes } = props.data;
                 const curNode = nodes.find(n => n.id === item.id);
-                // const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
-                // TODO: 测试下 isMatchKeyValue 性能
-                const dragChild = curNode.dragChild || curNode && curNode.extra && curNode.extra.dragChild;
+                const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
+                // // TODO: 测试下 isMatchKeyValue 性能
+                // const dragChild = curNode.dragChild || curNode && curNode.extra && curNode.extra.dragChild;
                 if(!dragChild) return null;
                 const childIds = lines.filter(n => n.start.split('-')[0] === item.id).map(n => n.end);
                 let childPosMap = {};

@@ -141,6 +141,12 @@ http://localhost:3000
             <td>只读模式，为true时不可编辑</td>
         </tr>
         <tr>
+            <td>prevNodeStyle</td>
+            <td>object</td>
+            <td>-</td>
+            <td>控制预览节点样式，目前支持配置 border、background 属性</td>
+        </tr>
+        <tr>
             <td>isReduceRender</td>
             <td>bool</td>
             <td>false</td>

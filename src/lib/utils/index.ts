@@ -11,7 +11,11 @@ export const shouldAutoLayout = (nodes: ITopologyNode[]) => {
     return !nodes.find(item => !!item.position);
 };
 
-/** 获取相对画布的坐标 */
+/**
+ * 获取相对画布的坐标
+ * TODO: 缩放 scale 之后 position 计算有问题，暂时没有想到可以绕过去的方法
+ * https://github.com/react-dnd/react-dnd/issues/1730
+ */
 export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) => {
     // 当窗口有滚动时，需加上窗口的滚动
     const rect = $wrapper.getBoundingClientRect();
