@@ -470,7 +470,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const impactNode = this.impactCheck(
             clientPo,
             activeLine![
-                activeLine.type === LineEditType.EDIT_START ? "end" : "start"
+            activeLine.type === LineEditType.EDIT_START ? "end" : "start"
             ]
         );
         this.setContext({
@@ -556,7 +556,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const { activeLine } = this.state.context;
         // @ts-ignore
         const isEditingLine = activeLine
-        // @ts-ignore
+            // @ts-ignore
             && [LineEditType.EDIT_START, LineEditType.EDIT_END].includes(
                 activeLine.type
             );
@@ -566,9 +566,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         }
         if (isDraggingCanvas) {
             this.dragCanvas(e.clientX, e.clientY);
-        }
-        if (isEditingLine && !this.props.readOnly) {
-            this.editLine(e.clientX, e.clientY);
         }
     };
 
@@ -807,9 +804,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         // @ts-ignore
         const isHighLight = (line: ITopologyLine) => {
-            if(!hoverCurrentNode || !lineLinkageHighlight) return false;
+            if (!hoverCurrentNode || !lineLinkageHighlight) return false;
             const { id } = hoverCurrentNode;
-            if(line.start.split("-")[0] === id || line.end === id) return true;
+            if (line.start.split("-")[0] === id || line.end === id) return true;
         }
 
         const getLineStartPo = (line: ITopologyLine) => {
@@ -823,7 +820,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             // 这里特殊处理下，目的是保持所有锚点的起始点位置与 startPointAnchorId 锚点位置一致
             return computeAnchorPo(
                 // `dom-map-${line.start}`,
-               `dom-map-${startPointAnchorId === undefined ? line.start : `${line.start.split("-")[0]}-${startPointAnchorId}`}`,
+                `dom-map-${startPointAnchorId === undefined ? line.start : `${line.start.split("-")[0]}-${startPointAnchorId}`}`,
                 nodeHash[line.start.split("-")[0]]
             );
         };
@@ -848,8 +845,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     const getTextXY = () => {
                         const minX = Math.min(start.x, end.x);
                         const minY = Math.min(start.y, end.y);
-                        const x = minX + Math.abs((start.x - end.x)/2);
-                        const y = minY + Math.abs((start.y - end.y)/2)
+                        const x = minX + Math.abs((start.x - end.x) / 2);
+                        const y = minY + Math.abs((start.y - end.y) / 2)
                         return {
                             x,
                             y
@@ -861,9 +858,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                             fill: lineTextColor[anchorId]
                         }}>{anchorId === startPointAnchorId && !showText(line.start.split("-")[0]) ? null : lineTextMap[anchorId]}</text>);
 
+
                     return (
                         <>
                             <Line
+                                scaleNum={this.state.scaleNum}
                                 key={key}
                                 lineOffsetY={lineOffsetY}
                                 data={line}
@@ -875,14 +874,15 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                                 readOnly={readOnly}
                             />
                             {
-                                lineTextDecorator ? <LineText data={this.props.data} lineTextDecorator={lineTextDecorator}  position={getTextXY()} line={line} /> : defaultTextEl
+                                lineTextDecorator ? <LineText data={this.props.data} lineTextDecorator={lineTextDecorator} position={getTextXY()} line={line} /> : defaultTextEl
                             }
                         </>
 
                     );
                 })}
+                {/* 拖动效果的线条 */}
                 {activeLine && activeLine.type === LineEditType.ADD && (
-                    <Line {...activeLine} />
+                    <Line {...activeLine} scaleNum={this.state.scaleNum} />
                 )}
             </svg>
         );
@@ -977,12 +977,12 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             overlapOffset = {}
         } = this.props;
 
-        if(!overlap) return false;
+        if (!overlap) return false;
 
         const getNodeOffsetPos = (position: IPosition, id: string): IPosition => {
             return {
                 x: position.x + getNodeSize(id).width + overlapOffset.offsetX || 0,
-                y: position.y+ getNodeSize(id).height + overlapOffset.offsetY || 0,
+                y: position.y + getNodeSize(id).height + overlapOffset.offsetY || 0,
             }
         }
 
@@ -997,7 +997,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     x: n.position.x,
                     y: n.position.y,
                 },
-                T2:  getNodeOffsetPos(n.position, n.id)
+                T2: getNodeOffsetPos(n.position, n.id)
             }
         })
         const isOverlap = posMap.some((p: IPosMap) => !(S2.y < p.T1.y || S1.y > p.T2.y || S2.x < p.T1.x || S1.x > p.T2.x) === true);
@@ -1069,7 +1069,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
                     component.$wrapper
                 );
                 if (!startPo || !endPo) {
-                     return;
+                    return;
                 }
                 const impactNode = component.impactCheck(endPo, startPo, id);
                 component.setContext({
@@ -1130,9 +1130,9 @@ export default DropTarget(
                 /**
                  * TODO： scaleNum 缩放与窗口滚动时有冲突, isChild 为子节点联动时使用 scalePosition 定位
                  */
-                 const position = component.scaleNum === 1 ? (
-                     isChild ? scalePosition : scrollPosition
-                 ) : scalePosition
+                const position = component.scaleNum === 1 ? (
+                    isChild ? scalePosition : scrollPosition
+                ) : scalePosition
                 return position;
             }
 
@@ -1146,12 +1146,12 @@ export default DropTarget(
                 const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
                 // // TODO: 测试下 isMatchKeyValue 性能
                 // const dragChild = curNode.dragChild || curNode && curNode.extra && curNode.extra.dragChild;
-                if(!dragChild) return null;
+                if (!dragChild) return null;
                 const childIds = lines.filter(n => n.start.split('-')[0] === item.id).map(n => n.end);
                 let childPosMap = {};
                 for (let childId of childIds) {
                     let childNodeDom: HTMLElement = document.getElementById(`topology-node-${childId}`);
-                    if(!childNodeDom) return null;
+                    if (!childNodeDom) return null;
                     childPosMap[childId] = getNodePosition(childNodeDom, true);
                 }
                 return childPosMap;
@@ -1186,8 +1186,8 @@ export default DropTarget(
                         nodes: [...props.data.nodes, { ...item.data, position }],
                     }, ChangeType.ADD_NODE);
 
-                    if(isOverlap(item.data.id, position)) {
-                         component.onChange({
+                    if (isOverlap(item.data.id, position)) {
+                        component.onChange({
                             ...props.data,
                             nodes: [...props.data.nodes],
                         }, ChangeType.ADD_NODE);
@@ -1195,7 +1195,7 @@ export default DropTarget(
                     };
                     break;
                 case NodeTypes.NORMAL_NODE:
-                    if(isOverlap((item as ITopologyNode).id, position)) {
+                    if (isOverlap((item as ITopologyNode).id, position)) {
                         props.overlapCallback && props.overlapCallback();
                         return;
                     };
