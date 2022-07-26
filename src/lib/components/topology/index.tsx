@@ -1008,7 +1008,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const { connectDropTarget, showBar } = this.props;
         const { context, scaleNum } = this.state;
         return connectDropTarget!(
-            <div className="byai-topology">
+            <div className="byai-topology" onClick={(e) => {
+                console.log(e.clientX, e.clientY);
+            }}>
                 <div
                     ref={r => {
                         this.$wrapper = r;
@@ -1052,6 +1054,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
     if (!monitor.getItem()) {
         return;
     }
+
     const { context } = component.state;
     const clientOffset = monitor.getClientOffset();
     const { id, type } = monitor.getItem();
@@ -1068,6 +1071,8 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
                     clientOffset,
                     component.$wrapper
                 );
+                // end: endPo
+                console.log('end: endPo:---', endPo);
                 if (!startPo || !endPo) {
                     return;
                 }

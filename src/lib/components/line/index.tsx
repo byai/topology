@@ -89,12 +89,19 @@ class Line extends React.Component<ILineProps, ILineState> {
             data,
             readOnly,
             context,
+            scaleNum
         } = this.props;
 
 
-        end.x = end.x - 50
-        end.y = end.y - 40
+        end.x = end.x
+        end.y = end.y
 
+        if(end.x !== 410){
+            console.log('line:', end.x, end.y);
+        }
+
+        // 422 572 没对齐
+        // 497 677 对齐 对齐
 
         const { hover } = this.state;
         const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';
@@ -114,6 +121,7 @@ class Line extends React.Component<ILineProps, ILineState> {
                     onMouseEnter={this.handleMouseEnter}
                     onMouseLeave={this.handleMouseLeave}
                 />
+                {/* 线 ～ */}
                 <path
                     onClick={this.handleClick}
                     strokeWidth={config.line.strokeWidth}
@@ -124,6 +132,7 @@ class Line extends React.Component<ILineProps, ILineState> {
                     onMouseEnter={this.handleMouseEnter}
                     onMouseLeave={this.handleMouseLeave}
                 />
+                {/* 结尾的三角点 ▶️ */}
                 <path
                     className={readOnly ? '' : 'byai-topology-line-end-triangle'}
                     fill={color}

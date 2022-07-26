@@ -8,9 +8,9 @@ const config = {
     },
     canvas: {
         /** 画布宽度 */
-        width: 40000,
+        width: 612,
         /** 画布高度 */
-        height: 40000,
+        height: 800,
     },
     line: {
         /** 线条宽度 */

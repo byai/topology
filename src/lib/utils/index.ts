@@ -19,10 +19,20 @@ export const shouldAutoLayout = (nodes: ITopologyNode[]) => {
 export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) => {
     // 当窗口有滚动时，需加上窗口的滚动
     const rect = $wrapper.getBoundingClientRect();
-    return {
-        x: position.x + $wrapper.scrollLeft + window.pageXOffset - rect.left,
-        y: position.y + $wrapper.scrollTop + window.pageYOffset - rect.top,
+    const canvas = document.querySelector('.topology-canvas');
+    const { width, height } = canvas.getBoundingClientRect();
+    // 缩放后画布的中心点
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // console.log(centerX, centerY, 'cneter', position.x, position.y);
+    // // console.log($wrapper);
+    // // console.log($wrapper.scrollLeft, window.pageXOffset, rect.left);
+    const po = {
+        x: (position.x - centerX) / (1 - 0.8) + $wrapper.scrollLeft + window.pageXOffset - rect.left,
+        y: (position.y - centerY) / (1 - 0.8) + $wrapper.scrollTop + window.pageYOffset - rect.top,
     } as IPosition;
+    return po;
 };
 
 /** 计算连接线路径 */

@@ -28,8 +28,8 @@ class Flow extends React.Component<{}, FlowState> {
                     content: '这是一个窄节点',
                     branches: ['锚点1'],
                     position: {
-                        x: 19726.906692504883,
-                        y: 19512.21832561493,
+                        x: 0,
+                        y: 0,
                     },
                     filterOverlap: true
                 },
@@ -39,15 +39,15 @@ class Flow extends React.Component<{}, FlowState> {
                     content: '这是一个宽节点',
                     branches: ['锚点1', '锚点2', '锚点3'],
                     position: {
-                        x: 19629.79557800293,
-                        y: 19696.197512626648,
+                        x: 300,
+                        y: 300,
                     },
                     extra: {
                         dragChild: true,
                         canDrag: false,
                     },
                     // canDrag: false,
-                },
+                }
             ],
         },
         readonly: false,
@@ -109,6 +109,29 @@ class Flow extends React.Component<{}, FlowState> {
         };
         return (
             <div className="topology">
+                <div style={{ width: '100%', height: 800 }}>
+                    <Topology
+                        data={data}
+                        autoLayout
+                        lineColor={mockLineColor}
+                        onChange={this.onChange}
+                        onSelect={this.handleSelect}
+                        renderTreeNode={this.renderTreeNode}
+                        lineLinkageHighlight
+                        readOnly={readonly}
+                        showBar={showBar}
+                        customPostionHeight={20}
+                        canConnectMultiLines={canConnectMultiLines}
+                        overlap={overlap}
+                        overlapOffset={{
+                            offsetX: 30,
+                            offsetY: 30
+                        }}
+                        getInstance={
+                            // eslint-disable-next-line
+                            (ins: any) => { this.topology = ins; }}
+                    />
+                </div>
                 <div className="topology-templates">
                     <button
                         onClick={() => this.setState({ readonly: !readonly })}
@@ -153,29 +176,6 @@ class Flow extends React.Component<{}, FlowState> {
                     <TemplateWrapper generator={() => this.generatorNodeData(false)}>
                         <div className="topology-templates-item">窄节点</div>
                     </TemplateWrapper>
-                </div>
-                <div style={{ width: '100%', height: 800 }}>
-                    <Topology
-                        data={data}
-                        autoLayout
-                        lineColor={mockLineColor}
-                        onChange={this.onChange}
-                        onSelect={this.handleSelect}
-                        renderTreeNode={this.renderTreeNode}
-                        lineLinkageHighlight
-                        readOnly={readonly}
-                        showBar={showBar}
-                        customPostionHeight={20}
-                        canConnectMultiLines={canConnectMultiLines}
-                        overlap={overlap}
-                        overlapOffset={{
-                            offsetX: 30,
-                            offsetY: 30
-                        }}
-                        getInstance={
-                            // eslint-disable-next-line
-                            (ins: any) => { this.topology = ins; }}
-                    />
                 </div>
             </div>
         );
