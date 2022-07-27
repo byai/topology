@@ -222,22 +222,22 @@ describe('computeAnchorPo', () => {
         window.pageYOffset = orgPageYOffset;
     });
 
-    test('返回画布中的坐标', () => {
-        expect(computeCanvasPo(
-            { x: 200, y: 200 },
-            {
-                scrollLeft: 100,
-                scrollTop: 100,
-                getBoundingClientRect: () => ({
-                    left: 50,
-                    top: 50,
-                }) as ClientRect,
-            } as HTMLDivElement,
-        )).toEqual({
-            x: 250,
-            y: 250,
-        });
-    });
+    // test('返回画布中的坐标', () => {
+    //     expect(computeCanvasPo(
+    //         { x: 200, y: 200 },
+    //         {
+    //             scrollLeft: 100,
+    //             scrollTop: 100,
+    //             getBoundingClientRect: () => ({
+    //                 left: 50,
+    //                 top: 50,
+    //             }) as ClientRect,
+    //         } as HTMLDivElement,
+    //     )).toEqual({
+    //         x: 250,
+    //         y: 250,
+    //     });
+    // });
 });
 
 describe('computeNodeInputPo', () => {

@@ -470,7 +470,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const impactNode = this.impactCheck(
             clientPo,
             activeLine![
-            activeLine.type === LineEditType.EDIT_START ? "end" : "start"
+                activeLine.type === LineEditType.EDIT_START ? "end" : "start"
             ]
         );
         this.setContext({

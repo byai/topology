@@ -17,11 +17,12 @@ exports[`topology basic render 1`] = `
           <div
             class="byai-topology-node-wrapper"
             id="topology-node-1"
-            style="position: absolute; left: 0px; top: 0px; transition: .2s; z-index: 999;"
+            style="position: absolute; left: 20000px; top: 20000px; transition: .2s; z-index: 999;"
           >
             <div
               class="topology-node-preview"
               data-id="1"
+              style="width: -2px; height: -2px;"
             />
             <div
               class="topology-node-content"

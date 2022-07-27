@@ -14,6 +14,7 @@ import './index.less';
 
 
 const Colors = { ACTIVE: '#1F8CEC', NORMAL: '#AAB7C4' };
+
 interface ILineProps {
     start: IPosition;
     end: IPosition;
@@ -23,7 +24,9 @@ interface ILineProps {
     context?: ITopologyContext;
     selected?: boolean;
     onSelect?: (data: ITopologyData) => void;
-    scaleNum: number;
+    scaleNum?: number;
+    lineOffsetY?: number;
+    highLight?: boolean;
 }
 
 interface ILineState {
