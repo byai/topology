@@ -69,18 +69,6 @@ class Line extends React.Component<ILineProps, ILineState> {
         });
     }
 
-    computeScaleNum = (scaleNum: number, end: IPosition): IPosition => {
-        const { width, height } = config.canvas;
-        const deviationX = (width - width * scaleNum) / 2;
-        const deviationY = (height - height * scaleNum) / 2;
-
-        return {
-            x: end.x - 140,
-            y: end.y - 40,
-        };
-
-    }
-
     render() {
         const {
             start,
@@ -89,19 +77,7 @@ class Line extends React.Component<ILineProps, ILineState> {
             data,
             readOnly,
             context,
-            scaleNum
         } = this.props;
-
-
-        end.x = end.x
-        end.y = end.y
-
-        if(end.x !== 410){
-            console.log('line:', end.x, end.y);
-        }
-
-        // 422 572 没对齐
-        // 497 677 对齐 对齐
 
         const { hover } = this.state;
         const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';

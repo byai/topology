@@ -1071,8 +1071,6 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
                     clientOffset,
                     component.$wrapper
                 );
-                // end: endPo
-                console.log('end: endPo:---', endPo);
                 if (!startPo || !endPo) {
                     return;
                 }

@@ -15,25 +15,28 @@ export const shouldAutoLayout = (nodes: ITopologyNode[]) => {
  * 获取相对画布的坐标
  * TODO: 缩放 scale 之后 position 计算有问题，暂时没有想到可以绕过去的方法
  * https://github.com/react-dnd/react-dnd/issues/1730
+ * fix：核心逻辑，缩放后以 1 的比例去思考
+ * 计算公式：找到中心点的位置 +（鼠标位置 - 中心点的距离) / 缩放）+（一些 dom 的偏离）/ 缩放
  */
 export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) => {
     // 当窗口有滚动时，需加上窗口的滚动
     const rect = $wrapper.getBoundingClientRect();
+    // 缩放的容器
     const canvas = document.querySelector('.topology-canvas');
+    // 可以获取到 svg 的宽高
     const { width, height } = canvas.getBoundingClientRect();
-    // 缩放后画布的中心点
-    const centerX = width / 2;
-    const centerY = height / 2;
+    const zoom = parseInt(document.querySelector('.topology-tools-percent').innerHTML) / 100;
+    // 缩放后画布的中心点,还是需要用缩放前的比例计算中心点
+    const centerX = width / zoom / 2;
+    const centerY = height / zoom / 2;
 
-    // console.log(centerX, centerY, 'cneter', position.x, position.y);
-    // // console.log($wrapper);
-    // // console.log($wrapper.scrollLeft, window.pageXOffset, rect.left);
     const po = {
-        x: (position.x - centerX) / (1 - 0.8) + $wrapper.scrollLeft + window.pageXOffset - rect.left,
-        y: (position.y - centerY) / (1 - 0.8) + $wrapper.scrollTop + window.pageYOffset - rect.top,
+        x: centerX + (position.x - centerX) / zoom + ($wrapper.scrollLeft + window.pageXOffset - rect.left) / zoom,
+        y: centerY + (position.y - centerY) / zoom + ($wrapper.scrollTop + window.pageYOffset - rect.top) / zoom,
     } as IPosition;
     return po;
 };
+
 
 /** 计算连接线路径 */
 export const computeLinePath = (start: IPosition, end: IPosition, lineOffsetY: number = 0)/* istanbul ignore next */ => {

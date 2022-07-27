@@ -28,8 +28,8 @@ class Flow extends React.Component<{}, FlowState> {
                     content: '这是一个窄节点',
                     branches: ['锚点1'],
                     position: {
-                        x: 0,
-                        y: 0,
+                        x: 19726.906692504883,
+                        y: 19512.21832561493,
                     },
                     filterOverlap: true
                 },
@@ -39,15 +39,11 @@ class Flow extends React.Component<{}, FlowState> {
                     content: '这是一个宽节点',
                     branches: ['锚点1', '锚点2', '锚点3'],
                     position: {
-                        x: 300,
-                        y: 300,
+                        x: 19629.79557800293,
+                        y: 19696.197512626648,
                     },
-                    extra: {
-                        dragChild: true,
-                        canDrag: false,
-                    },
-                    // canDrag: false,
-                }
+                    canDrag: false,
+                },
             ],
         },
         readonly: false,
