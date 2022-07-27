@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.27](https://github.com/byai/topology/compare/v1.1.26...v1.1.27) (2022-07-27)
+
+
+### Features
+
+* 修复缩放连线终点偏移问题 ([9042030](https://github.com/byai/topology/commit/9042030161203dac8e6803ab70745d5861eaf210))
+* 测试缩放后的位置 ([bd3af25](https://github.com/byai/topology/commit/bd3af25f82c50ebb1a973ca38a28161465ea68b8))
+* 调试缩放拖拽 ([ac64ccd](https://github.com/byai/topology/commit/ac64ccd11f071480182e16af56e829d88283a971))
+
 ### [1.1.26](https://github.com/byai/topology/compare/v1.1.25...v1.1.26) (2022-07-21)
 
 
