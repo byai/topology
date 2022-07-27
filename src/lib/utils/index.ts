@@ -25,6 +25,7 @@ export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) =
     const canvas = document.querySelector('.topology-canvas');
     // 可以获取到 svg 的宽高
     const { width, height } = canvas.getBoundingClientRect();
+    // eslint-disable-next-line radix
     const zoom = parseInt(document.querySelector('.topology-tools-percent').innerHTML) / 100;
     // 缩放后画布的中心点,还是需要用缩放前的比例计算中心点
     const centerX = width / zoom / 2;
