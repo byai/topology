@@ -10,7 +10,7 @@ import {
     computeMouseClientToCanvas,
     computeContentCenter,
     computeAnchorPo,
-    computeCanvasPo,
+    // computeCanvasPo,
     computeNodeInputPo,
 } from '..';
 

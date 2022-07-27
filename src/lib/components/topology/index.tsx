@@ -567,6 +567,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         if (isDraggingCanvas) {
             this.dragCanvas(e.clientX, e.clientY);
         }
+        if (isEditingLine && !this.props.readOnly) {
+            this.editLine(e.clientX, e.clientY);
+        }
     };
 
     samePostionLinesLength = (curLine: ITopologyLine): number => {
@@ -1008,9 +1011,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const { connectDropTarget, showBar } = this.props;
         const { context, scaleNum } = this.state;
         return connectDropTarget!(
-            <div className="byai-topology" onClick={(e) => {
-                console.log(e.clientX, e.clientY);
-            }}>
+            <div className="byai-topology">
                 <div
                     ref={r => {
                         this.$wrapper = r;
@@ -1147,8 +1148,6 @@ export default DropTarget(
                 const { lines, nodes } = props.data;
                 const curNode = nodes.find(n => n.id === item.id);
                 const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
-                // // TODO: 测试下 isMatchKeyValue 性能
-                // const dragChild = curNode.dragChild || curNode && curNode.extra && curNode.extra.dragChild;
                 if (!dragChild) return null;
                 const childIds = lines.filter(n => n.start.split('-')[0] === item.id).map(n => n.end);
                 let childPosMap = {};

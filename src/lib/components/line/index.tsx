@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props */
 import React from 'react';
 import _ from 'lodash';
 import {
@@ -18,15 +19,16 @@ const Colors = { ACTIVE: '#1F8CEC', NORMAL: '#AAB7C4' };
 interface ILineProps {
     start: IPosition;
     end: IPosition;
+    color?: string;
+    lineOffsetY?: number;
     data?: ITopologyLine;
     arrow?: boolean;
     readOnly?: boolean;
     context?: ITopologyContext;
     selected?: boolean;
+    highLight?: boolean;
     onSelect?: (data: ITopologyData) => void;
     scaleNum?: number;
-    lineOffsetY?: number;
-    highLight?: boolean;
 }
 
 interface ILineState {
@@ -77,17 +79,20 @@ class Line extends React.Component<ILineProps, ILineState> {
             start,
             end,
             selected,
+            highLight,
             data,
             readOnly,
-            context,
+            lineOffsetY,
+            context: { linking, activeLine },
         } = this.props;
 
         const { hover } = this.state;
         const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';
         const getTriangleStart = () => ({ ...end, y: end.y - config.line.triangleWidth });
-        const color = selected || hover ? Colors.ACTIVE : Colors.NORMAL;
-        const transition = context.linking ? 'none' : config.transition;
-
+        // 只高亮新增或者编辑的当前线
+        const curLinking = linking && !activeLine.origin && !data;
+        const lColor = highLight || selected || hover || curLinking ? Colors.ACTIVE : ((data && data.color) || Colors.NORMAL);
+        const transition = linking ? 'none' : config.transition;
         return (
             <React.Fragment>
                 <path
@@ -96,25 +101,23 @@ class Line extends React.Component<ILineProps, ILineState> {
                     stroke="transparent"
                     fill="none"
                     style={{ pointerEvents: 'all', transition }}
-                    d={computeLinePath(start, getTriangleStart())}
+                    d={computeLinePath(start, getTriangleStart(), lineOffsetY)}
                     onMouseEnter={this.handleMouseEnter}
                     onMouseLeave={this.handleMouseLeave}
                 />
-                {/* 线 ～ */}
                 <path
                     onClick={this.handleClick}
-                    strokeWidth={config.line.strokeWidth}
-                    stroke={color}
+                    strokeWidth={highLight || selected || hover ? config.line.strokeLargeWidth : config.line.strokeWidth}
+                    stroke={lColor}
                     fill="none"
                     style={{ pointerEvents: 'all', transition }}
-                    d={computeLinePath(start, getTriangleStart())}
+                    d={computeLinePath(start, getTriangleStart(), lineOffsetY)}
                     onMouseEnter={this.handleMouseEnter}
                     onMouseLeave={this.handleMouseLeave}
                 />
-                {/* 结尾的三角点 ▶️ */}
                 <path
                     className={readOnly ? '' : 'byai-topology-line-end-triangle'}
-                    fill={color}
+                    fill={lColor}
                     stroke="none"
                     data-type={LineEditType.EDIT_END}
                     data-json={dataJson}

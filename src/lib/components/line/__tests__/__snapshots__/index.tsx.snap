@@ -19,7 +19,7 @@ exports[`line 有数据时 1`] = `
     "
     fill="none"
     stroke="#1F8CEC"
-    stroke-width="1"
+    stroke-width="2"
     style="pointer-events: all; transition: .2s;"
   />
   <path
@@ -99,7 +99,7 @@ exports[`line 选中时 1`] = `
     "
     fill="none"
     stroke="#1F8CEC"
-    stroke-width="1"
+    stroke-width="2"
     style="pointer-events: all; transition: .2s;"
   />
   <path
@@ -125,19 +125,21 @@ exports[`line 鼠标操作： 第一个path移入、移出、点击 1`] = `
 - First value
 + Second value
 
-@@ -13,11 +13,11 @@
+@@ -13,12 +13,12 @@
       d=\\"
           M 0 0
           C 8, 30 92, 60 100 90
       \\"
       fill=\\"none\\"
 -     stroke=\\"#AAB7C4\\"
+-     stroke-width=\\"1\\"
 +     stroke=\\"#1F8CEC\\"
-      stroke-width=\\"1\\"
++     stroke-width=\\"2\\"
       style=\\"pointer-events: all; transition: .2s;\\"
     />
     <path
       class=\\"byai-topology-line-end-triangle\\"
+      d=\\"
 @@ -28,10 +28,10 @@
       l -5 -10
       Z
@@ -157,19 +159,21 @@ exports[`line 鼠标操作： 第一个path移入、移出、点击 2`] = `
 - First value
 + Second value
 
-@@ -13,11 +13,11 @@
+@@ -13,12 +13,12 @@
       d=\\"
           M 0 0
           C 8, 30 92, 60 100 90
       \\"
       fill=\\"none\\"
 -     stroke=\\"#1F8CEC\\"
+-     stroke-width=\\"2\\"
 +     stroke=\\"#AAB7C4\\"
-      stroke-width=\\"1\\"
++     stroke-width=\\"1\\"
       style=\\"pointer-events: all; transition: .2s;\\"
     />
     <path
       class=\\"byai-topology-line-end-triangle\\"
+      d=\\"
 @@ -28,10 +28,10 @@
       l -5 -10
       Z
@@ -194,19 +198,21 @@ exports[`line 鼠标操作： 第二个path移入、移出、点击 1`] = `
 - First value
 + Second value
 
-@@ -13,11 +13,11 @@
+@@ -13,12 +13,12 @@
       d=\\"
           M 0 0
           C 8, 30 92, 60 100 90
       \\"
       fill=\\"none\\"
 -     stroke=\\"#AAB7C4\\"
+-     stroke-width=\\"1\\"
 +     stroke=\\"#1F8CEC\\"
-      stroke-width=\\"1\\"
++     stroke-width=\\"2\\"
       style=\\"pointer-events: all; transition: .2s;\\"
     />
     <path
       class=\\"byai-topology-line-end-triangle\\"
+      d=\\"
 @@ -28,10 +28,10 @@
       l -5 -10
       Z
@@ -226,19 +232,21 @@ exports[`line 鼠标操作： 第二个path移入、移出、点击 2`] = `
 - First value
 + Second value
 
-@@ -13,11 +13,11 @@
+@@ -13,12 +13,12 @@
       d=\\"
           M 0 0
           C 8, 30 92, 60 100 90
       \\"
       fill=\\"none\\"
 -     stroke=\\"#1F8CEC\\"
+-     stroke-width=\\"2\\"
 +     stroke=\\"#AAB7C4\\"
-      stroke-width=\\"1\\"
++     stroke-width=\\"1\\"
       style=\\"pointer-events: all; transition: .2s;\\"
     />
     <path
       class=\\"byai-topology-line-end-triangle\\"
+      d=\\"
 @@ -28,10 +28,10 @@
       l -5 -10
       Z

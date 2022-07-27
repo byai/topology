@@ -225,7 +225,6 @@ export default DragSource(
     {
         canDrag(props: INodeWrapperProps) {
             const canDragNode = props.canDrag === false || isMatchKeyValue(props, 'canDrag', false);
-            // const canDragNode = props.canDrag === false || (props && props.data && props.data.extra && props.data.extra.canDrag === false);
             return canDragNode ? !canDragNode : (props.readOnly ? !props.readOnly: !canDragNode);
         },
         beginDrag(props: INodeWrapperProps) {
