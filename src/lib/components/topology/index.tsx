@@ -27,7 +27,6 @@ import {
     impactCheck,
     computeAnchorPo,
     computeNodeInputPo,
-    computeMouseClientToCanvas,
     computeContentCenter,
     computeContentPostionY,
     createHashFromObjectArray,
@@ -462,9 +461,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             return;
         }
 
-        const clientPo = computeMouseClientToCanvas(
-            clientX,
-            clientY,
+        const clientPo = computeCanvasPo(
+            {
+                x: clientX,
+                y: clientY,
+            },
             this.$wrapper
         );
         const impactNode = this.impactCheck(
