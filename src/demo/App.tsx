@@ -115,6 +115,7 @@ class Flow extends React.Component<{}, FlowState> {
                         renderTreeNode={this.renderTreeNode}
                         lineLinkageHighlight
                         readOnly={readonly}
+                        scaleNum={0.8}
                         showBar={showBar}
                         customPostionHeight={20}
                         canConnectMultiLines={canConnectMultiLines}

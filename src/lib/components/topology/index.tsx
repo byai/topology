@@ -71,6 +71,7 @@ export interface ITopologyProps {
     lineTextMap?: {
         [x: string]: string; // 线条上文字与 anchorId 映射对象 eg: {'anchorId1': '锚点1', 'anchorId2': '锚点2'}
     };
+    scaleNum: number;
     showText?: (start: string) => boolean;
     lineTextDecorator?: (text: {
         x: number;
@@ -137,7 +138,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     componentDidMount() {
-        const { getInstance, readOnly, customPostionHeight } = this.props;
+        const { getInstance, readOnly, customPostionHeight,scaleNum } = this.props;
         this.editLine = _.throttle(this.editLine, 40);
         if (!readOnly) {
             this.initDomEvents();
@@ -160,6 +161,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         if (getInstance) {
             getInstance(this);
         }
+
+        this.setState(() => {
+            this.scaleNum = scaleNum === undefined ? 1 : scaleNum;
+            return { scaleNum: scaleNum };
+        })
     }
 
     componentWillReceiveProps(nextProps: ITopologyProps) {
@@ -471,7 +477,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const impactNode = this.impactCheck(
             clientPo,
             activeLine![
-                activeLine.type === LineEditType.EDIT_START ? "end" : "start"
+            activeLine.type === LineEditType.EDIT_START ? "end" : "start"
             ]
         );
         this.setContext({
