@@ -904,7 +904,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const { scaleNum } = this.state;
         /* eslint-disable */
         // @ts-ignore
-        const zoomPercent = `${parseInt(String(scaleNum.toFixed(1) * 100))}%`;
+        const zoomPercent = `${parseInt(String((scaleNum ? scaleNum : 1).toFixed(1) * 100))}%`;
         return (
             <div className="topology-tools">
                 <div
