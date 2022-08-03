@@ -138,7 +138,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     componentDidMount() {
-        const { getInstance, readOnly, customPostionHeight,scaleNum } = this.props;
+        const {
+            getInstance, readOnly, customPostionHeight, scaleNum
+        } = this.props;
         this.editLine = _.throttle(this.editLine, 40);
         if (!readOnly) {
             this.initDomEvents();
@@ -164,8 +166,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         this.setState(() => {
             this.scaleNum = scaleNum === undefined ? 1 : scaleNum;
-            return { scaleNum: scaleNum };
-        })
+            return { scaleNum };
+        });
     }
 
     componentWillReceiveProps(nextProps: ITopologyProps) {
@@ -477,7 +479,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const impactNode = this.impactCheck(
             clientPo,
             activeLine![
-            activeLine.type === LineEditType.EDIT_START ? "end" : "start"
+                activeLine.type === LineEditType.EDIT_START ? "end" : "start"
             ]
         );
         this.setContext({
