@@ -22,7 +22,6 @@ exports[`topology basic render 1`] = `
             <div
               class="topology-node-preview"
               data-id="1"
-              style="width: -2px; height: -2px;"
             />
             <div
               class="topology-node-content"
