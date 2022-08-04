@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.31](https://github.com/byai/topology/compare/v1.1.30...v1.1.31) (2022-08-04)
+
+
+### Features
+
+* 可设置默认画布 zoom 缩放大小值 ([a7e4d0e](https://github.com/byai/topology/commit/a7e4d0ef0027990d94fb36e69bd1933561053da8))
+* 居中后保持默认的缩放比例 ([cf955fa](https://github.com/byai/topology/commit/cf955fa7812a6a3f4b75d353431345893a756616))
+
 ### [1.1.30](https://github.com/byai/topology/compare/v1.1.29...v1.1.30) (2022-08-03)
 
 
