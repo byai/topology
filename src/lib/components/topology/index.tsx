@@ -166,6 +166,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         this.setState(() => {
             this.scaleNum = scaleNum === undefined ? 1 : scaleNum;
+            // 记录默认缩放的值，resetScale 时候用
+            this.defaultScaleNum = this.scaleNum;
             return { scaleNum };
         });
     }
@@ -208,6 +210,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         onChange(data, type);
     };
 
+    defaultScaleNum = 1;
     scaleNum = 1;
 
     zoomIn = () => {
@@ -230,8 +233,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     resetScale = () => {
         this.setState(() => {
-            this.scaleNum = 1;
-            return { scaleNum: 1 };
+            const { defaultScaleNum } = this;
+            this.scaleNum = defaultScaleNum;
+            return { scaleNum: defaultScaleNum };
         });
         this.setDraggingId(null);
     }
@@ -479,7 +483,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const impactNode = this.impactCheck(
             clientPo,
             activeLine![
-                activeLine.type === LineEditType.EDIT_START ? "end" : "start"
+            activeLine.type === LineEditType.EDIT_START ? "end" : "start"
             ]
         );
         this.setContext({
