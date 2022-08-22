@@ -49,6 +49,7 @@ interface ITopologyProps {
     sortChildren?: (parent: ITopologyNode, children: ITopologyNode[]) => ITopologyNode[];
     connectDropTarget?: ConnectDropTarget;
     renderToolBars?: () => React.ReactNode;
+    handleLineHighlight?: (line: ITopologyLine, nodes: ITopologyNode[]) => boolean
 }
 
 interface ITopologyState {
@@ -511,18 +512,35 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             }
             return computeNodeInputPo(nodeHash[line.end]);
         };
+        const isHighlightLine = typeof this.props.handleLineHighlight === 'function' ? this.props.handleLineHighlight : (line: ITopologyLine, totalNodes: ITopologyNode[]) => {
+            let start = line.start, end = line.end;
+            let isStartNodeSuccess;
+            let isEndNodeFailure;
+            totalNodes.forEach(function (currNode) {
+                const id = currNode.id, status = currNode.status;
+                if (start.startsWith(id)) {
+                    isStartNodeSuccess = status === 'SUCCESS';
+                }
+                if (end.startsWith(id)) {
+                    isEndNodeFailure = status === 'SUCCESS';
+                }
+            });
+            return isStartNodeSuccess && isEndNodeFailure;
+        }
 
         return (
             <svg className="topology-svg">
                 {lines.map((line) => {
                     const start = getLineStartPo(line);
                     const end = getLineEndPo(line);
+                    const isHighlight = isHighlightLine(line, nodes);
                     if (!start || !end) { return null; }
                     return (
                         <Line
                             key={`${line.start}-${line.end}`}
                             data={line}
                             start={start}
+                            isHighlight={isHighlight}
                             end={end}
                             onSelect={this.selectLine}
                             selected={isSelected(line)}
