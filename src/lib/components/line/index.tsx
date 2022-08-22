@@ -10,10 +10,9 @@ import {
 import { Consumer } from '../context';
 import { computeLinePath, computeTrianglePath } from '../../utils';
 import config from '../../config';
-import './index.less';
 
 
-const Colors = { ACTIVE: '#1F8CEC', NORMAL: '#AAB7C4' };
+const Colors = { ACTIVE: '#1F8CEC', NORMAL: '#AAB7C4', HIGHTLIGHT: '#52C41B'  };
 interface ILineProps {
     start: IPosition;
     end: IPosition;
@@ -23,6 +22,7 @@ interface ILineProps {
     context?: ITopologyContext;
     selected?: boolean;
     onSelect?: (data: ITopologyData) => void;
+    isHighlight?: boolean;
 }
 
 interface ILineState {
@@ -76,12 +76,14 @@ class Line extends React.Component<ILineProps, ILineState> {
             data,
             readOnly,
             context,
+            isHighlight,
         } = this.props;
 
         const { hover } = this.state;
         const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';
         const getTriangleStart = () => ({ ...end, y: end.y - config.line.triangleWidth });
-        const color = selected || hover ? Colors.ACTIVE : Colors.NORMAL;
+        const normalColor = isHighlight ? Colors.HIGHTLIGHT : Colors.NORMAL;
+        const color = selected || hover ? Colors.ACTIVE : normalColor;
         const transition = context.linking ? 'none' : config.transition;
 
         return (
