@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/byai/topology/compare/v1.1.31...v1.2.0) (2022-09-27)
+
+
+### Features
+
+* 自动清除选中项 ([fafcc23](https://github.com/byai/topology/commit/fafcc23fc4a89aa13753f08e8a0bc245ad16cf77))
+
 ### [1.1.31](https://github.com/byai/topology/compare/v1.1.30...v1.1.31) (2022-08-04)
 
 
