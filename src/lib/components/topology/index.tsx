@@ -83,6 +83,7 @@ export interface ITopologyProps {
     renderTreeNode?: (data: ITopologyNode, wrappers: IWrapperOptions) => React.ReactNode;
     sortChildren?: (parent: ITopologyNode, children: ITopologyNode[]) => ITopologyNode[];
     connectDropTarget?: ConnectDropTarget;
+    autoRemoveSelected?: boolean | ((e: MouseEvent) => void);
 }
 
 interface ITopologyState {
@@ -116,6 +117,8 @@ const initialTopologyState = {
 } as ITopologyState;
 
 class Topology extends React.Component<ITopologyProps, ITopologyState> {
+    $topology: HTMLDivElement | null;
+
     $wrapper: HTMLDivElement | null;
 
     $canvas: HTMLDivElement | null;
@@ -135,6 +138,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     componentWillMount() {
         this.renderDomMap();
+        const autoClearSelectedFn = this.getAutoClearSelectedFn();
+        if (autoClearSelectedFn) {
+            document.body.removeEventListener('click', autoClearSelectedFn);
+        }
     }
 
     componentDidMount() {
@@ -153,6 +160,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             } else {
                 this.scrollCanvasToCenter();
             }
+            const autoClearSelectedFn = this.getAutoClearSelectedFn();
+            if (autoClearSelectedFn) {
+                document.body.addEventListener('click', autoClearSelectedFn);
+            }
         }
 
         if (this.shouldAutoLayout) {
@@ -170,6 +181,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             this.defaultScaleNum = this.scaleNum;
             return { scaleNum };
         });
+    }
+
+    getAutoClearSelectedFn() {
+        if (!this.props.autoRemoveSelected) {
+            return undefined;
+        }
+        return typeof this.props.autoRemoveSelected === 'function' ? this.props.autoRemoveSelected : this.clearSelectedWhenClickOutside;
     }
 
     componentWillReceiveProps(nextProps: ITopologyProps) {
@@ -213,6 +231,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     defaultScaleNum = 1;
 
     scaleNum = 1;
+
+    clearSelectedWhenClickOutside = (e: MouseEvent) => {
+        if (this.$topology.contains(e.target as Node)) {
+            return;
+        }
+        this.clearSelectData();
+    }
 
     zoomIn = () => {
         this.setState((prevState: ITopologyState) => {
@@ -1025,7 +1050,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const { connectDropTarget, showBar } = this.props;
         const { context, scaleNum } = this.state;
         return connectDropTarget!(
-            <div className="byai-topology">
+            <div className="byai-topology"
+                ref={r => {
+                    this.$topology = r;
+                }}
+            >
                 <div
                     ref={r => {
                         this.$wrapper = r;
