@@ -980,16 +980,15 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     downloadImg = async () => {
-        this.scrollCanvasToCenter();
+        // this.scrollCanvasToCenter();
         const graphEl = document.querySelector(".byai-topology");
-        let imgBase64 = '11';
+        let imgBase64 = '';
         /**
          * 绘制流程
          * 1. 通过 findScale 方法找到一个 scale，能完全让所有节点处于可视化区域内
          * 2. onclone 复制画布，在此基础上做一些处理，不影响原来的画布
          */
         const downloadScale = await this.findScale(graphEl.cloneNode(true));
-        console.log('findScale =>', downloadScale)
         const _this = this;
         html2canvas(graphEl as HTMLElement, {
             onclone: function(documentClone){
@@ -997,9 +996,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 const nodeContentEls: HTMLCollectionOf<Element> = documentClone.getElementsByClassName('topology-node-content');
                 nodeContentEls && Array.from(nodeContentEls).forEach((node: HTMLElement) => {
                     const childNode: any = node.childNodes && node.childNodes[0];
+                    const grandsonChildNode: any = childNode && childNode.childNodes[0];
                     node.style.backgroundColor = 'transparent';
                     node.style.border = '1px solid #fff';
                     childNode.style.backgroundColor = 'white';
+                    grandsonChildNode.style.boxShadow = 'none';
                 })
 
                 documentClone.getElementById('topology-canvas').style.transform = `scale(${downloadScale})`;
@@ -1007,7 +1008,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 const {  minYId } = getMaxAndMinNodeId(_this.props.data.nodes);
                 // 定位画布中最顶层的节点，让其滚动在浏览器顶部，尽可能的多展示其它节点
                 let minYIdElement = documentClone.getElementById(`topology-node-${minYId}`);
-                minYIdElement.scrollIntoView({ block: "start" });
+                minYIdElement.scrollIntoView({
+                    block: "start",
+                    inline: 'center'
+                });
+
             },
             backgroundColor: 'white',
             useCORS: true, //支持图片跨域
