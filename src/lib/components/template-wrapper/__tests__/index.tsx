@@ -16,7 +16,8 @@ test('templateWrapper', () => {
     const backend = root.getManager().getBackend();
 
     // @ts-ignore
-    const box = TestUtils.findRenderedComponentWithType(root, TemplateWrapper);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const box: any = TestUtils.findRenderedComponentWithType(root, TemplateWrapper);
     backend.simulateBeginDrag([box.getHandlerId()]);
 
     // @ts-ignore
