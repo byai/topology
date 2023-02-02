@@ -105,6 +105,24 @@ http://localhost:3000
             <td>是否显示工具栏</td>
         </tr>
         <tr>
+            <td>showCenter</td>
+            <td>bool</td>
+            <td>true</td>
+            <td>是否显示工具栏中的定位中心</td>
+        </tr>
+        <tr>
+            <td>showLayout</td>
+            <td>bool</td>
+            <td>true</td>
+            <td>是否显示工具栏中的自动布局</td>
+        </tr>
+        <tr>
+            <td>showDownload</td>
+            <td>bool</td>
+            <td>false</td>
+            <td>是否显示工具栏中的下载图片</td>
+        </tr>
+        <tr>
             <td>canConnectMultiLines</td>
             <td>bool</td>
             <td>false</td>

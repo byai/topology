@@ -115,8 +115,9 @@ class Flow extends React.Component<{}, FlowState> {
                         renderTreeNode={this.renderTreeNode}
                         lineLinkageHighlight
                         readOnly={readonly}
-                        scaleNum={0.8}
+                        scaleNum={1}
                         showBar={showBar}
+                        showDownload
                         customPostionHeight={20}
                         canConnectMultiLines={canConnectMultiLines}
                         overlap={overlap}
@@ -129,7 +130,7 @@ class Flow extends React.Component<{}, FlowState> {
                             (ins: any) => { this.topology = ins; }}
                     />
                 </div>
-                <div className="topology-templates">
+                <div className="topology-templates" data-html2canvas-ignore="true">
                     <button
                         onClick={() => this.setState({ readonly: !readonly })}
                         style={{ marginBottom: 20 }}

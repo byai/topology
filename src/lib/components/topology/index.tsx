@@ -3,11 +3,13 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { DropTarget, ConnectDropTarget } from 'react-dnd';
 import _ from 'lodash';
 import classnames from 'classnames';
+import html2canvas from 'html2canvas';
 import selectNodes, { SelectMode } from '../../utils/selectNodes';
 import { Provider, defaultContext } from '../context';
 import NodeWrapper from '../node-wrapper';
 import Line from '../line';
 import LineText from '../line/lineText';
+
 import {
     KeyCode,
     NodeTypes,
@@ -32,7 +34,9 @@ import {
     createHashFromObjectArray,
     getNodeSize,
     shouldAutoLayout,
-    isMatchKeyValue
+    isMatchKeyValue,
+    getMaxAndMinNodeId,
+    isInViewPort,
 } from '../../utils';
 // import layoutCalculation from '../../utils/layoutCalculation';
 import computeLayout from '../../utils/computeLayout';
@@ -44,6 +48,9 @@ export interface ITopologyProps {
     data: ITopologyData; // 数据 { nodes: []; lines: [] }
     readOnly?: boolean; // 只读模式，为true时不可编辑
     showBar?: boolean; // 是否显示工具栏
+    showCenter?: boolean; // 是否显示工具栏中的定位中心
+    showLayout?: boolean; // 是否显示工具栏中的自动布局
+    showDownload?: boolean; // 是否显示工具栏中的下载图片
     canConnectMultiLines?: boolean; // 控制一个锚点是否可以连接多条线
     overlap?: boolean; // 是否允许节点覆盖，默认允许，设置 true 时不允许
     overlapCallback?: () => void; // overlap 回调
@@ -184,9 +191,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     getAutoClearSelectedFn() {
+        // eslint-disable-next-line react/destructuring-assignment
         if (!this.props.autoRemoveSelected) {
             return undefined;
         }
+        // eslint-disable-next-line react/destructuring-assignment
         return typeof this.props.autoRemoveSelected === 'function' ? this.props.autoRemoveSelected : this.clearSelectedWhenClickOutside;
     }
 
@@ -930,14 +939,100 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         );
     };
 
+    // TODO：系统计算设置一个合适的 scale，使所有节点均在可视化区域内
+    findScale = async (clonegraph) => {
+        const { scaleNum } = this.state;
+        let downloadScale: number = Number(scaleNum.toFixed(1));
+
+        let canvasEle = clonegraph.querySelector('#topology-canvas');
+        canvasEle.style.transform = `scale(${downloadScale})`;
+        const { minXId, maxXId, minYId, maxYId } = getMaxAndMinNodeId(this.props.data.nodes);
+        let minYIdElement = clonegraph.querySelector(`#topology-node-${minYId}`);
+
+        minYIdElement.scrollIntoView({ block: "start" });
+
+        const isAllView = () => {
+            let minxIdView = isInViewPort(minXId, document);
+            let maxxIdView = isInViewPort(maxXId, document);
+            let minYIdView = isInViewPort(minYId, document);
+            let maxYIdView = isInViewPort(maxYId, document);
+            // console.log('minxIdView', minxIdView)
+            // console.log('maxxIdView', maxxIdView)
+            // console.log('minYIdView', minYIdView)
+            // console.log('maxYIdView', maxYIdView);
+            return minxIdView && maxxIdView && minYIdView && maxYIdView
+        }
+
+        let isViw = isAllView();
+        if (isViw) return downloadScale;
+
+        // scale 从 1 => 0.1，寻找一个能完全展示所有内容的值
+        for (let i = 1; i <= 10; i++) {
+            downloadScale = Number((downloadScale - 0.1).toFixed(1));
+            canvasEle.style.transform = `scale(${downloadScale})`;
+            minYIdElement.scrollIntoView({ block: "start" });
+            isViw = isAllView();
+            if(isViw || downloadScale === 0.1) {
+                break;
+            }
+        }
+        return downloadScale;
+    }
+
+    downloadImg = async () => {
+        this.scrollCanvasToCenter();
+        const graphEl = document.querySelector(".byai-topology");
+        let imgBase64 = '11';
+        /**
+         * 绘制流程
+         * 1. 通过 findScale 方法找到一个 scale，能完全让所有节点处于可视化区域内
+         * 2. onclone 复制画布，在此基础上做一些处理，不影响原来的画布
+         */
+        const downloadScale = await this.findScale(graphEl.cloneNode(true));
+        console.log('findScale =>', downloadScale)
+        const _this = this;
+        html2canvas(graphEl as HTMLElement, {
+            onclone: function(documentClone){
+                // 背景色置为透明色
+                const nodeContentEls: HTMLCollectionOf<Element> = documentClone.getElementsByClassName('topology-node-content');
+                nodeContentEls && Array.from(nodeContentEls).forEach((node: HTMLElement) => {
+                    const childNode: any = node.childNodes && node.childNodes[0];
+                    node.style.backgroundColor = 'transparent';
+                    node.style.border = '1px solid #fff';
+                    childNode.style.backgroundColor = 'white';
+                })
+
+                documentClone.getElementById('topology-canvas').style.transform = `scale(${downloadScale})`;
+
+                const {  minYId } = getMaxAndMinNodeId(_this.props.data.nodes);
+                // 定位画布中最顶层的节点，让其滚动在浏览器顶部，尽可能的多展示其它节点
+                let minYIdElement = documentClone.getElementById(`topology-node-${minYId}`);
+                minYIdElement.scrollIntoView({ block: "start" });
+            },
+            backgroundColor: 'white',
+            useCORS: true, //支持图片跨域
+            height: graphEl.scrollHeight, // 图片宽高
+            width: document.documentElement.offsetWidth,
+            scale: 1 / downloadScale, // 处理模糊问题
+        }).then((canvas) => {
+            imgBase64 = canvas.toDataURL('image/png')
+            // 生成图片导出
+            const a = document.createElement('a');
+            a.href = imgBase64;
+            a.download = '图片';
+            a.click();
+        })
+    }
+
     renderToolBars = () => {
         const { scaleNum } = this.state;
+        const { showCenter, showLayout, showDownload } = this.props;
         /* eslint-disable */
         // @ts-ignore
         const zoomPercent = `${parseInt(String((scaleNum ? scaleNum : 1).toFixed(1) * 100))}%`;
         return (
-            <div className="topology-tools">
-                <div
+            <div className="topology-tools" data-html2canvas-ignore={false}>
+                {showCenter !== false && <div
                     className="topology-tools-btn"
                     id="scroll-canvas-to-center"
                     onClick={this.props.customPostionHeight ? this.scrollCanvasToPositionY : this.scrollCanvasToCenter}
@@ -947,8 +1042,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         alt=""
                     />
                     <div className="tooltip">定位中心</div>
-                </div>
-                <div
+                </div>}
+
+                {showLayout !== false && <div
                     className="topology-tools-btn"
                     id="auto-layout"
                     onClick={this.autoLayout}
@@ -958,7 +1054,18 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         alt=""
                     />
                     <div className="tooltip">自动布局</div>
-                </div>
+                </div>}
+
+                {showDownload && <div
+                    className="topology-tools-btn"
+                    id="export-img"
+                    onClick={async () => {
+                        this.downloadImg();
+                    }}
+                >
+                    <img src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNjc1MzMyMDg0NjE2IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjQzNjkiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxwYXRoIGQ9Ik04MTIuMSA5MTNoLTYwMGMtMTYuNiAwLTMwLTEzLjQtMzAtMzBzMTMuNC0zMCAzMC0zMGg2MDBjMTYuNiAwIDMwIDEzLjQgMzAgMzBzLTEzLjQgMzAtMzAgMzB6TTQ4MiA2NzdWMTQzYzAtMTYuNiAxMy40LTMwIDMwLTMwczMwIDEzLjQgMzAgMzB2NTM0YzAgMTYuNi0xMy40IDMwLTMwIDMwcy0zMC0xMy40LTMwLTMweiIgZmlsbD0iIzY4Njg2OCIgcC1pZD0iNDM3MCI+PC9wYXRoPjxwYXRoIGQ9Ik03MDIuNyA1MDNhMjkuOTM3IDI5LjkzNyAwIDAgMC00Mi41IDBMNTQwLjQgNjIyLjhjLTE1LjYgMTUuNi00MC45IDE1LjYtNTYuNiAwTDM2My45IDUwMi45Yy0xMS43LTExLjctMzAuNy0xMS43LTQyLjQgMHMtMTEuNyAzMC43IDAgNDIuNGwxNjIuNiAxNjIuNmMxNS42IDE1LjYgNDEgMTUuNiA1Ni42IDBsMTYyLTE2Mi41YzExLjctMTEuOCAxMS43LTMwLjcgMC00Mi40eiIgZmlsbD0iIzY4Njg2OCIgcC1pZD0iNDM3MSI+PC9wYXRoPjwvc3ZnPg=='/>
+                    <div className="tooltip">导出图片</div>
+                </div>}
 
                 <div className="topology-tools-zoom" onClick={this.zoomIn}>
                     <img
@@ -1072,6 +1179,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         ref={r => {
                             this.$canvas = r;
                         }}
+                        id='topology-canvas'
                         className="topology-canvas topology-zoom"
                         // @ts-ignore
                         style={{
