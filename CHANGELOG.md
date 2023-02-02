@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/byai/topology/compare/v1.2.0...v1.3.0) (2023-02-02)
+
+
+### Features
+
+* image export ([73e5c99](https://github.com/byai/topology/commit/73e5c9924de48cf7d8c206e1c8a172ae1a66f991))
+
 ## [1.2.0](https://github.com/byai/topology/compare/v1.1.31...v1.2.0) (2022-09-27)
 
 
