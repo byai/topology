@@ -979,7 +979,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return downloadScale;
     }
 
-    downloadImg = async () => {
+    downloadImg = async (openDownload?: boolean) => {
         // this.scrollCanvasToCenter();
         const graphEl = document.querySelector(".byai-topology");
         let imgBase64 = '';
@@ -990,7 +990,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
          */
         const downloadScale = await this.findScale(graphEl.cloneNode(true));
         const _this = this;
-        html2canvas(graphEl as HTMLElement, {
+        return html2canvas(graphEl as HTMLElement, {
             onclone: function(documentClone){
                 // 背景色置为透明色
                 const nodeContentEls: HTMLCollectionOf<Element> = documentClone.getElementsByClassName('topology-node-content');
@@ -1012,7 +1012,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     block: "start",
                     inline: 'center'
                 });
-
             },
             backgroundColor: 'white',
             useCORS: true, //支持图片跨域
@@ -1020,13 +1019,21 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             width: document.documentElement.offsetWidth,
             scale: 1 / downloadScale, // 处理模糊问题
         }).then((canvas) => {
-            imgBase64 = canvas.toDataURL('image/png')
+            imgBase64 = canvas.toDataURL('image/png');
             // 生成图片导出
-            const a = document.createElement('a');
-            a.href = imgBase64;
-            a.download = '图片';
-            a.click();
+            if (openDownload) {
+                const a = document.createElement('a');
+                a.href = imgBase64;
+                a.download = '图片';
+                a.click();
+            }
+            return Promise.resolve(imgBase64);
         })
+    }
+
+    getImageBase64Url = async () => {
+        const url = await this.downloadImg();
+        return url;
     }
 
     renderToolBars = () => {
@@ -1065,7 +1072,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     className="topology-tools-btn"
                     id="export-img"
                     onClick={async () => {
-                        this.downloadImg();
+                        this.downloadImg(true);
                     }}
                 >
                     <img src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNjc1MzMyMDg0NjE2IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjQzNjkiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxwYXRoIGQ9Ik04MTIuMSA5MTNoLTYwMGMtMTYuNiAwLTMwLTEzLjQtMzAtMzBzMTMuNC0zMCAzMC0zMGg2MDBjMTYuNiAwIDMwIDEzLjQgMzAgMzBzLTEzLjQgMzAtMzAgMzB6TTQ4MiA2NzdWMTQzYzAtMTYuNiAxMy40LTMwIDMwLTMwczMwIDEzLjQgMzAgMzB2NTM0YzAgMTYuNi0xMy40IDMwLTMwIDMwcy0zMC0xMy40LTMwLTMweiIgZmlsbD0iIzY4Njg2OCIgcC1pZD0iNDM3MCI+PC9wYXRoPjxwYXRoIGQ9Ik03MDIuNyA1MDNhMjkuOTM3IDI5LjkzNyAwIDAgMC00Mi41IDBMNTQwLjQgNjIyLjhjLTE1LjYgMTUuNi00MC45IDE1LjYtNTYuNiAwTDM2My45IDUwMi45Yy0xMS43LTExLjctMzAuNy0xMS43LTQyLjQgMHMtMTEuNyAzMC43IDAgNDIuNGwxNjIuNiAxNjIuNmMxNS42IDE1LjYgNDEgMTUuNiA1Ni42IDBsMTYyLTE2Mi41YzExLjctMTEuOCAxMS43LTMwLjcgMC00Mi40eiIgZmlsbD0iIzY4Njg2OCIgcC1pZD0iNDM3MSI+PC9wYXRoPjwvc3ZnPg=='/>
