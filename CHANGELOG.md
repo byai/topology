@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.2](https://github.com/byai/topology/compare/v1.3.1...v1.3.2) (2023-02-06)
+
+
+### Features
+
+* add getImageBase64Url function ([90f755f](https://github.com/byai/topology/commit/90f755f24f8cae29d2db8babebe58a21991b73fd))
+
 ### [1.3.1](https://github.com/byai/topology/compare/v1.3.0...v1.3.1) (2023-02-02)
 
 
