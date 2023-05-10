@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.3](https://github.com/byai/topology/compare/v1.3.2...v1.3.3) (2023-05-10)
+
+
+### Features
+
+* update html2canvas config ([6851df1](https://github.com/byai/topology/commit/6851df1028f2ea39a731ad5b4fa8ffd068b86bb4))
+
 ### [1.3.2](https://github.com/byai/topology/compare/v1.3.1...v1.3.2) (2023-02-06)
 
 
