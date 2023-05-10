@@ -37,6 +37,7 @@ import {
     isMatchKeyValue,
     getMaxAndMinNodeId,
     isInViewPort,
+    computeMaxAndMin,
 } from '../../utils';
 // import layoutCalculation from '../../utils/layoutCalculation';
 import computeLayout from '../../utils/computeLayout';
@@ -942,7 +943,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     // TODO：系统计算设置一个合适的 scale，使所有节点均在可视化区域内
     findScale = async (clonegraph) => {
         const { scaleNum } = this.state;
-        let downloadScale: number = Number(scaleNum.toFixed(1));
+        let downloadScale: number = Number(scaleNum && scaleNum.toFixed(1));
 
         let canvasEle = clonegraph.querySelector('#topology-canvas');
         canvasEle.style.transform = `scale(${downloadScale})`;
@@ -956,10 +957,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             let maxxIdView = isInViewPort(maxXId, document);
             let minYIdView = isInViewPort(minYId, document);
             let maxYIdView = isInViewPort(maxYId, document);
-            // console.log('minxIdView', minxIdView)
-            // console.log('maxxIdView', maxxIdView)
-            // console.log('minYIdView', minYIdView)
-            // console.log('maxYIdView', maxYIdView);
             return minxIdView && maxxIdView && minYIdView && maxYIdView
         }
 
@@ -980,17 +977,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     downloadImg = async (openDownload?: boolean) => {
-        // this.scrollCanvasToCenter();
-        const graphEl = document.querySelector(".byai-topology");
+        const graphEl: any = document.querySelector(".topology-canvas");
         let imgBase64 = '';
-        /**
-         * 绘制流程
-         * 1. 通过 findScale 方法找到一个 scale，能完全让所有节点处于可视化区域内
-         * 2. onclone 复制画布，在此基础上做一些处理，不影响原来的画布
-         */
-        const downloadScale = await this.findScale(graphEl.cloneNode(true));
         const _this = this;
-        return html2canvas(graphEl as HTMLElement, {
+        const { minX, maxX, minY, maxY } = computeMaxAndMin(_this.props.data.nodes)
+        const imgPadding = 50;
+        const imgMinSize = 200;
+        return html2canvas(graphEl, {
             onclone: function(documentClone){
                 // 背景色置为透明色
                 const nodeContentEls: HTMLCollectionOf<Element> = documentClone.getElementsByClassName('topology-node-content');
@@ -1002,9 +995,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     childNode.style.backgroundColor = 'white';
                     grandsonChildNode.style.boxShadow = 'none';
                 })
-
-                documentClone.getElementById('topology-canvas').style.transform = `scale(${downloadScale})`;
-
                 const {  minYId } = getMaxAndMinNodeId(_this.props.data.nodes);
                 // 定位画布中最顶层的节点，让其滚动在浏览器顶部，尽可能的多展示其它节点
                 let minYIdElement = documentClone.getElementById(`topology-node-${minYId}`);
@@ -1015,9 +1005,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             },
             backgroundColor: 'white',
             useCORS: true, //支持图片跨域
-            height: graphEl.scrollHeight, // 图片宽高
-            width: document.documentElement.offsetWidth,
-            scale: 1 / downloadScale, // 处理模糊问题
+            scale: 1,
+            x: minX - imgPadding,
+            y: minY - imgPadding,
+            width: maxX - minX + imgMinSize,
+            height: maxY - minY + imgMinSize,
         }).then((canvas) => {
             imgBase64 = canvas.toDataURL('image/png');
             // 生成图片导出
