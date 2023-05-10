@@ -118,6 +118,9 @@ class Flow extends React.Component<{}, FlowState> {
                         scaleNum={1}
                         showBar={showBar}
                         showDownload
+                        downloadImg={() => {
+                            this.topology.downloadImg(true, '测试图片名称');
+                        }}
                         customPostionHeight={20}
                         canConnectMultiLines={canConnectMultiLines}
                         overlap={overlap}

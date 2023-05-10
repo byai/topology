@@ -52,6 +52,7 @@ export interface ITopologyProps {
     showCenter?: boolean; // 是否显示工具栏中的定位中心
     showLayout?: boolean; // 是否显示工具栏中的自动布局
     showDownload?: boolean; // 是否显示工具栏中的下载图片
+    downloadImg?: (download?: boolean, name?: string) => void;
     canConnectMultiLines?: boolean; // 控制一个锚点是否可以连接多条线
     overlap?: boolean; // 是否允许节点覆盖，默认允许，设置 true 时不允许
     overlapCallback?: () => void; // overlap 回调
@@ -976,7 +977,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return downloadScale;
     }
 
-    downloadImg = async (openDownload?: boolean) => {
+    downloadImg = async (openDownload?: boolean, imgName?: string) => {
         const graphEl: any = document.querySelector(".topology-canvas");
         let imgBase64 = '';
         const _this = this;
@@ -1016,7 +1017,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             if (openDownload) {
                 const a = document.createElement('a');
                 a.href = imgBase64;
-                a.download = '图片';
+                a.download = imgName || '图片';
                 a.click();
             }
             return Promise.resolve(imgBase64);
@@ -1030,7 +1031,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     renderToolBars = () => {
         const { scaleNum } = this.state;
-        const { showCenter, showLayout, showDownload } = this.props;
+        const { showCenter, showLayout, showDownload, downloadImg } = this.props;
         /* eslint-disable */
         // @ts-ignore
         const zoomPercent = `${parseInt(String((scaleNum ? scaleNum : 1).toFixed(1) * 100))}%`;
@@ -1064,7 +1065,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     className="topology-tools-btn"
                     id="export-img"
                     onClick={async () => {
-                        this.downloadImg(true);
+                        // 截图之前需要重置 scaleNum 为 1，避免坐标错位
+                        this.setState({
+                            scaleNum: 1
+                        }, () => {
+                            downloadImg ? downloadImg() : this.downloadImg(true);
+                        })
+
                     }}
                 >
                     <img src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNjc1MzMyMDg0NjE2IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjQzNjkiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxwYXRoIGQ9Ik04MTIuMSA5MTNoLTYwMGMtMTYuNiAwLTMwLTEzLjQtMzAtMzBzMTMuNC0zMCAzMC0zMGg2MDBjMTYuNiAwIDMwIDEzLjQgMzAgMzBzLTEzLjQgMzAtMzAgMzB6TTQ4MiA2NzdWMTQzYzAtMTYuNiAxMy40LTMwIDMwLTMwczMwIDEzLjQgMzAgMzB2NTM0YzAgMTYuNi0xMy40IDMwLTMwIDMwcy0zMC0xMy40LTMwLTMweiIgZmlsbD0iIzY4Njg2OCIgcC1pZD0iNDM3MCI+PC9wYXRoPjxwYXRoIGQ9Ik03MDIuNyA1MDNhMjkuOTM3IDI5LjkzNyAwIDAgMC00Mi41IDBMNTQwLjQgNjIyLjhjLTE1LjYgMTUuNi00MC45IDE1LjYtNTYuNiAwTDM2My45IDUwMi45Yy0xMS43LTExLjctMzAuNy0xMS43LTQyLjQgMHMtMTEuNyAzMC43IDAgNDIuNGwxNjIuNiAxNjIuNmMxNS42IDE1LjYgNDEgMTUuNiA1Ni42IDBsMTYyLTE2Mi41YzExLjctMTEuOCAxMS43LTMwLjcgMC00Mi40eiIgZmlsbD0iIzY4Njg2OCIgcC1pZD0iNDM3MSI+PC9wYXRoPjwvc3ZnPg=='/>
