@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.5](https://github.com/byai/topology/compare/v1.3.4...v1.3.5) (2023-05-15)
+
+
+### Features
+
+* add locateNodeById function ([75cb67c](https://github.com/byai/topology/commit/75cb67cce8aa84c68548ea136203a29b13d6dee0))
+
 ### [1.3.4](https://github.com/byai/topology/compare/v1.3.3...v1.3.4) (2023-05-10)
 
 
