@@ -1029,6 +1029,26 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return url;
     }
 
+    // 定位节点
+    locateNodeById = (id) => {
+        const {
+            context: { selectedData }
+        } = this.state;
+        const { nodes } =  this.props.data;
+        const curNode = nodes && nodes.find(n => n.id === id)
+        const isSelect = selectedData.nodes.findIndex(n => n.id === id) !== -1;
+        const ele = document.getElementById(`topology-node-${id}`);
+
+        if (ele) {
+            // 如果已选中，则不做处理
+            !isSelect && this.selectNode(curNode, SelectMode.NORMAL)
+            ele.scrollIntoView({
+                block: "center",
+                inline: 'center'
+            });
+        }
+    }
+
     renderToolBars = () => {
         const { scaleNum } = this.state;
         const { showCenter, showLayout, showDownload, downloadImg } = this.props;
