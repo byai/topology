@@ -12,6 +12,8 @@ export enum SelectMode {
     MUL_NORMAL,
     MULTI,
     RIGHT_NORMAL,
+    // /** 框选 */
+    // BOX_SELECTION
 }
 
 export interface ProduceselectedDataFunc {
@@ -97,6 +99,9 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
         const selectNodesId = selectedData.nodes.map(item => item.id);
         const selectedChildren = _.intersection(children, selectNodesId);
         const selectedParents = _.intersection(parents, selectNodesId);
+        // const isCombined = !!node.combineId;
+        // const combinedNodeList = isCombined ? data.nodes.filter(n => n.combineId === node.combineId) : [];
+        // const combinedLineList = isCombined ? data.lines.filter(n => n.combineId === node.combineId) : [];
 
         if (mode === SelectMode.NORMAL || mode === SelectMode.RIGHT_NORMAL) {
             return {

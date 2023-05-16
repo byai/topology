@@ -31,6 +31,8 @@ export interface INodeWrapperProps {
     onMouseLeave?: () => void;
     readOnly?: boolean;
     isReduceRender?: boolean;
+    isSelected?: boolean;
+    combineId?: string;
     prevNodeStyle?: {
         // 暂时支持这两个属性
         border?: string;
@@ -110,7 +112,26 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     };
 
     handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        const { onSelect, data } = this.props;
+        // 避免一些交互上的冲突,改为mousedown触发
+        // const { onSelect, data } = this.props;
+        // if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+        //     onSelect(data, SelectMode.MULTI);
+        //     return;
+        // }
+        // if (e.ctrlKey || e.metaKey) {
+        //     onSelect(data, SelectMode.MUL_NORMAL);
+        //     return;
+        // }
+        // onSelect(data, SelectMode.NORMAL);
+    };
+
+    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const { data, onSelect } = this.props;
+        if (e.button === 2) {
+            e.preventDefault();
+            onSelect(data, SelectMode.RIGHT_NORMAL);
+            return;
+        }
         if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
             onSelect(data, SelectMode.MULTI);
             return;
@@ -120,14 +141,6 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             return;
         }
         onSelect(data, SelectMode.NORMAL);
-    };
-
-    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (e.button === 2) {
-            e.preventDefault();
-            const { data, onSelect } = this.props;
-            onSelect(data, SelectMode.RIGHT_NORMAL);
-        }
     };
 
     handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -185,6 +198,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         return connectDragSource(
             <div
                 id={data ? `topology-node-${data.id}` : ""}
+                data-combine-id={data.combineId}
                 style={this.computeStyle()}
                 className="byai-topology-node-wrapper"
                 onClick={this.handleClick}
@@ -229,7 +243,11 @@ export default DragSource(
         },
         beginDrag(props: INodeWrapperProps) {
             const id = props.data ? props.data.id : null;
-            const { scaleNum, prevNodeStyle = {} } = props;
+            const { scaleNum=1, prevNodeStyle = {} } = props;
+            const isSelected = props.isSelected;
+            if (!isSelected) {
+                props.onSelect(props.data, SelectMode.NORMAL);
+            }
             props.setDraggingId(id);
 
             // beginDrag 时机 处理预览节点样式问题
@@ -237,13 +255,21 @@ export default DragSource(
             if (!draggingPreviewNode) return null;
             const realNodeDom = document.getElementById(`topology-node-${id}`);
             if (!realNodeDom) return null;
-
+            // const testNode = document.getElementById('test');
+            // const distanceX = testNode ? Math.abs(realNodeDom.offsetLeft - testNode.offsetLeft) : 0;
+            // const distanceY = testNode ? Math.abs(realNodeDom.offsetTop - testNode.offsetTop) : 0;
             const previewNodeWidth = scaleNum * realNodeDom.offsetWidth - 2; // border
             const previewNodeHeight = scaleNum * realNodeDom.offsetHeight - 2;
+            // const previewNodeWidth = scaleNum * (testNode? testNode: realNodeDom).offsetWidth - 2; // border
+            // const previewNodeHeight = scaleNum * (testNode? testNode: realNodeDom).offsetHeight - 2;
             draggingPreviewNode.style.background = prevNodeStyle.background || '#6f6fc7';
             draggingPreviewNode.style.border = prevNodeStyle.border || '1px dashed #1F8CEC';
             draggingPreviewNode.style.width = previewNodeWidth + 'px';
             draggingPreviewNode.style.height = previewNodeHeight + 'px';
+            // draggingPreviewNode.style.setProperty('--width', previewNodeWidth + 'px');
+            // draggingPreviewNode.style.setProperty('--height', previewNodeHeight + 'px');
+            // draggingPreviewNode.style.setProperty('--transformX', testNode ? `${-distanceX}px` : '0px');
+            // draggingPreviewNode.style.setProperty('--transformY', testNode ? `${-distanceY}px` : '0px');
             // 恢复
             setTimeout(() => {
                 draggingPreviewNode.style.background = 'transparent';
@@ -253,6 +279,13 @@ export default DragSource(
         },
         endDrag(props: INodeWrapperProps) {
             props.setDraggingId(null);
+            // const id = props.data ? props.data.id : null;
+            // const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
+            // if (!draggingPreviewNode) return null;
+            // draggingPreviewNode.style.setProperty('--width', '100%');
+            // draggingPreviewNode.style.setProperty('--height', '100%');
+            // draggingPreviewNode.style.setProperty('--transformX', '0px');
+            // draggingPreviewNode.style.setProperty('--transformY', '0px');
         },
     },
     connect => ({

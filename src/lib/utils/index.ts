@@ -11,14 +11,7 @@ export const shouldAutoLayout = (nodes: ITopologyNode[]) => {
     return !nodes.find(item => !!item.position);
 };
 
-/**
- * 获取相对画布的坐标
- * TODO: 缩放 scale 之后 position 计算有问题，暂时没有想到可以绕过去的方法
- * https://github.com/react-dnd/react-dnd/issues/1730
- * fix：核心逻辑，缩放后以 1 的比例去思考
- * 计算公式：找到中心点的位置 +（鼠标位置 - 中心点的距离) / 缩放）+（一些 dom 的偏离）/ 缩放
- */
-export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) => {
+const computeCanvasPoHelper = ($wrapper: HTMLDivElement) => {
     // 当窗口有滚动时，需加上窗口的滚动
     const rect = $wrapper.getBoundingClientRect();
     // 缩放的容器
@@ -30,12 +23,41 @@ export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) =
     // 缩放后画布的中心点,还是需要用缩放前的比例计算中心点
     const centerX = width / zoom / 2;
     const centerY = height / zoom / 2;
+    return {
+        centerX,
+        centerY,
+        rect,
+        zoom,
+        scrollLeft: $wrapper.scrollLeft,
+        scrollTop: $wrapper.scrollTop
+    };
+}
 
+/**
+ * 获取相对画布的坐标
+ * TODO: 缩放 scale 之后 position 计算有问题，暂时没有想到可以绕过去的方法
+ * https://github.com/react-dnd/react-dnd/issues/1730
+ * fix：核心逻辑，缩放后以 1 的比例去思考
+ * 计算公式：找到中心点的位置 +（鼠标位置 - 中心点的距离) / 缩放）+（一些 dom 的偏离）/ 缩放
+ */
+export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) => {
+    const { centerX, centerY, rect, zoom, scrollLeft, scrollTop } = computeCanvasPoHelper($wrapper);
     const po = {
-        x: centerX + (position.x - centerX) / zoom + ($wrapper.scrollLeft + window.pageXOffset - rect.left) / zoom,
-        y: centerY + (position.y - centerY) / zoom + ($wrapper.scrollTop + window.pageYOffset - rect.top) / zoom,
+        x: centerX + (position.x - centerX) / zoom + (scrollLeft + window.pageXOffset - rect.left) / zoom,
+        y: centerY + (position.y - centerY) / zoom + (scrollTop + window.pageYOffset - rect.top) / zoom,
     } as IPosition;
     return po;
+};
+
+export const multiComputeCanvasPo = (positionList: IPosition[], $wrapper: HTMLDivElement) => {
+    const { centerX, centerY, rect, zoom, scrollLeft, scrollTop } = computeCanvasPoHelper($wrapper);
+    return positionList.map((position) => {
+        const po = {
+            x: centerX + (position.x - centerX) / zoom + (scrollLeft + window.pageXOffset - rect.left) / zoom,
+            y: centerY + (position.y - centerY) / zoom + (scrollTop + window.pageYOffset - rect.top) / zoom,
+        } as IPosition;
+        return po;
+    });
 };
 
 

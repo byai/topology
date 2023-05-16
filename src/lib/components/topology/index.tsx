@@ -39,6 +39,7 @@ import computeLayout from '../../utils/computeLayout';
 import deleteSelectedData from '../../utils/deleteSelectedData';
 import config from '../../config';
 import './index.less';
+import Selection from '../selection';
 
 export interface ITopologyProps {
     data: ITopologyData; // 数据 { nodes: []; lines: [] }
@@ -83,11 +84,25 @@ export interface ITopologyProps {
     renderTreeNode?: (data: ITopologyNode, wrappers: IWrapperOptions) => React.ReactNode;
     sortChildren?: (parent: ITopologyNode, children: ITopologyNode[]) => ITopologyNode[];
     connectDropTarget?: ConnectDropTarget;
+    /** 组合节点 */
+    hasCombineNode?: boolean;
+    combineIdSet?: Set<string>;
+    cancelCombine?: (id: string) => void;
+    combineNode?: (ids: string[]) => string;
+    onShowMenu?: () => void;
+    renderBoxSelectionTool?: () => React.ReactNode;
 }
 
 interface ITopologyState {
     context: ITopologyContext;
     scaleNum: number;
+    boxSelectionInfo: {
+        initX: number;
+        initY: number;
+        x: number;
+        y: number;
+        status?: 'drag' | 'static' | 'none';
+    } | undefined;
     draggingId: string;
 }
 
@@ -374,6 +389,31 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         window.removeEventListener("keydown", this.handleKeydown);
     };
 
+    generateBoxBySelectedNodes = (elements: Element[]) => {
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+        elements.forEach(e => {
+            const { x, y, height, width } = e.getBoundingClientRect();
+            minX = Math.min(x, minX);
+            minY = Math.min(y, minY);
+            maxX = Math.max(x + width, maxX);
+            maxY = Math.max(y + height, maxY);
+        });
+        setTimeout(() => {
+            this.setState({
+                boxSelectionInfo: {
+                    initX: minX-3,
+                    initY: minY-3,
+                    x: maxX+3,
+                    y: maxY+3,
+                    status: 'static',
+                }
+            })
+        }, 0)
+    }
+
     handleKeydown = (e: KeyboardEvent) => {
         // eslint-disable-next-line
         const { classList = [] } = e.target as any;
@@ -443,6 +483,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         );
     };
 
+    selectNodesForSelection = () => {
+
+    }
+
     selectLine = (data: ITopologyData) => {
         this.setContext(
             {
@@ -502,15 +546,35 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         });
     }
 
+    isSelected = (id: string) => {
+        const {
+            context: { selectedData }
+        } = this.state;
+        return selectedData.nodes.some(item => item.id === id);
+    }
+
     clearHoverCurrentNode = () => {
         this.setContext({
             hoverCurrentNode: null
         });
     }
 
+
     handleMouseDown = (
         e: React.MouseEvent<HTMLDivElement | SVGCircleElement>
     ) => {
+        if (e.button === 2) { // 检查是否右键
+            this.setState({
+                boxSelectionInfo: {
+                    initX: e.clientX,
+                    initY: e.clientY,
+                    x: e.clientX,
+                    y: e.clientY,
+                    status: 'drag',
+                }
+            });
+            return;
+        }
         // @ts-ignore
         const itemType = e.target.getAttribute("data-type");
         // @ts-ignore
@@ -567,6 +631,19 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     };
 
     handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.persist();
+        if (!!this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'drag') {
+            this.setState((prev) => {
+                return {
+                    boxSelectionInfo: {
+                        ...prev.boxSelectionInfo,
+                        x: e.clientX,
+                        y: e.clientY,
+                    }
+                }
+            });
+            return;
+        }
         const { activeLine } = this.state.context;
         // @ts-ignore
         const isEditingLine = activeLine
@@ -604,11 +681,165 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return index;
     }
 
-    handleMouseUp = () => {
+    inSelection = (selectionPositionGroup: [IPosition, IPosition], nodePositionGroup: [IPosition, IPosition]) => {
+        const [selectionLeftTopPosition, selectionRightBottomPosition] = selectionPositionGroup;
+        const [nodeLeftTopPosition, nodeRightBottomPosition] = nodePositionGroup;
+        return (
+            nodeLeftTopPosition.x > selectionLeftTopPosition.x
+            && nodeLeftTopPosition.y > selectionLeftTopPosition.y
+            && nodeRightBottomPosition.x < selectionRightBottomPosition.x
+            && nodeRightBottomPosition.y < selectionRightBottomPosition.y
+        );
+    }
+
+    getBoxPositionGroup = () => {
+        if (!this.state.boxSelectionInfo) {
+            return undefined;
+        }
+        const {
+            boxSelectionInfo: {
+                initX,
+                initY,
+                x,
+                y
+            }
+        } = this.state;
+        const selectionLeftTopPosition = {
+            x: Math.min(initX, x),
+            y: Math.min(initY, y),
+        }
+        const selectionRightBottomPosition = {
+            x: Math.max(initX, x),
+            y: Math.max(initY, y),
+        }
+        return [selectionLeftTopPosition, selectionRightBottomPosition] as [IPosition, IPosition];
+    }
+
+    getNodeDomList = () => {
+        return [...(this.$canvas.querySelectorAll('[id^="topology-node-"]') as any)] as Element[];
+    }
+
+    // getShouldSelectedNodeList函数：获取框选中的节点列表
+    getShouldSelectedNodeList = () => {
+        // Step 1: 获取box(矩形选择框)的位置信息(boxPositionGroup)和需要筛选的DOM列表(nodeList)
+        const boxPositionGroup = this.getBoxPositionGroup();
+        const ret = {
+        nativeNodeList: [] as Element[],
+        selectedNodeList: [] as ITopologyNode[],
+        boxPositionGroup,
+        }
+
+        // 如果没有筛选框的位置信息，则直接返回空；否则，获取框选中的节点列表进行下一步处理
+        if (!boxPositionGroup) {
+        return ret;
+        }
+        const nodeList: Element[] = this.getNodeDomList();
+
+        // Step 2: 筛选出所有与box相交的节点(nativeNodeList)，以及属于这些节点所属的整合组合的集合(combineIdSet)
+        const nativeNodeList = nodeList.filter(node => {
+        const info = node.getBoundingClientRect();
+        const nodePositionLeftTop: IPosition = {
+            x: info.x,
+            y: info.y,
+        }
+        const nodePositionRightBottom = {
+            x: info.x + info.width,
+            y: info.y + info.height,
+        }
+        const nodePositionGroup: [IPosition, IPosition] = [nodePositionLeftTop, nodePositionRightBottom];
+        return this.inSelection(boxPositionGroup, nodePositionGroup);
+        }) as HTMLElement [];
+        const combineIdSet = new Set(nativeNodeList.map(node => node.dataset.combineId).filter(id => !!id)); // 把每个有'data-combine-id'属性的HTML节点转化为数组后，筛选出仅由combileId的(无重复)集合combineIdSet
+
+        // Step 3: 将筛选后的结果flat化、去重和拼接之后，以id形式存储在shouldSelectedNodeIdList中
+        const combineIdList = [];
+        combineIdSet.forEach(id => {
+            combineIdList.push(id);
+        });
+        const shouldSelectedNodeIdList = nativeNodeList.map(n => (n.firstChild as HTMLElement)).map(node => node.dataset.id); // 把所有HTML节点的第一个子元素，即头部节点的'data-id'属性放进shouldSelectedNodeIdList中
+        this.props.data.nodes.forEach(node => { // 筛选出每个整合组合的'data-id', 拼接到shouldSelectedNodeIdList里面
+            if (combineIdSet.has(node.combineId)) {
+                shouldSelectedNodeIdList.push(node.id);
+            }
+        });
+
+        // Step 4: 把结果与props.data.nodes中的节点进行比较并存储下来(selectedNodeList是把筛选过的节点的详细信息添加到一个新对象(IWidgetNode)构成的列表里)
+        const idSet = new Set(shouldSelectedNodeIdList);
+        const selectedNodeList: ITopologyNode[] = [];
+        this.props.data.nodes.forEach(node => {
+            if (idSet.has(node.id)) {
+                selectedNodeList.push(node);
+            }
+        })
+
+        // Step 5: 返回所有需要返回的信息(nativeNodeList, selectedNodeList, boxPositionGroup)，其中nativeNodeList中是从nodeList-filter-domNodeList里面经过box筛选后得到的HTML节点，selectedNodeList则是把选中节点详细存储到一个对象构成的列表里
+        ret.nativeNodeList = nodeList.filter(node => idSet.has((node.firstChild as HTMLElement).dataset.id));
+        ret.selectedNodeList = selectedNodeList;
+        return ret;
+    }
+
+    getLinesFromNode = (nodes: ITopologyNode[]) => {
+        const set = new Set(nodes.map(n => n.id));
+        const {
+            data: { lines },
+        } = this.props;
+        return lines.filter(line => set.has(line.start.split('-')[0]) && set.has(line.end.split('-')[0]));
+    }
+
+    couldDispatchContextMenuEvent = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.button !== 2) {
+            return false;
+        }
+        if (this.state.boxSelectionInfo && (Math.abs(this.state.boxSelectionInfo.initX - e.clientX) > 3 || Math.abs(this.state.boxSelectionInfo.initY - e.clientY) > 3)) {
+            return false;
+        }
+        return true;
+    }
+
+    handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
         const {
             data: { lines },
             readOnly
         } = this.props;
+        const shouldOpenContextMenuFlag = this.couldDispatchContextMenuEvent(e);
+        const isDragBox = this.state?.boxSelectionInfo?.status === 'drag' && !shouldOpenContextMenuFlag;
+        let boxSelectionInfoState = isDragBox ? {...this.state.boxSelectionInfo, status: 'none' as const} : undefined;
+
+        if (shouldOpenContextMenuFlag) {
+            const mouseEvent = new MouseEvent('contextmenu', {
+                bubbles: true,
+                cancelable: true,
+                clientX: e.clientX,
+                clientY: e.clientY,
+                screenX: e.screenX,
+                screenY: e.screenY,
+                button: e.button,
+                buttons: e.buttons,
+            });
+            this.$wrapper.dispatchEvent(mouseEvent);
+        }
+        if (isDragBox) {
+            const { selectedNodeList: nodeList, nativeNodeList } = this.getShouldSelectedNodeList();
+            if (nodeList.length === 0) {
+                boxSelectionInfoState = undefined;
+            } else {
+                this.generateBoxBySelectedNodes(nativeNodeList);
+            }
+            const lineList = this.getLinesFromNode(nodeList);
+            this.setContext({ selectedData: { nodes: nodeList, lines: lineList } }, () => {
+                const { onSelect } = this.props;
+                if (onSelect) {
+                    onSelect(this.state.context.selectedData);
+                }
+            });
+            this.setState({
+                boxSelectionInfo: boxSelectionInfoState
+            });
+            return;
+        }
+        this.setState({
+            boxSelectionInfo: boxSelectionInfoState
+        });
         const { activeLine, impactNode } = this.state.context;
         const isLineEdit = activeLine && activeLine.type !== LineEditType.ADD;
         if (isLineEdit && impactNode && !readOnly) {
@@ -738,6 +969,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 data={item}
                 scaleNum={scaleNum}
                 draggingId={draggingId}
+                isSelected={this.isSelected(item.id)}
+                combineId={item.combineId}
                 setDraggingId={this.setDraggingId}
                 isReduceRender={isReduceRender}
                 readOnly={readOnly}
@@ -794,6 +1027,17 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         document.body.appendChild(domMap);
         setTimeout(this.cacheNodeSize, 1000);
     };
+
+    // renderSelection = () => {
+    //     const selectionInfo = this.state.boxSelectionInfo;
+    //     const { x: initX, y: initY } = computeCanvasPo({x: selectionInfo.initX, y: selectionInfo.initY}, this.$wrapper);
+    //     const { x, y } = computeCanvasPo({x: selectionInfo.x, y: selectionInfo.y}, this.$wrapper);
+    //     const maxX = Math.min(initX, x);
+    //     const maxY = Math.min(initY, y);
+    //     const width = Math.abs(x - initX);
+    //     const height = Math.abs(y - initY);
+    //     return <div style={{ position: 'absolute', zIndex: 1010, opacity: 0.5, left: `${maxX}px`, top: `${maxY}px`, width: `${width}px`, height: `${height}px`, background: 'blue' }}></div>
+    // }
 
     renderLines = () => {
         const {
@@ -1021,9 +1265,15 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return isOverlap;
     }
 
+    multiValidateIsOverlap = (drawId, pos): boolean => {
+        return false;
+    }
+
     render() {
         const { connectDropTarget, showBar } = this.props;
-        const { context, scaleNum } = this.state;
+        const { context, scaleNum, boxSelectionInfo } = this.state;
+        const xPos = boxSelectionInfo ? `${boxSelectionInfo.x},${boxSelectionInfo.initX}` : '';
+        const yPos = boxSelectionInfo ? `${boxSelectionInfo.y},${boxSelectionInfo.initY}` : '';
         return connectDropTarget!(
             <div className="byai-topology">
                 <div
@@ -1034,6 +1284,12 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         "topology-wrapper": true,
                         "topology-linking": context.linking
                     })}
+                    onContextMenu={(e) => {
+                        if (e.isTrusted) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                        }
+                    }}
                     onMouseDown={this.handleMouseDown}
                     onMouseMove={this.handleMouseMove}
                     onMouseUp={this.handleMouseUp}
@@ -1056,6 +1312,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         <Provider value={context}>
                             {this.renderNodes()}
                             {this.renderLines()}
+                            <Selection renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper} visible={!!boxSelectionInfo} />
                         </Provider>
                     </div>
                 </div>
@@ -1122,7 +1379,6 @@ export default DropTarget(
             const item = monitor.getItem();
             const type = monitor.getItemType();
             const clientOffset = monitor.getDifferenceFromInitialOffset();
-
             if (!clientOffset) {
                 return;
             }
