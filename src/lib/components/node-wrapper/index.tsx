@@ -13,6 +13,7 @@ import {
 import './index.less';
 import { SelectMode } from '../../utils/selectNodes';
 import {
+    getRealNodeDom,
     isMatchKeyValue
 } from '../../utils';
 import config from '../../config';
@@ -32,6 +33,13 @@ export interface INodeWrapperProps {
     readOnly?: boolean;
     isReduceRender?: boolean;
     isSelected?: boolean;
+    getBoundary: (elements: Element[]) => {
+        minX: number;
+        minY: number;
+        maxX: number;
+        maxY: number;
+    };
+    selectedNodes?: ITopologyNode[];
     combineId?: string;
     prevNodeStyle?: {
         // 暂时支持这两个属性
@@ -125,7 +133,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         // onSelect(data, SelectMode.NORMAL);
     };
 
-    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, isSelect=true) => {
         const { data, onSelect } = this.props;
         if (e.button === 2) {
             e.preventDefault();
@@ -140,7 +148,9 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             onSelect(data, SelectMode.MUL_NORMAL);
             return;
         }
-        onSelect(data, SelectMode.NORMAL);
+        if (!isSelect) {
+            onSelect(data, SelectMode.NORMAL);
+        }
     };
 
     handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -203,7 +213,9 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
                 className="byai-topology-node-wrapper"
                 onClick={this.handleClick}
                 onContextMenu={this.handleRightClick}
-                onMouseDown={this.handleMouseDown}
+                onMouseDown={(e) => {
+                    this.handleMouseDown(e, isSelected);
+                }}
                 onMouseEnter={() => { onMouseEnter(data) }}
                 onMouseLeave={() => { onMouseLeave() }}
             >
@@ -244,32 +256,35 @@ export default DragSource(
         beginDrag(props: INodeWrapperProps) {
             const id = props.data ? props.data.id : null;
             const { scaleNum=1, prevNodeStyle = {} } = props;
-            const isSelected = props.isSelected;
-            if (!isSelected) {
-                props.onSelect(props.data, SelectMode.NORMAL);
-            }
             props.setDraggingId(id);
-
             // beginDrag 时机 处理预览节点样式问题
             const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
             if (!draggingPreviewNode) return null;
-            const realNodeDom = document.getElementById(`topology-node-${id}`);
+            const realNodeDom = getRealNodeDom(id);
             if (!realNodeDom) return null;
-            // const testNode = document.getElementById('test');
-            // const distanceX = testNode ? Math.abs(realNodeDom.offsetLeft - testNode.offsetLeft) : 0;
-            // const distanceY = testNode ? Math.abs(realNodeDom.offsetTop - testNode.offsetTop) : 0;
-            const previewNodeWidth = scaleNum * realNodeDom.offsetWidth - 2; // border
-            const previewNodeHeight = scaleNum * realNodeDom.offsetHeight - 2;
-            // const previewNodeWidth = scaleNum * (testNode? testNode: realNodeDom).offsetWidth - 2; // border
-            // const previewNodeHeight = scaleNum * (testNode? testNode: realNodeDom).offsetHeight - 2;
+            let distanceX = 0;
+            let distanceY = 0;
+            const otherRealNodeDomList = props.selectedNodes.filter(item => item.id !== id).map(item => getRealNodeDom(item.id));
+            let width = realNodeDom.offsetWidth;
+            let height = realNodeDom.offsetHeight
+            if (otherRealNodeDomList.length > 0) {
+                const boxPosition = props.getBoundary([...otherRealNodeDomList, realNodeDom]);
+                const { x , y } = realNodeDom.getBoundingClientRect();
+                distanceX = x - boxPosition.minX;
+                distanceY = y - boxPosition.minY;
+                width = boxPosition.maxX - boxPosition.minX;
+                height = boxPosition.maxY - boxPosition.minY;
+            }
+            const previewNodeWidth = scaleNum * width - 2; // border
+            const previewNodeHeight = scaleNum * height - 2;
             draggingPreviewNode.style.background = prevNodeStyle.background || '#6f6fc7';
             draggingPreviewNode.style.border = prevNodeStyle.border || '1px dashed #1F8CEC';
             draggingPreviewNode.style.width = previewNodeWidth + 'px';
             draggingPreviewNode.style.height = previewNodeHeight + 'px';
-            // draggingPreviewNode.style.setProperty('--width', previewNodeWidth + 'px');
-            // draggingPreviewNode.style.setProperty('--height', previewNodeHeight + 'px');
-            // draggingPreviewNode.style.setProperty('--transformX', testNode ? `${-distanceX}px` : '0px');
-            // draggingPreviewNode.style.setProperty('--transformY', testNode ? `${-distanceY}px` : '0px');
+            draggingPreviewNode.style.setProperty('--width', previewNodeWidth + 'px');
+            draggingPreviewNode.style.setProperty('--height', previewNodeHeight + 'px');
+            draggingPreviewNode.style.setProperty('--transformX', `${-distanceX}px`);
+            draggingPreviewNode.style.setProperty('--transformY', `${-distanceY}px`);
             // 恢复
             setTimeout(() => {
                 draggingPreviewNode.style.background = 'transparent';
@@ -279,13 +294,13 @@ export default DragSource(
         },
         endDrag(props: INodeWrapperProps) {
             props.setDraggingId(null);
-            // const id = props.data ? props.data.id : null;
-            // const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
-            // if (!draggingPreviewNode) return null;
-            // draggingPreviewNode.style.setProperty('--width', '100%');
-            // draggingPreviewNode.style.setProperty('--height', '100%');
-            // draggingPreviewNode.style.setProperty('--transformX', '0px');
-            // draggingPreviewNode.style.setProperty('--transformY', '0px');
+            const id = props.data ? props.data.id : null;
+            const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
+            if (!draggingPreviewNode) return null;
+            draggingPreviewNode.style.setProperty('--width', '100%');
+            draggingPreviewNode.style.setProperty('--height', '100%');
+            draggingPreviewNode.style.setProperty('--transformX', '0px');
+            draggingPreviewNode.style.setProperty('--transformY', '0px');
         },
     },
     connect => ({

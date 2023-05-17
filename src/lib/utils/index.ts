@@ -292,3 +292,9 @@ export const isMatchKeyValue = (obj, matchKey?, matchValue?) => {
     loop(obj);
     return isMatch;
 };
+
+export const TOPOLOGY_NODE_PREFIX = 'topology-node-';
+
+export const getRealNodeDom = (id: string) => {
+    return document.getElementById(`${TOPOLOGY_NODE_PREFIX}${id}`);
+}

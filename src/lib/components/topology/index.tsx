@@ -389,7 +389,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         window.removeEventListener("keydown", this.handleKeydown);
     };
 
-    generateBoxBySelectedNodes = (elements: Element[]) => {
+    getBoundary = (elements: Element[]) => {
         let minX = Infinity;
         let minY = Infinity;
         let maxX = -Infinity;
@@ -401,13 +401,23 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             maxX = Math.max(x + width, maxX);
             maxY = Math.max(y + height, maxY);
         });
+        return {
+            minX,
+            minY,
+            maxX,
+            maxY
+        }
+    }
+
+    generateBoxBySelectedNodes = (elements: Element[], offset=3) => {
+        const { minX, minY, maxX, maxY } = this.getBoundary(elements);
         setTimeout(() => {
             this.setState({
                 boxSelectionInfo: {
-                    initX: minX-3,
-                    initY: minY-3,
-                    x: maxX+3,
-                    y: maxY+3,
+                    initX: minX - offset,
+                    initY: minY - offset,
+                    x: maxX + offset,
+                    y: maxY + offset,
                     status: 'static',
                 }
             })
@@ -801,6 +811,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             data: { lines },
             readOnly
         } = this.props;
+        const { clientX, clientY, screenX, screenY, button, buttons } = e;
         const shouldOpenContextMenuFlag = this.couldDispatchContextMenuEvent(e);
         const isDragBox = this.state?.boxSelectionInfo?.status === 'drag' && !shouldOpenContextMenuFlag;
         let boxSelectionInfoState = isDragBox ? {...this.state.boxSelectionInfo, status: 'none' as const} : undefined;
@@ -809,12 +820,12 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             const mouseEvent = new MouseEvent('contextmenu', {
                 bubbles: true,
                 cancelable: true,
-                clientX: e.clientX,
-                clientY: e.clientY,
-                screenX: e.screenX,
-                screenY: e.screenY,
-                button: e.button,
-                buttons: e.buttons,
+                clientX,
+                clientY,
+                screenX,
+                screenY,
+                button,
+                buttons
             });
             this.$wrapper.dispatchEvent(mouseEvent);
         }
@@ -902,7 +913,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         this.clearMouseEventData();
     };
 
-    handleNodeDraw = (nodeId: string, position: IPosition, childPosMap?: {
+    handleNodeDraw = (nodeInfoList: [string, IPosition][], childPosMap?: {
         [key: string]: {
             x: number;
             y: number;
@@ -910,7 +921,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }) => {
         const { data } = this.props;
         const posMaps = {
-            [nodeId]: position,
+            ...nodeInfoList.reduce((prev, curr) => {
+                const [nodeId, position] = curr;
+                return {
+                    ...prev,
+                    [nodeId]: position
+                }
+            }, {}),
             ...childPosMap
         };
         this.onChange(
@@ -947,6 +964,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             isReduceRender,
             prevNodeStyle,
         } = this.props;
+        const { context } = this.state;
+        const selectedNodes = context?.selectedData?.nodes || [];
         const {
             scaleNum,
             draggingId,
@@ -971,6 +990,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 draggingId={draggingId}
                 isSelected={this.isSelected(item.id)}
                 combineId={item.combineId}
+                getBoundary={this.getBoundary}
+                selectedNodes={selectedNodes}
                 setDraggingId={this.setDraggingId}
                 isReduceRender={isReduceRender}
                 readOnly={readOnly}
@@ -1231,7 +1252,41 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
      * @param pos
      * @returns
      */
-    validateIsOverlap = (drawId, pos): boolean => {
+    // validateIsOverlap = (drawId, pos): boolean => {
+    //     const {
+    //         data: { nodes },
+    //         overlap,
+    //         overlapOffset = {}
+    //     } = this.props;
+
+    //     if (!overlap) return false;
+
+    //     const getNodeOffsetPos = (position: IPosition, id: string): IPosition => {
+    //         return {
+    //             x: position.x + getNodeSize(id).width + overlapOffset.offsetX || 0,
+    //             y: position.y + getNodeSize(id).height + overlapOffset.offsetY || 0,
+    //         }
+    //     }
+
+    //     const S1 = {
+    //         x: pos.x,
+    //         y: pos.y
+    //     }
+    //     const S2 = getNodeOffsetPos(pos, drawId);
+    //     const posMap: IPosMap[] = nodes && nodes.filter(n => n.id !== drawId && !n.filterOverlap).map(n => {
+    //         return {
+    //             T1: {
+    //                 x: n.position.x,
+    //                 y: n.position.y,
+    //             },
+    //             T2: getNodeOffsetPos(n.position, n.id)
+    //         }
+    //     })
+    //     const isOverlap = posMap.some((p: IPosMap) => !(S2.y < p.T1.y || S1.y > p.T2.y || S2.x < p.T1.x || S1.x > p.T2.x) === true);
+    //     return isOverlap;
+    // }
+
+    validateIsOverlap = (nodeInfo: [string, IPosition][]): boolean => {
         const {
             data: { nodes },
             overlap,
@@ -1239,6 +1294,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         } = this.props;
 
         if (!overlap) return false;
+        const nodePosMap = new Map<string, IPosition>();
+        nodeInfo.forEach(([id, pos]) => {
+            nodePosMap.set(id, pos);
+        });
 
         const getNodeOffsetPos = (position: IPosition, id: string): IPosition => {
             return {
@@ -1247,12 +1306,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             }
         }
 
-        const S1 = {
-            x: pos.x,
-            y: pos.y
-        }
-        const S2 = getNodeOffsetPos(pos, drawId);
-        const posMap: IPosMap[] = nodes && nodes.filter(n => n.id !== drawId && !n.filterOverlap).map(n => {
+
+        const posMap: IPosMap[] = nodes && nodes.filter(n => !nodePosMap.has(n.id) && !n.filterOverlap).map(n => {
+            // const pos = nodePosMap.get(n.id);
+
             return {
                 T1: {
                     x: n.position.x,
@@ -1261,12 +1318,23 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 T2: getNodeOffsetPos(n.position, n.id)
             }
         })
-        const isOverlap = posMap.some((p: IPosMap) => !(S2.y < p.T1.y || S1.y > p.T2.y || S2.x < p.T1.x || S1.x > p.T2.x) === true);
+        const isOverlap = Array.from(nodePosMap).some(([id, pos]) => {
+            const S1 = {
+                x: pos.x,
+                y: pos.y
+            }
+            const S2 = getNodeOffsetPos(pos, id);
+            return posMap.some((p: IPosMap) => !(S2.y < p.T1.y || S1.y > p.T2.y || S2.x < p.T1.x || S1.x > p.T2.x) === true);
+        });
         return isOverlap;
     }
 
     multiValidateIsOverlap = (drawId, pos): boolean => {
         return false;
+    }
+
+    getSelectNodeDom = () => {
+
     }
 
     render() {
@@ -1396,7 +1464,6 @@ export default DropTarget(
                         Number(nodePosition.top.replace(/[px]+/g, "")) +
                         clientOffset.y / component.scaleNum
                 };
-
                 const scrollPosition = computeCanvasPo(
                     monitor.getSourceClientOffset(),
                     component.$wrapper
@@ -1439,9 +1506,9 @@ export default DropTarget(
                     component.$wrapper
                 )
             }
-
-            const isOverlap = (id, position) => {
-                return component.validateIsOverlap(id, position);
+            let nodeProps: [string, IPosition][] = [[(item as ITopologyNode).id, position]];
+            const isOverlap = (nodeInfo: [string, IPosition][]) => {
+                return component.validateIsOverlap(nodeInfo);
             }
 
             switch (type) {
@@ -1458,7 +1525,7 @@ export default DropTarget(
                         nodes: [...props.data.nodes, { ...item.data, position }],
                     }, ChangeType.ADD_NODE);
 
-                    if (isOverlap(item.data.id, position)) {
+                    if (isOverlap([[item.data.id, position]])) {
                         component.onChange({
                             ...props.data,
                             nodes: [...props.data.nodes],
@@ -1467,11 +1534,34 @@ export default DropTarget(
                     };
                     break;
                 case NodeTypes.NORMAL_NODE:
-                    if (isOverlap((item as ITopologyNode).id, position)) {
+
+                    const targetNodeInfo = props.data.nodes.find(node => {
+                        return node.id === item.id;
+                    });
+                    const targetPosition = targetNodeInfo ? targetNodeInfo.position : null;
+                    if (targetPosition) {
+                        const offset = {
+                            x: position.x - targetPosition.x,
+                            y: position.y - targetPosition.y
+                        };
+                        const selectedIdSet = new Set(component.state.context.selectedData.nodes.map(n => n.id));
+                        const selectedPositionList: [string, IPosition][] = [];
+                        props.data.nodes.forEach(n => {
+                            if (selectedIdSet.has(n.id)) {
+                                const newPosition = {
+                                    x: n.position.x + offset.x,
+                                    y: n.position.y + offset.y
+                                }
+                                selectedPositionList.push([n.id, newPosition]);
+                            }
+                        });
+                        nodeProps = [...selectedPositionList, ...nodeProps]
+                    }
+                    if (isOverlap(nodeProps)) {
                         props.overlapCallback && props.overlapCallback();
                         return;
                     };
-                    component.handleNodeDraw((item as ITopologyNode).id, position, getChildPosMap());
+                    component.handleNodeDraw(nodeProps, getChildPosMap());
                     break;
                 case NodeTypes.ANCHOR:
                     component.handleLineDraw((item as { id: string }).id);
