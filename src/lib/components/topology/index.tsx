@@ -981,7 +981,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     downloadImg = async (openDownload?: boolean, imgName?: string) => {
-        openDownload && this.setState({ loading: true, })
+        // openDownload && this.setState({ loading: true, })
         const graphEl: any = document.querySelector(".topology-canvas");
         let imgBase64 = '';
         const _this = this;
@@ -1101,6 +1101,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         // 截图之前需要重置 scaleNum 为 1，避免坐标错位
                         this.setState({
                             scaleNum: 1,
+                            loading: true,
                         }, () => {
                             downloadImg ? downloadImg() : this.downloadImg(true);
                         })
