@@ -99,6 +99,7 @@ interface ITopologyState {
     context: ITopologyContext;
     scaleNum: number;
     draggingId: string;
+    loading: boolean;
 }
 
 interface NodeSizeCache {
@@ -122,7 +123,8 @@ const MIN_SCALE = 0.1;
 const initialTopologyState = {
     context: defaultContext,
     scaleNum: 1,
-    draggingId: null
+    draggingId: null,
+    loading: false
 } as ITopologyState;
 
 class Topology extends React.Component<ITopologyProps, ITopologyState> {
@@ -139,6 +141,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     dragCanvasPo: IPosition | null = null;
 
     shouldAutoLayout: boolean = false;
+
 
     constructor(props: ITopologyProps) {
         super(props);
@@ -978,6 +981,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     downloadImg = async (openDownload?: boolean, imgName?: string) => {
+        openDownload && this.setState({ loading: true, })
         const graphEl: any = document.querySelector(".topology-canvas");
         let imgBase64 = '';
         const _this = this;
@@ -1020,6 +1024,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 a.download = imgName || '图片';
                 a.click();
             }
+            this.setState({ loading: false })
             return Promise.resolve(imgBase64);
         })
     }
@@ -1050,11 +1055,17 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     renderToolBars = () => {
-        const { scaleNum } = this.state;
+        const { scaleNum, loading } = this.state;
         const { showCenter, showLayout, showDownload, downloadImg } = this.props;
         /* eslint-disable */
         // @ts-ignore
         const zoomPercent = `${parseInt(String((scaleNum ? scaleNum : 1).toFixed(1) * 100))}%`;
+
+        const exportStyle: React.CSSProperties = loading ? {
+            backgroundColor: 'rgba(0,0,0,.04)',
+            cursor: 'not-allowed',
+        } : {}
+
         return (
             <div className="topology-tools" data-html2canvas-ignore={false}>
                 {showCenter !== false && <div
@@ -1084,10 +1095,12 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 {showDownload && <div
                     className="topology-tools-btn"
                     id="export-img"
+                    style={exportStyle}
                     onClick={async () => {
+                        if (loading) return;
                         // 截图之前需要重置 scaleNum 为 1，避免坐标错位
                         this.setState({
-                            scaleNum: 1
+                            scaleNum: 1,
                         }, () => {
                             downloadImg ? downloadImg() : this.downloadImg(true);
                         })
@@ -1095,7 +1108,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     }}
                 >
                     <img alt='' src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9IiM2MTYxNjEiIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPjxwYXRoIGQ9Ik01MTIgNjJsNS42LjRDNTM5LjggNjUuMSA1NTcgODQuMSA1NTcgMTA3YzAgMjQuOS0yMC4xIDQ1LTQ1IDQ1SDE3NC41bC00LjUuNWMtMTAuMyAyLjEtMTggMTEuMi0xOCAyMnY0OTcuOWwxNzIuOC0xNTguM2MyNy41LTI1LjIgNjguNy0yNy41IDk4LjYtNi4zbDUuOCA0LjUgMTUxLjkgMTMwLjIgMTA0LjQtMTA0LjNjMjYtMjYgNjYuMi0zMC4zIDk2LjktMTEuNGw2IDQuMSA4My41IDYyLjZWNTEyaDkwdjMzNy41bC0uMyA4LjRDOTU3LjQgOTE2LjEgOTA4LjggOTYyIDg0OS41IDk2MmgtNjc1bC04LjQtLjNDMTA3LjkgOTU3LjQgNjIgOTA4LjggNjIgODQ5LjV2LTY3NWwuMy04LjRDNjYuNiAxMDcuOSAxMTUuMiA2MiAxNzQuNSA2Mkg1MTJ6TTM3My4xIDU2MmwtMi43IDEuOUwxNTIgNzY0djg1LjVsLjUgNC41YzIuMSAxMC4zIDExLjIgMTggMjIgMThoNjc1YzEyLjQgMCAyMi41LTEwLjEgMjIuNS0yMi41VjY3Ny45bC0xMjQtOTNjLTMuNi0yLjctOC4zLTIuOS0xMi4xLS45bC0yLjYgMi0xMDAuNyAxMDAuNiA4MS40IDY5LjhjMTQuMiAxMi4xIDE1LjggMzMuNCAzLjcgNDcuNi0xMSAxMi45LTI5LjYgMTUuNC00My42IDYuNmwtNC0zLTI4NC43LTI0NGMtMy41LTMtOC4zLTMuNS0xMi4zLTEuNnpNOTE3IDQ2N2MyNC45IDAgNDUgMjAuMSA0NSA0NWgtOTBjMC0yNC45IDIwLjEtNDUgNDUtNDV6TTgwNC41IDczLjJjMTcuMSAwIDMxLjIgMTIuNyAzMy40IDI5LjJsLjMgNC42djE4OC41bDU0LjktNTQuOWMxMi0xMiAzMC43LTEzLjEgNDMuOS0zLjNsMy44IDMuM2MxMiAxMiAxMy4xIDMwLjcgMy4zIDQzLjlsLTMuMyAzLjgtMTEyLjQgMTEyLjYtMS44IDEuNi0uMy4yLS43LjctLjMuMi0uNS41LjQtLjQtMi42IDEuOWMtLjkuNi0xLjkgMS4xLTIuOSAxLjYtLjMuMS0uNi4zLS44LjQtMS4zLjYtMi42IDEuMS00IDEuNS0uNi4yLTEuMS4zLTEuNi41LTEuMS4zLTIuMy42LTMuNS43bC0uOS4xYy0xLjQuMi0yLjguMy00LjIuM2wtMi4zLS4xYy0yLjgtLjItNS42LS43LTguMi0xLjYtMS0uMy0xLjctLjYtMi4zLS45LTIuNS0xLTQuOS0yLjQtNy4yLTQuMS0uNy0uNS0xLjMtMS0xLjgtMS40bC0yLTEuOC0xMTIuOC0xMTIuNGMtMTMuMi0xMy4yLTEzLjItMzQuNSAwLTQ3LjcgMTItMTIgMzAuNy0xMy4xIDQzLjktMy4zbDMuOCAzLjMgNTQuOSA1NC45VjEwNy4xYy4xLTE4LjcgMTUuMi0zMy45IDMzLjgtMzMuOXoiLz48L3N2Zz4=' />
-                    <div className="tooltip">导出图片</div>
+                    <div className="tooltip">{loading? '导出中...' : '导出图片'}</div>
                 </div>}
 
                 <div className="topology-tools-zoom" onClick={this.zoomIn}>
