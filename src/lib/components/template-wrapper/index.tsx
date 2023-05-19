@@ -1,10 +1,10 @@
 import React from 'react';
 import { DragSource, DragElementWrapper } from 'react-dnd';
-import { NodeTypes, ITopologyNode } from '../../declare';
+import { NodeTypes, ITopologyNode, ITopologyData } from '../../declare';
 import './index.less';
 
 export interface ITemplateWrapperProps {
-    generator: () => ITopologyNode;
+    generator: () => ITopologyNode | ITopologyData;
     connectDragSource?: DragElementWrapper<React.ReactNode>;
     connectDragPreview?: DragElementWrapper<React.ReactNode>;
     disabled?: boolean;

@@ -7,6 +7,7 @@ export enum ChangeType {
     'DELETE',
     'EDIT_LINE',
     'EDIT_NODE',
+    'ADD_COMPONENT'
 }
 
 export enum NodeTypes {

@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { DropTarget, ConnectDropTarget } from 'react-dnd';
 import _ from 'lodash';
 import classnames from 'classnames';
-import selectNodes, { SelectMode } from '../../utils/selectNodes';
+import selectNodes, { getLinesFromNode, SelectMode } from '../../utils/selectNodes';
 import { Provider, defaultContext } from '../context';
 import NodeWrapper from '../node-wrapper';
 import Line from '../line';
@@ -32,7 +32,8 @@ import {
     createHashFromObjectArray,
     getNodeSize,
     shouldAutoLayout,
-    isMatchKeyValue
+    isMatchKeyValue,
+    getRealNodeDom
 } from '../../utils';
 // import layoutCalculation from '../../utils/layoutCalculation';
 import computeLayout from '../../utils/computeLayout';
@@ -104,6 +105,7 @@ interface ITopologyState {
         status?: 'drag' | 'static' | 'none';
     } | undefined;
     draggingId: string;
+    realDragNodeDomList?: Element[] | null;
 }
 
 interface NodeSizeCache {
@@ -409,8 +411,14 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         }
     }
 
-    generateBoxBySelectedNodes = (elements: Element[], offset=3) => {
-        const { minX, minY, maxX, maxY } = this.getBoundary(elements);
+    getRealNodeDomByIdList = (ids: string[]) => {
+        return ids.map(getRealNodeDom)
+    }
+
+
+
+    generateBoxByRealSelectedNodeDom = (elements: Element[] | null, offset=3) => {
+        const { minX, minY, maxX, maxY } = this.getBoundary(elements || this.state.realDragNodeDomList);
         setTimeout(() => {
             this.setState({
                 boxSelectionInfo: {
@@ -422,6 +430,16 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 }
             })
         }, 0)
+    }
+
+    generateBoxBySelectedNode = (nodes: ITopologyNode[], offset=3) => {
+        if (nodes.length === 0) {
+            this.setState({
+                boxSelectionInfo: null
+            })
+            return;
+        }
+        this.generateBoxByRealSelectedNodeDom(this.getRealNodeDomByIdList(nodes.map(n => n.id)), offset);
     }
 
     handleKeydown = (e: KeyboardEvent) => {
@@ -486,6 +504,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 })
             },
             () => {
+                if (this.state.boxSelectionInfo) {
+                    this.generateBoxBySelectedNode(this.state.context.selectedData.nodes);
+                }
                 if (onSelect) {
                     onSelect(this.state.context.selectedData);
                 }
@@ -729,6 +750,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return [...(this.$canvas.querySelectorAll('[id^="topology-node-"]') as any)] as Element[];
     }
 
+    getCombineNode = (combineId: string) => {
+        if (!combineId) {
+            return [];
+        }
+        return this.props.data.nodes.filter(item => item.combineId === combineId);
+    }
+
     // getShouldSelectedNodeList函数：获取框选中的节点列表
     getShouldSelectedNodeList = () => {
         // Step 1: 获取box(矩形选择框)的位置信息(boxPositionGroup)和需要筛选的DOM列表(nodeList)
@@ -788,13 +816,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return ret;
     }
 
-    getLinesFromNode = (nodes: ITopologyNode[]) => {
-        const set = new Set(nodes.map(n => n.id));
-        const {
-            data: { lines },
-        } = this.props;
-        return lines.filter(line => set.has(line.start.split('-')[0]) && set.has(line.end.split('-')[0]));
-    }
 
     couldDispatchContextMenuEvent = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.button !== 2) {
@@ -806,6 +827,12 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return true;
     }
 
+    closeBoxSelection = () => {
+        this.setState({
+            boxSelectionInfo: null
+        })
+    }
+
     handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
         const {
             data: { lines },
@@ -813,9 +840,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         } = this.props;
         const { clientX, clientY, screenX, screenY, button, buttons } = e;
         const shouldOpenContextMenuFlag = this.couldDispatchContextMenuEvent(e);
+        const isMultiClick = e.ctrlKey || e.metaKey;
         const isDragBox = this.state?.boxSelectionInfo?.status === 'drag' && !shouldOpenContextMenuFlag;
-        let boxSelectionInfoState = isDragBox ? {...this.state.boxSelectionInfo, status: 'none' as const} : undefined;
 
+        // 允许打开右键菜单
         if (shouldOpenContextMenuFlag) {
             const mouseEvent = new MouseEvent('contextmenu', {
                 bubbles: true,
@@ -829,14 +857,25 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             });
             this.$wrapper.dispatchEvent(mouseEvent);
         }
+        // 单击且没有按住ctrl/meta键时，清空框选框
+        if (!isMultiClick) {
+            this.setState({
+                boxSelectionInfo: undefined
+            })
+        }
+
+        // 拖动框选box结束时
         if (isDragBox) {
             const { selectedNodeList: nodeList, nativeNodeList } = this.getShouldSelectedNodeList();
-            if (nodeList.length === 0) {
-                boxSelectionInfoState = undefined;
+            if (nodeList.length === 0) { // 没有选中任何节点
+                this.setState({
+                    boxSelectionInfo: undefined
+                });
+                return;
             } else {
-                this.generateBoxBySelectedNodes(nativeNodeList);
+                this.generateBoxByRealSelectedNodeDom(nativeNodeList);
             }
-            const lineList = this.getLinesFromNode(nodeList);
+            const lineList = getLinesFromNode(lines, nodeList);
             this.setContext({ selectedData: { nodes: nodeList, lines: lineList } }, () => {
                 const { onSelect } = this.props;
                 if (onSelect) {
@@ -844,13 +883,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 }
             });
             this.setState({
-                boxSelectionInfo: boxSelectionInfoState
+                boxSelectionInfo: {...this.state.boxSelectionInfo, status: 'none' as const}
             });
             return;
         }
-        this.setState({
-            boxSelectionInfo: boxSelectionInfoState
-        });
+
         const { activeLine, impactNode } = this.state.context;
         const isLineEdit = activeLine && activeLine.type !== LineEditType.ADD;
         if (isLineEdit && impactNode && !readOnly) {
@@ -994,6 +1031,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 selectedNodes={selectedNodes}
                 setDraggingId={this.setDraggingId}
                 isReduceRender={isReduceRender}
+                closeBoxSelection={this.closeBoxSelection}
                 readOnly={readOnly}
                 prevNodeStyle={prevNodeStyle}
                 isolated={!lineHash[item.id]}
@@ -1333,8 +1371,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return false;
     }
 
-    getSelectNodeDom = () => {
-
+    setRealDragNodeDomList = (element?: Element[] | null) => {
+        this.setState({
+            realDragNodeDomList: element
+        })
     }
 
     render() {
@@ -1506,7 +1546,7 @@ export default DropTarget(
                     component.$wrapper
                 )
             }
-            let nodeProps: [string, IPosition][] = [[(item as ITopologyNode).id, position]];
+            let nodeProps: [string, IPosition][] = [[(item as ITopologyNode).id ?? item?.data?.id, position]];
             const isOverlap = (nodeInfo: [string, IPosition][]) => {
                 return component.validateIsOverlap(nodeInfo);
             }
@@ -1516,25 +1556,51 @@ export default DropTarget(
                     if (!item.data) {
                         return;
                     }
+                    const isMultiInfo = item.data.nodes && Array.isArray(item.data.nodes) && item.data.lines && Array.isArray(item.data.lines);
                     /**
                      * TODO：Here first render the newly added node, if it overlaps, delete the node
                      * The main reason is that there is currently no good unified method to get the default width and height of the newly added nodes in the upper layer.
                      */
-                    component.onChange({
-                        ...props.data,
-                        nodes: [...props.data.nodes, { ...item.data, position }],
-                    }, ChangeType.ADD_NODE);
-
-                    if (isOverlap([[item.data.id, position]])) {
+                    if (isMultiInfo) {
+                        nodeProps = [];
+                        const minX = Math.min(...item.data.nodes.map(n => n.position.x));
+                        const minY = Math.min(...item.data.nodes.map(n => n.position.y));
+                        const offset = {
+                            x: position.x - minX,
+                            y: position.y - minY
+                        }
+                        const selectedPositionList: [string, IPosition][] = [];
+                        item.data.nodes.forEach(n => {
+                            const newPosition = {
+                                x: n.position.x + offset.x,
+                                y: n.position.y + offset.y
+                            }
+                            selectedPositionList.push([n.id, newPosition]);
+                        })
+                        nodeProps = [...selectedPositionList, ...nodeProps]
+                        component.onChange({
+                            ...props.data,
+                            nodes: [...props.data.nodes, ...item.data.nodes.map(n => {
+                                return { ...n, position: nodeProps.find(p => p[0] === n.id)[1] ?? n.position }
+                            })],
+                            lines: [...props.data.lines, ...item.data.lines ]
+                        }, ChangeType.ADD_NODE);
+                    } else {
+                        component.onChange({
+                            ...props.data,
+                            nodes: [...props.data.nodes, { ...item.data, position }],
+                        }, ChangeType.ADD_NODE);
+                    }
+                    if (isOverlap(nodeProps)) {
                         component.onChange({
                             ...props.data,
                             nodes: [...props.data.nodes],
+                            lines: [...props.data.lines]
                         }, ChangeType.ADD_NODE);
                         props.overlapCallback && props.overlapCallback();
                     };
                     break;
                 case NodeTypes.NORMAL_NODE:
-
                     const targetNodeInfo = props.data.nodes.find(node => {
                         return node.id === item.id;
                     });

@@ -39,6 +39,7 @@ export interface INodeWrapperProps {
         maxX: number;
         maxY: number;
     };
+    closeBoxSelection: () => void;
     selectedNodes?: ITopologyNode[];
     combineId?: string;
     prevNodeStyle?: {
@@ -255,7 +256,8 @@ export default DragSource(
         },
         beginDrag(props: INodeWrapperProps) {
             const id = props.data ? props.data.id : null;
-            const { scaleNum=1, prevNodeStyle = {} } = props;
+            const { scaleNum=1, prevNodeStyle = {}, closeBoxSelection } = props;
+            closeBoxSelection();
             props.setDraggingId(id);
             // beginDrag 时机 处理预览节点样式问题
             const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
@@ -265,10 +267,11 @@ export default DragSource(
             let distanceX = 0;
             let distanceY = 0;
             const otherRealNodeDomList = props.selectedNodes.filter(item => item.id !== id).map(item => getRealNodeDom(item.id));
+            const allRealNodeDomList = [...otherRealNodeDomList, realNodeDom];
             let width = realNodeDom.offsetWidth;
             let height = realNodeDom.offsetHeight
             if (otherRealNodeDomList.length > 0) {
-                const boxPosition = props.getBoundary([...otherRealNodeDomList, realNodeDom]);
+                const boxPosition = props.getBoundary(allRealNodeDomList);
                 const { x , y } = realNodeDom.getBoundingClientRect();
                 distanceX = x - boxPosition.minX;
                 distanceY = y - boxPosition.minY;
@@ -279,8 +282,6 @@ export default DragSource(
             const previewNodeHeight = scaleNum * height - 2;
             draggingPreviewNode.style.background = prevNodeStyle.background || '#6f6fc7';
             draggingPreviewNode.style.border = prevNodeStyle.border || '1px dashed #1F8CEC';
-            draggingPreviewNode.style.width = previewNodeWidth + 'px';
-            draggingPreviewNode.style.height = previewNodeHeight + 'px';
             draggingPreviewNode.style.setProperty('--width', previewNodeWidth + 'px');
             draggingPreviewNode.style.setProperty('--height', previewNodeHeight + 'px');
             draggingPreviewNode.style.setProperty('--transformX', `${-distanceX}px`);
