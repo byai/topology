@@ -13,6 +13,7 @@ import {
 import './index.less';
 import { SelectMode } from '../../utils/selectNodes';
 import {
+    getRealNodeDom,
     isMatchKeyValue
 } from '../../utils';
 import config from '../../config';
@@ -31,6 +32,17 @@ export interface INodeWrapperProps {
     onMouseLeave?: () => void;
     readOnly?: boolean;
     isReduceRender?: boolean;
+    isSelected?: boolean;
+    getBoundary: (elements: Element[]) => {
+        minX: number;
+        minY: number;
+        maxX: number;
+        maxY: number;
+    };
+    closeBoxSelection: () => void;
+    showBoxSelection?: () => void;
+    selectedNodes?: ITopologyNode[];
+    combineId?: string;
     prevNodeStyle?: {
         // 暂时支持这两个属性
         border?: string;
@@ -110,7 +122,26 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     };
 
     handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        const { onSelect, data } = this.props;
+        // 避免一些交互上的冲突,改为mousedown触发
+        // const { onSelect, data } = this.props;
+        // if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+        //     onSelect(data, SelectMode.MULTI);
+        //     return;
+        // }
+        // if (e.ctrlKey || e.metaKey) {
+        //     onSelect(data, SelectMode.MUL_NORMAL);
+        //     return;
+        // }
+        // onSelect(data, SelectMode.NORMAL);
+    };
+
+    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, isSelect=true) => {
+        const { data, onSelect } = this.props;
+        if (e.button === 2) {
+            e.preventDefault();
+            onSelect(data, SelectMode.RIGHT_NORMAL);
+            return;
+        }
         if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
             onSelect(data, SelectMode.MULTI);
             return;
@@ -119,14 +150,12 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             onSelect(data, SelectMode.MUL_NORMAL);
             return;
         }
-        onSelect(data, SelectMode.NORMAL);
-    };
-
-    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (e.button === 2) {
-            e.preventDefault();
-            const { data, onSelect } = this.props;
-            onSelect(data, SelectMode.RIGHT_NORMAL);
+        if (e.shiftKey && !e.ctrlKey && !e.metaKey) {
+            onSelect(data, SelectMode.BOX_SELECTION);
+            return;
+        }
+        if (!isSelect) {
+            onSelect(data, SelectMode.NORMAL);
         }
     };
 
@@ -185,11 +214,14 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         return connectDragSource(
             <div
                 id={data ? `topology-node-${data.id}` : ""}
+                data-combine-id={data.combineId}
                 style={this.computeStyle()}
                 className="byai-topology-node-wrapper"
                 onClick={this.handleClick}
                 onContextMenu={this.handleRightClick}
-                onMouseDown={this.handleMouseDown}
+                onMouseDown={(e) => {
+                    this.handleMouseDown(e, isSelected);
+                }}
                 onMouseEnter={() => { onMouseEnter(data) }}
                 onMouseLeave={() => { onMouseLeave() }}
             >
@@ -229,21 +261,36 @@ export default DragSource(
         },
         beginDrag(props: INodeWrapperProps) {
             const id = props.data ? props.data.id : null;
-            const { scaleNum, prevNodeStyle = {} } = props;
+            const { scaleNum=1, prevNodeStyle = {}, closeBoxSelection } = props;
+            closeBoxSelection();
             props.setDraggingId(id);
-
             // beginDrag 时机 处理预览节点样式问题
             const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
             if (!draggingPreviewNode) return null;
-            const realNodeDom = document.getElementById(`topology-node-${id}`);
+            const realNodeDom = getRealNodeDom(id);
             if (!realNodeDom) return null;
-
-            const previewNodeWidth = scaleNum * realNodeDom.offsetWidth - 2; // border
-            const previewNodeHeight = scaleNum * realNodeDom.offsetHeight - 2;
+            let distanceX = 0;
+            let distanceY = 0;
+            const otherRealNodeDomList = props.selectedNodes.filter(item => item.id !== id).map(item => getRealNodeDom(item.id));
+            const allRealNodeDomList = [...otherRealNodeDomList, realNodeDom];
+            let width = realNodeDom.offsetWidth;
+            let height = realNodeDom.offsetHeight
+            if (otherRealNodeDomList.length > 0) {
+                const boxPosition = props.getBoundary(allRealNodeDomList);
+                const { x , y } = realNodeDom.getBoundingClientRect();
+                distanceX = x - boxPosition.minX;
+                distanceY = y - boxPosition.minY;
+                width = boxPosition.maxX - boxPosition.minX;
+                height = boxPosition.maxY - boxPosition.minY;
+            }
+            const previewNodeWidth = scaleNum * width - 2; // border
+            const previewNodeHeight = scaleNum * height - 2;
             draggingPreviewNode.style.background = prevNodeStyle.background || '#6f6fc7';
             draggingPreviewNode.style.border = prevNodeStyle.border || '1px dashed #1F8CEC';
-            draggingPreviewNode.style.width = previewNodeWidth + 'px';
-            draggingPreviewNode.style.height = previewNodeHeight + 'px';
+            draggingPreviewNode.style.setProperty('--width', previewNodeWidth + 'px');
+            draggingPreviewNode.style.setProperty('--height', previewNodeHeight + 'px');
+            draggingPreviewNode.style.setProperty('--transformX', `${-distanceX}px`);
+            draggingPreviewNode.style.setProperty('--transformY', `${-distanceY}px`);
             // 恢复
             setTimeout(() => {
                 draggingPreviewNode.style.background = 'transparent';
@@ -253,6 +300,14 @@ export default DragSource(
         },
         endDrag(props: INodeWrapperProps) {
             props.setDraggingId(null);
+            const id = props.data ? props.data.id : null;
+            props?.showBoxSelection?.();
+            const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
+            if (!draggingPreviewNode) return null;
+            draggingPreviewNode.style.setProperty('--width', '100%');
+            draggingPreviewNode.style.setProperty('--height', '100%');
+            draggingPreviewNode.style.setProperty('--transformX', '0px');
+            draggingPreviewNode.style.setProperty('--transformY', '0px');
         },
     },
     connect => ({

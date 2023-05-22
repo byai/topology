@@ -12,6 +12,8 @@ export enum SelectMode {
     MUL_NORMAL,
     MULTI,
     RIGHT_NORMAL,
+    // /** 框选 */
+    BOX_SELECTION
 }
 
 export interface ProduceselectedDataFunc {
@@ -50,32 +52,52 @@ function cancelSelect(params: {
     selectedData: ITopologyData;
     mode: SelectMode;
     node: ITopologyNode;
+    nodeList: ITopologyNode[];
+    data: ITopologyData;
 }) {
     const {
         selectedData,
         mode,
         node,
+        nodeList,
     } = params;
     if (mode === SelectMode.NORMAL) {
         return { nodes: [], lines: [] };
     }
+    const currNodeIdSet = new Set(node.id);
+    nodeList.forEach(n => currNodeIdSet.add(n.id));
     const lines = selectedData.lines.filter((item) => {
-        if (item.end === node.id) {
+        if (currNodeIdSet.has(item.end)) {
             return false;
         }
-        if (item.start.split('-')[0] === node.id) {
+        if (currNodeIdSet.has(item.start.split('-')[0])) {
             return false;
         }
         return true;
     });
     let nodes;
-    if (mode === SelectMode.MUL_NORMAL) {
-        nodes = selectedData.nodes.filter(item => item.id !== node.id);
+    if (mode === SelectMode.MUL_NORMAL || mode === SelectMode.BOX_SELECTION) {
+        nodes = selectedData.nodes.filter(item => !currNodeIdSet.has(item.id));
     } else {
-        const filterArray = [...getChildren(node.id, selectedData.lines), node.id];
+        const filterArray = [...getChildren(node.id, selectedData.lines), ...nodeList.map(n => n.id)];
         nodes = selectedData.nodes.filter(item => filterArray.indexOf(item.id) === -1);
     }
     return { nodes, lines };
+}
+
+export const getLinesFromNode = (allLines: ITopologyLine[], nodes: ITopologyNode[]) => {
+    if (nodes.length === 0) {
+        return [];
+    }
+    const set = new Set(nodes.map(n => n.id));
+    return allLines.filter(line => set.has(line.start.split('-')[0]) && set.has(line.end.split('-')[0]));
+}
+
+const getCombineNodes = (data: ITopologyData, combineId: string) => {
+    if (!combineId) {
+        return [];
+    }
+    return data.nodes.filter(item => item.combineId === combineId);
 }
 
 /**
@@ -89,37 +111,50 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
     }
 
     return ({ node, mode }) => {
+        const combineNodeList = getCombineNodes(data, node.combineId);
+        const hasCombineNode = combineNodeList.length > 0;
+        if (!hasCombineNode) {
+            combineNodeList.push(node);
+        };
         if (hasSelected(node)) {
-            return cancelSelect({ selectedData, mode, node });
+            return cancelSelect({ selectedData, mode, node, nodeList: [...combineNodeList], data });
         }
         const children = getChildren(node.id, data.lines);
         const parents = getParents(node.id, data.lines);
         const selectNodesId = selectedData.nodes.map(item => item.id);
         const selectedChildren = _.intersection(children, selectNodesId);
         const selectedParents = _.intersection(parents, selectNodesId);
+        const currNodeIdSet = new Set(node.id);
+        combineNodeList.forEach(n => currNodeIdSet.add(n.id));
+        const shouldSelectedLines = getLinesFromNode(data.lines, combineNodeList);
+
+        // const isCombined = !!node.combineId;
+        // const combinedNodeList = isCombined ? data.nodes.filter(n => n.combineId === node.combineId) : [];
+        // const combinedLineList = isCombined ? data.lines.filter(n => n.combineId === node.combineId) : [];
 
         if (mode === SelectMode.NORMAL || mode === SelectMode.RIGHT_NORMAL) {
+
             return {
-                nodes: [node],
-                lines: [],
+                nodes: combineNodeList,
+                lines: shouldSelectedLines,
             };
         }
-        if (mode === SelectMode.MUL_NORMAL) {
+        if (mode === SelectMode.MUL_NORMAL || mode === SelectMode.BOX_SELECTION) {
             const selectlines = data.lines.filter((item) => {
                 const [parent] = item.start.split('-');
                 // 当前节点为父节点，并且子节点为已选择状态，则选中当前线段
-                if (parent === node.id && selectedChildren.indexOf(item.end) > -1) {
+                if (currNodeIdSet.has(parent) && selectedChildren.indexOf(item.end) > -1) {
                     return true;
                 }
                 // 当前节点为子节点，并且父节点为已选择状态，则选中当前线段
-                if (item.end === node.id && selectedParents.indexOf(parent) > -1) {
+                if (currNodeIdSet.has(item.end) && selectedParents.indexOf(parent) > -1) {
                     return true;
                 }
                 return false;
             });
             return {
-                nodes: [...selectedData.nodes, node],
-                lines: [...selectedData.lines, ...selectlines],
+                nodes: [...selectedData.nodes, ...combineNodeList],
+                lines: [...selectedData.lines, ...shouldSelectedLines, ...selectlines],
             };
         }
         // 复选模式下选中节点同时选中节点的子节点及关系线段
@@ -130,10 +165,10 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
                 return false;
             }
             // 当前节点为子节点，并且父节点为已选择状态，则选中当前线段
-            if (item.end === node.id && selectedParents.indexOf(parent) > -1) {
+            if (currNodeIdSet.has(item.end) && selectedParents.indexOf(parent) > -1) {
                 return true;
             }
-            if (parent === node.id && unSelectedChildren.indexOf(item.end) > -1) {
+            if (currNodeIdSet.has(parent) && unSelectedChildren.indexOf(item.end) > -1) {
                 return true;
             }
             return false;
@@ -142,10 +177,10 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
         return {
             nodes: [
                 ...selectedData.nodes,
-                node,
+                ...combineNodeList,
                 ...nodes,
             ],
-            lines: [...selectedData.lines, ...lines],
+            lines: [...selectedData.lines, ...shouldSelectedLines, ...lines],
         };
     };
 };

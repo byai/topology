@@ -7,6 +7,7 @@ export enum ChangeType {
     'DELETE',
     'EDIT_LINE',
     'EDIT_NODE',
+    'ADD_COMPONENT'
 }
 
 export enum NodeTypes {
@@ -49,6 +50,8 @@ export interface ITopologyNode {
     canDrag?: boolean; // 控制节点是否可拖拽
     dragChild?: boolean; // 设置当前节点下的子节点是否需要联动拖动
     filterOverlap?: boolean; // 控制节点在设置 overlap 为 true 时是否仍允许被覆盖
+    /** 组件Id */
+    combineId?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [prop: string]: any;
 }
@@ -58,6 +61,8 @@ export interface ITopologyLine {
     end: string;
     color?: string;
     index?: number; // 线条重复次数
+    /** 组件Id */
+    combineId?: string;
 }
 
 export interface ITopologyContext {

@@ -39,7 +39,7 @@ export default DragSource(
     NodeTypes.ANCHOR,
     {
         canDrag(props: IAnchorWrapperProps) {
-            return !props.readOnly;
+            return !props.readOnly ;
         },
         beginDrag(props: IAnchorWrapperProps) {
             return {
