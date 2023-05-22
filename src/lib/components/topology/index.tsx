@@ -3,11 +3,13 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { DropTarget, ConnectDropTarget } from 'react-dnd';
 import _ from 'lodash';
 import classnames from 'classnames';
+import html2canvas from 'html2canvas';
 import selectNodes, { getLinesFromNode, SelectMode } from '../../utils/selectNodes';
 import { Provider, defaultContext } from '../context';
 import NodeWrapper from '../node-wrapper';
 import Line from '../line';
 import LineText from '../line/lineText';
+
 import {
     KeyCode,
     NodeTypes,
@@ -33,7 +35,10 @@ import {
     getNodeSize,
     shouldAutoLayout,
     isMatchKeyValue,
-    getRealNodeDom
+    getRealNodeDom,
+    getMaxAndMinNodeId,
+    isInViewPort,
+    computeMaxAndMin,
 } from '../../utils';
 // import layoutCalculation from '../../utils/layoutCalculation';
 import computeLayout from '../../utils/computeLayout';
@@ -46,6 +51,10 @@ export interface ITopologyProps {
     data: ITopologyData; // 数据 { nodes: []; lines: [] }
     readOnly?: boolean; // 只读模式，为true时不可编辑
     showBar?: boolean; // 是否显示工具栏
+    showCenter?: boolean; // 是否显示工具栏中的定位中心
+    showLayout?: boolean; // 是否显示工具栏中的自动布局
+    showDownload?: boolean; // 是否显示工具栏中的下载图片
+    downloadImg?: (download?: boolean, name?: string) => void;
     canConnectMultiLines?: boolean; // 控制一个锚点是否可以连接多条线
     overlap?: boolean; // 是否允许节点覆盖，默认允许，设置 true 时不允许
     overlapCallback?: () => void; // overlap 回调
@@ -92,6 +101,7 @@ export interface ITopologyProps {
     combineNode?: (ids: string[]) => string;
     onShowMenu?: () => void;
     renderBoxSelectionTool?: () => React.ReactNode;
+    autoRemoveSelected?: boolean | ((e: MouseEvent) => void);
 }
 
 export interface ITopologyState {
@@ -107,6 +117,7 @@ export interface ITopologyState {
     draggingId: string;
     realDragNodeDomList?: Element[] | null;
     boxVisibleFlag?: boolean;
+    loading: boolean;
 }
 
 interface NodeSizeCache {
@@ -130,10 +141,13 @@ const MIN_SCALE = 0.1;
 const initialTopologyState = {
     context: defaultContext,
     scaleNum: 1,
-    draggingId: null
+    draggingId: null,
+    loading: false
 } as ITopologyState;
 
 class Topology extends React.Component<ITopologyProps, ITopologyState> {
+    $topology: HTMLDivElement | null;
+
     $wrapper: HTMLDivElement | null;
 
     $canvas: HTMLDivElement | null;
@@ -146,6 +160,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     shouldAutoLayout: boolean = false;
 
+
     constructor(props: ITopologyProps) {
         super(props);
         this.shouldAutoLayout = shouldAutoLayout(props.data.nodes);
@@ -153,6 +168,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     componentWillMount() {
         this.renderDomMap();
+        const autoClearSelectedFn = this.getAutoClearSelectedFn();
+        if (autoClearSelectedFn) {
+            document.body.removeEventListener('click', autoClearSelectedFn);
+        }
     }
 
     componentDidMount() {
@@ -171,6 +190,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             } else {
                 this.scrollCanvasToCenter();
             }
+            const autoClearSelectedFn = this.getAutoClearSelectedFn();
+            if (autoClearSelectedFn) {
+                document.body.addEventListener('click', autoClearSelectedFn);
+            }
         }
 
         if (this.shouldAutoLayout) {
@@ -188,6 +211,15 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             this.defaultScaleNum = this.scaleNum;
             return { scaleNum };
         });
+    }
+
+    getAutoClearSelectedFn() {
+        // eslint-disable-next-line react/destructuring-assignment
+        if (!this.props.autoRemoveSelected) {
+            return undefined;
+        }
+        // eslint-disable-next-line react/destructuring-assignment
+        return typeof this.props.autoRemoveSelected === 'function' ? this.props.autoRemoveSelected : this.clearSelectedWhenClickOutside;
     }
 
     componentWillReceiveProps(nextProps: ITopologyProps) {
@@ -231,6 +263,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     defaultScaleNum = 1;
 
     scaleNum = 1;
+
+    clearSelectedWhenClickOutside = (e: MouseEvent) => {
+        if (this.$topology.contains(e.target as Node)) {
+            return;
+        }
+        this.clearSelectData();
+    }
 
     zoomIn = () => {
         this.setState((prevState: ITopologyState) => {
@@ -474,6 +513,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             deleteSelectedData(data, selectedData),
             ChangeType.DELETE
         );
+        this.closeBoxSelection();
     };
 
     setDraggingId = (id) => {
@@ -1222,14 +1262,131 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         );
     };
 
-    renderToolBars = () => {
+    // TODO：系统计算设置一个合适的 scale，使所有节点均在可视化区域内
+    findScale = async (clonegraph) => {
         const { scaleNum } = this.state;
+        let downloadScale: number = Number(scaleNum && scaleNum.toFixed(1));
+
+        let canvasEle = clonegraph.querySelector('#topology-canvas');
+        canvasEle.style.transform = `scale(${downloadScale})`;
+        const { minXId, maxXId, minYId, maxYId } = getMaxAndMinNodeId(this.props.data.nodes);
+        let minYIdElement = clonegraph.querySelector(`#topology-node-${minYId}`);
+
+        minYIdElement.scrollIntoView({ block: "start" });
+
+        const isAllView = () => {
+            let minxIdView = isInViewPort(minXId, document);
+            let maxxIdView = isInViewPort(maxXId, document);
+            let minYIdView = isInViewPort(minYId, document);
+            let maxYIdView = isInViewPort(maxYId, document);
+            return minxIdView && maxxIdView && minYIdView && maxYIdView
+        }
+
+        let isViw = isAllView();
+        if (isViw) return downloadScale;
+
+        // scale 从 1 => 0.1，寻找一个能完全展示所有内容的值
+        for (let i = 1; i <= 10; i++) {
+            downloadScale = Number((downloadScale - 0.1).toFixed(1));
+            canvasEle.style.transform = `scale(${downloadScale})`;
+            minYIdElement.scrollIntoView({ block: "start" });
+            isViw = isAllView();
+            if(isViw || downloadScale === 0.1) {
+                break;
+            }
+        }
+        return downloadScale;
+    }
+
+    downloadImg = async (openDownload?: boolean, imgName?: string) => {
+        // openDownload && this.setState({ loading: true, })
+        const graphEl: any = document.querySelector(".topology-canvas");
+        let imgBase64 = '';
+        const _this = this;
+        const { minX, maxX, minY, maxY } = computeMaxAndMin(_this.props.data.nodes)
+        const imgPadding = 50;
+        const imgMinSize = 200;
+        return html2canvas(graphEl, {
+            onclone: function(documentClone){
+                // 背景色置为透明色
+                const nodeContentEls: HTMLCollectionOf<Element> = documentClone.getElementsByClassName('topology-node-content');
+                nodeContentEls && Array.from(nodeContentEls).forEach((node: HTMLElement) => {
+                    const childNode: any = node.childNodes && node.childNodes[0];
+                    const grandsonChildNode: any = childNode && childNode.childNodes[0];
+                    node.style.backgroundColor = 'transparent';
+                    node.style.border = '1px solid #fff';
+                    childNode.style.backgroundColor = 'white';
+                    grandsonChildNode.style.boxShadow = 'none';
+                })
+                const {  minYId } = getMaxAndMinNodeId(_this.props.data.nodes);
+                // 定位画布中最顶层的节点，让其滚动在浏览器顶部，尽可能的多展示其它节点
+                let minYIdElement = documentClone.getElementById(`topology-node-${minYId}`);
+                minYIdElement.scrollIntoView({
+                    block: "start",
+                    inline: 'center'
+                });
+            },
+            backgroundColor: 'white',
+            useCORS: true, //支持图片跨域
+            scale: 1,
+            x: minX - imgPadding,
+            y: minY - imgPadding,
+            width: maxX - minX + imgMinSize,
+            height: maxY - minY + imgMinSize,
+        }).then((canvas) => {
+            imgBase64 = canvas.toDataURL('image/png');
+            // 生成图片导出
+            if (openDownload) {
+                const a = document.createElement('a');
+                a.href = imgBase64;
+                a.download = imgName || '图片';
+                a.click();
+            }
+            this.setState({ loading: false })
+            return Promise.resolve(imgBase64);
+        })
+    }
+
+    getImageBase64Url = async () => {
+        const url = await this.downloadImg();
+        return url;
+    }
+
+    // 定位节点
+    locateNodeById = (id) => {
+        const {
+            context: { selectedData }
+        } = this.state;
+        const { nodes } =  this.props.data;
+        const curNode = nodes && nodes.find(n => n.id === id)
+        const isSelect = selectedData.nodes.findIndex(n => n.id === id) !== -1;
+        const ele = document.getElementById(`topology-node-${id}`);
+
+        if (ele) {
+            // 如果已选中，则不做处理
+            !isSelect && this.selectNode(curNode, SelectMode.NORMAL)
+            ele.scrollIntoView({
+                block: "center",
+                inline: 'center'
+            });
+        }
+    }
+
+    renderToolBars = () => {
+        const { scaleNum, loading } = this.state;
+        const { showCenter, showLayout, showDownload, downloadImg } = this.props;
         /* eslint-disable */
         // @ts-ignore
         const zoomPercent = `${parseInt(String((scaleNum ? scaleNum : 1).toFixed(1) * 100))}%`;
+
+        const exportStyle: React.CSSProperties = loading ? {
+            backgroundColor: 'rgba(0,0,0,.04)',
+            cursor: 'not-allowed',
+        } : {}
+
         return (
-            <div className="topology-tools">
-                <div
+            <div className="topology-tools" data-html2canvas-ignore={false}>
+                {showCenter !== false && <div
                     className="topology-tools-btn"
                     id="scroll-canvas-to-center"
                     onClick={this.props.customPostionHeight ? this.scrollCanvasToPositionY : this.scrollCanvasToCenter}
@@ -1239,8 +1396,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         alt=""
                     />
                     <div className="tooltip">定位中心</div>
-                </div>
-                <div
+                </div>}
+
+                {showLayout !== false && <div
                     className="topology-tools-btn"
                     id="auto-layout"
                     onClick={this.autoLayout}
@@ -1250,7 +1408,27 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         alt=""
                     />
                     <div className="tooltip">自动布局</div>
-                </div>
+                </div>}
+
+                {showDownload && <div
+                    className="topology-tools-btn"
+                    id="export-img"
+                    style={exportStyle}
+                    onClick={async () => {
+                        if (loading) return;
+                        // 截图之前需要重置 scaleNum 为 1，避免坐标错位
+                        this.setState({
+                            scaleNum: 1,
+                            loading: true,
+                        }, () => {
+                            downloadImg ? downloadImg() : this.downloadImg(true);
+                        })
+
+                    }}
+                >
+                    <img alt='' src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9IiM2MTYxNjEiIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPjxwYXRoIGQ9Ik01MTIgNjJsNS42LjRDNTM5LjggNjUuMSA1NTcgODQuMSA1NTcgMTA3YzAgMjQuOS0yMC4xIDQ1LTQ1IDQ1SDE3NC41bC00LjUuNWMtMTAuMyAyLjEtMTggMTEuMi0xOCAyMnY0OTcuOWwxNzIuOC0xNTguM2MyNy41LTI1LjIgNjguNy0yNy41IDk4LjYtNi4zbDUuOCA0LjUgMTUxLjkgMTMwLjIgMTA0LjQtMTA0LjNjMjYtMjYgNjYuMi0zMC4zIDk2LjktMTEuNGw2IDQuMSA4My41IDYyLjZWNTEyaDkwdjMzNy41bC0uMyA4LjRDOTU3LjQgOTE2LjEgOTA4LjggOTYyIDg0OS41IDk2MmgtNjc1bC04LjQtLjNDMTA3LjkgOTU3LjQgNjIgOTA4LjggNjIgODQ5LjV2LTY3NWwuMy04LjRDNjYuNiAxMDcuOSAxMTUuMiA2MiAxNzQuNSA2Mkg1MTJ6TTM3My4xIDU2MmwtMi43IDEuOUwxNTIgNzY0djg1LjVsLjUgNC41YzIuMSAxMC4zIDExLjIgMTggMjIgMThoNjc1YzEyLjQgMCAyMi41LTEwLjEgMjIuNS0yMi41VjY3Ny45bC0xMjQtOTNjLTMuNi0yLjctOC4zLTIuOS0xMi4xLS45bC0yLjYgMi0xMDAuNyAxMDAuNiA4MS40IDY5LjhjMTQuMiAxMi4xIDE1LjggMzMuNCAzLjcgNDcuNi0xMSAxMi45LTI5LjYgMTUuNC00My42IDYuNmwtNC0zLTI4NC43LTI0NGMtMy41LTMtOC4zLTMuNS0xMi4zLTEuNnpNOTE3IDQ2N2MyNC45IDAgNDUgMjAuMSA0NSA0NWgtOTBjMC0yNC45IDIwLjEtNDUgNDUtNDV6TTgwNC41IDczLjJjMTcuMSAwIDMxLjIgMTIuNyAzMy40IDI5LjJsLjMgNC42djE4OC41bDU0LjktNTQuOWMxMi0xMiAzMC43LTEzLjEgNDMuOS0zLjNsMy44IDMuM2MxMiAxMiAxMy4xIDMwLjcgMy4zIDQzLjlsLTMuMyAzLjgtMTEyLjQgMTEyLjYtMS44IDEuNi0uMy4yLS43LjctLjMuMi0uNS41LjQtLjQtMi42IDEuOWMtLjkuNi0xLjkgMS4xLTIuOSAxLjYtLjMuMS0uNi4zLS44LjQtMS4zLjYtMi42IDEuMS00IDEuNS0uNi4yLTEuMS4zLTEuNi41LTEuMS4zLTIuMy42LTMuNS43bC0uOS4xYy0xLjQuMi0yLjguMy00LjIuM2wtMi4zLS4xYy0yLjgtLjItNS42LS43LTguMi0xLjYtMS0uMy0xLjctLjYtMi4zLS45LTIuNS0xLTQuOS0yLjQtNy4yLTQuMS0uNy0uNS0xLjMtMS0xLjgtMS40bC0yLTEuOC0xMTIuOC0xMTIuNGMtMTMuMi0xMy4yLTEzLjItMzQuNSAwLTQ3LjcgMTItMTIgMzAuNy0xMy4xIDQzLjktMy4zbDMuOCAzLjMgNTQuOSA1NC45VjEwNy4xYy4xLTE4LjcgMTUuMi0zMy45IDMzLjgtMzMuOXoiLz48L3N2Zz4=' />
+                    <div className="tooltip">{loading? '导出中...' : '导出图片'}</div>
+                </div>}
 
                 <div className="topology-tools-zoom" onClick={this.zoomIn}>
                     <img
@@ -1397,7 +1575,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const xPos = boxSelectionInfo ? `${boxSelectionInfo.x},${boxSelectionInfo.initX}` : '';
         const yPos = boxSelectionInfo ? `${boxSelectionInfo.y},${boxSelectionInfo.initY}` : '';
         return connectDropTarget!(
-            <div className="byai-topology">
+            <div className="byai-topology"
+                ref={r => {
+                    this.$topology = r;
+                }}
+            >
                 <div
                     ref={r => {
                         this.$wrapper = r;
@@ -1421,6 +1603,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         ref={r => {
                             this.$canvas = r;
                         }}
+                        id='topology-canvas'
                         className="topology-canvas topology-zoom"
                         // @ts-ignore
                         style={{

@@ -2,6 +2,71 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.8](https://github.com/byai/topology/compare/v1.3.7...v1.3.8) (2023-05-17)
+
+
+### Bug Fixes
+
+* earlier loading ([f7fa606](https://github.com/byai/topology/commit/f7fa606800808cefea88d102f00dd4fcbcd6bf40))
+
+### [1.3.7](https://github.com/byai/topology/compare/v1.3.6...v1.3.7) (2023-05-17)
+
+
+### Features
+
+* add download loading status ([7a9f347](https://github.com/byai/topology/commit/7a9f347e09886635995f0cad786a6bf170fc3c96))
+
+### [1.3.6](https://github.com/byai/topology/compare/v1.3.5...v1.3.6) (2023-05-17)
+
+### [1.3.5](https://github.com/byai/topology/compare/v1.3.4...v1.3.5) (2023-05-15)
+
+
+### Features
+
+* add locateNodeById function ([75cb67c](https://github.com/byai/topology/commit/75cb67cce8aa84c68548ea136203a29b13d6dee0))
+
+### [1.3.4](https://github.com/byai/topology/compare/v1.3.3...v1.3.4) (2023-05-10)
+
+
+### Bug Fixes
+
+* download config ([b2c9a43](https://github.com/byai/topology/commit/b2c9a43312dd8de9b594f2ef9fbb27166a4f5c7d))
+
+### [1.3.3](https://github.com/byai/topology/compare/v1.3.2...v1.3.3) (2023-05-10)
+
+
+### Features
+
+* update html2canvas config ([6851df1](https://github.com/byai/topology/commit/6851df1028f2ea39a731ad5b4fa8ffd068b86bb4))
+
+### [1.3.2](https://github.com/byai/topology/compare/v1.3.1...v1.3.2) (2023-02-06)
+
+
+### Features
+
+* add getImageBase64Url function ([90f755f](https://github.com/byai/topology/commit/90f755f24f8cae29d2db8babebe58a21991b73fd))
+
+### [1.3.1](https://github.com/byai/topology/compare/v1.3.0...v1.3.1) (2023-02-02)
+
+
+### Bug Fixes
+
+* fix int ([1c5bb25](https://github.com/byai/topology/commit/1c5bb25dea84c934fa332d90074fe9dc6b41f37b))
+
+## [1.3.0](https://github.com/byai/topology/compare/v1.2.0...v1.3.0) (2023-02-02)
+
+
+### Features
+
+* image export ([73e5c99](https://github.com/byai/topology/commit/73e5c9924de48cf7d8c206e1c8a172ae1a66f991))
+
+## [1.2.0](https://github.com/byai/topology/compare/v1.1.31...v1.2.0) (2022-09-27)
+
+
+### Features
+
+* 自动清除选中项 ([fafcc23](https://github.com/byai/topology/commit/fafcc23fc4a89aa13753f08e8a0bc245ad16cf77))
+
 ### [1.1.31](https://github.com/byai/topology/compare/v1.1.30...v1.1.31) (2022-08-04)
 
 

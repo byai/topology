@@ -201,6 +201,70 @@ export const computeMaxAndMin = (nodes: ITopologyNode[]) => {
     };
 };
 
+export const getMaxAndMinNodeId = (nodes: ITopologyNode[]) => {
+    // @ts-ignore
+    if (!nodes.length || nodes.find(item => !item.position || [item.position.x, item.position.y].includes(undefined))) {
+        return null;
+    }
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    let minXId = null;
+    let maxXId = null;
+    let minYId = null;
+    let maxYId = null;
+
+    nodes.forEach(({ position, id }) => {
+        const { x, y } = position;
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
+
+        if (x === minX) {
+            minXId = id;
+        }
+        if (x === maxX) {
+            maxXId = id;
+        }
+        if (y === minY) {
+            minYId = id;
+        }
+        if (y === maxY) {
+            maxYId = id;
+        }
+    });
+    return {
+        minXId,
+        maxXId,
+        minYId,
+        maxYId
+    };
+};
+
+/**
+ * TODO: 缩放之后影响到计算判断, viewHeight 可视化高度区分判断是画布高度还是屏幕高度
+ * 判断节点是否位于可视区域内
+ * @param nodeId
+ * @param doc
+ * @returns
+ */
+export const isInViewPort = (nodeId, doc) => {
+    const viewWidth = window.innerWidth || document.documentElement.clientWidth;
+    // const viewHeight = window.innerHeight || document.documentElement.clientHeight;
+    const viewHeight = document.documentElement.offsetHeight;
+    const {
+        top,
+        right,
+        bottom,
+        left,
+    } = doc.getElementById(`topology-node-${nodeId}`).getBoundingClientRect();
+    return (
+        top >= 0 && left >= 0 && right <= viewWidth && bottom <= viewHeight
+    );
+};
+
 export const computeContentCenter = (nodes: ITopologyNode[]) => {
     if (!computeMaxAndMin(nodes)) return null;
     const {
