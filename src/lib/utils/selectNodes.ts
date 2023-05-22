@@ -13,7 +13,7 @@ export enum SelectMode {
     MULTI,
     RIGHT_NORMAL,
     // /** 框选 */
-    // BOX_SELECTION
+    BOX_SELECTION
 }
 
 export interface ProduceselectedDataFunc {
@@ -76,7 +76,7 @@ function cancelSelect(params: {
         return true;
     });
     let nodes;
-    if (mode === SelectMode.MUL_NORMAL) {
+    if (mode === SelectMode.MUL_NORMAL || mode === SelectMode.BOX_SELECTION) {
         nodes = selectedData.nodes.filter(item => !currNodeIdSet.has(item.id));
     } else {
         const filterArray = [...getChildren(node.id, selectedData.lines), ...nodeList.map(n => n.id)];
@@ -139,7 +139,7 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
                 lines: shouldSelectedLines,
             };
         }
-        if (mode === SelectMode.MUL_NORMAL) {
+        if (mode === SelectMode.MUL_NORMAL || mode === SelectMode.BOX_SELECTION) {
             const selectlines = data.lines.filter((item) => {
                 const [parent] = item.start.split('-');
                 // 当前节点为父节点，并且子节点为已选择状态，则选中当前线段

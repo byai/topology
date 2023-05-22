@@ -10,6 +10,7 @@ export type ISelectionProps = {
   visible?: boolean;
   renderTool?: () => React.ReactNode;
   toolVisible?: boolean;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
 type ISelectionState = {
@@ -72,7 +73,7 @@ class Selection extends PureComponent<ISelectionProps, ISelectionState> {
           visible
       })} style={{ left: `${minX}px`, top: `${minY}px`, width: `${width}px`, height: `${height}px` }}>
         {this.props.toolVisible && this.props.renderTool &&
-            <div className={classNames("byai-topology-selection-tool")} onMouseUp={e => e.stopPropagation()}>
+            <div onClick={this.props.onClick} className={classNames("byai-topology-selection-tool")} onMouseUp={e => e.stopPropagation()}>
                 {this.props.renderTool()}
             </div>
         }

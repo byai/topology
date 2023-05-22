@@ -40,6 +40,7 @@ export interface INodeWrapperProps {
         maxY: number;
     };
     closeBoxSelection: () => void;
+    showBoxSelection?: () => void;
     selectedNodes?: ITopologyNode[];
     combineId?: string;
     prevNodeStyle?: {
@@ -147,6 +148,10 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         }
         if (e.ctrlKey || e.metaKey) {
             onSelect(data, SelectMode.MUL_NORMAL);
+            return;
+        }
+        if (e.shiftKey && !e.ctrlKey && !e.metaKey) {
+            onSelect(data, SelectMode.BOX_SELECTION);
             return;
         }
         if (!isSelect) {
@@ -296,6 +301,7 @@ export default DragSource(
         endDrag(props: INodeWrapperProps) {
             props.setDraggingId(null);
             const id = props.data ? props.data.id : null;
+            props?.showBoxSelection?.();
             const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
             if (!draggingPreviewNode) return null;
             draggingPreviewNode.style.setProperty('--width', '100%');

@@ -94,7 +94,7 @@ export interface ITopologyProps {
     renderBoxSelectionTool?: () => React.ReactNode;
 }
 
-interface ITopologyState {
+export interface ITopologyState {
     context: ITopologyContext;
     scaleNum: number;
     boxSelectionInfo: {
@@ -106,6 +106,7 @@ interface ITopologyState {
     } | undefined;
     draggingId: string;
     realDragNodeDomList?: Element[] | null;
+    boxVisibleFlag?: boolean;
 }
 
 interface NodeSizeCache {
@@ -418,21 +419,28 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
 
     generateBoxByRealSelectedNodeDom = (elements: Element[] | null, offset=3) => {
-        const { minX, minY, maxX, maxY } = this.getBoundary(elements || this.state.realDragNodeDomList);
+        const boundary = this.getBoundary(elements || this.state.realDragNodeDomList);
         setTimeout(() => {
-            this.setState({
-                boxSelectionInfo: {
-                    initX: minX - offset,
-                    initY: minY - offset,
-                    x: maxX + offset,
-                    y: maxY + offset,
-                    status: 'static',
-                }
-            })
+            this.generateBoxByBoundary(boundary, offset)
         }, 0)
     }
 
-    generateBoxBySelectedNode = (nodes: ITopologyNode[], offset=3) => {
+    generateBoxByBoundary = (boundary: { minX: number; minY: number; maxX: number; maxY: number }, offset=3) => {
+        const { minX, minY, maxX, maxY } = boundary;
+        this.setState({
+            boxSelectionInfo: {
+                initX: minX - offset,
+                initY: minY - offset,
+                x: maxX + offset,
+                y: maxY + offset,
+                status: 'static',
+            }
+        })
+    }
+
+    generateBoxBySelectedNode = (nodes?: ITopologyNode[], offset?: number) => {
+        nodes = nodes || this.state.context.selectedData.nodes;
+        offset = offset || 3;
         if (nodes.length === 0) {
             this.setState({
                 boxSelectionInfo: null
@@ -504,7 +512,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 })
             },
             () => {
-                if (this.state.boxSelectionInfo) {
+                if (mode === SelectMode.BOX_SELECTION) {
                     this.generateBoxBySelectedNode(this.state.context.selectedData.nodes);
                 }
                 if (onSelect) {
@@ -828,9 +836,16 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     closeBoxSelection = () => {
-        this.setState({
-            boxSelectionInfo: null
-        })
+        this.setState(this.state.boxSelectionInfo ? { boxVisibleFlag: true, boxSelectionInfo: null } : {boxSelectionInfo: null});
+    }
+
+    showBoxSelection = () => {
+        if (this.state.boxVisibleFlag) {
+            this.setState({
+                boxVisibleFlag: false
+            });
+            this.generateBoxBySelectedNode();
+        }
     }
 
     handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -840,7 +855,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         } = this.props;
         const { clientX, clientY, screenX, screenY, button, buttons } = e;
         const shouldOpenContextMenuFlag = this.couldDispatchContextMenuEvent(e);
-        const isMultiClick = e.ctrlKey || e.metaKey;
+        const isMultiClick = e.ctrlKey || e.metaKey || e.shiftKey;
         const isDragBox = this.state?.boxSelectionInfo?.status === 'drag' && !shouldOpenContextMenuFlag;
 
         // 允许打开右键菜单
@@ -857,7 +872,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             });
             this.$wrapper.dispatchEvent(mouseEvent);
         }
-        // 单击且没有按住ctrl/meta键时，清空框选框
+        // 单击且没有按住ctrl/meta/shift键时，清空框选框
         if (!isMultiClick) {
             this.setState({
                 boxSelectionInfo: undefined
@@ -1178,7 +1193,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                             fill: lineTextColor[anchorId]
                         }}>{anchorId === startPointAnchorId && !showText(line.start.split("-")[0]) ? null : lineTextMap[anchorId]}</text>);
 
-
                     return (
                         <>
                             <Line
@@ -1420,7 +1434,12 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         <Provider value={context}>
                             {this.renderNodes()}
                             {this.renderLines()}
-                            <Selection renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper} visible={!!boxSelectionInfo} />
+                            <Selection onClick={e => {
+                                e.stopPropagation();
+                                this.setState({
+                                    boxSelectionInfo: null
+                                })
+                            }} renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper} visible={!!boxSelectionInfo} />
                         </Provider>
                     </div>
                 </div>
@@ -1625,9 +1644,14 @@ export default DropTarget(
                     }
                     if (isOverlap(nodeProps)) {
                         props.overlapCallback && props.overlapCallback();
+                        component.showBoxSelection();
                         return;
                     };
                     component.handleNodeDraw(nodeProps, getChildPosMap());
+                    // 存在移动动画时间
+                    setTimeout(() => {
+                        component.showBoxSelection();
+                    }, 210);
                     break;
                 case NodeTypes.ANCHOR:
                     component.handleLineDraw((item as { id: string }).id);
