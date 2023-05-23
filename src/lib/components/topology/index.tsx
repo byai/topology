@@ -909,9 +909,19 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const shouldOpenContextMenuFlag = this.couldDispatchContextMenuEvent(e);
         const isMultiClick = e.ctrlKey || e.metaKey || e.shiftKey;
         const isDragBox = this.state?.boxSelectionInfo?.status === 'drag' && !shouldOpenContextMenuFlag;
+        const isEmitByNodeWrapper = () => {
+        let target = e.target as HTMLElement;
+            while(target.className !== e.currentTarget.className && target !== document.body) {
+                if (target.className.indexOf('topology-node-content') > -1) {
+                    return true;
+                }
+                target = target.parentElement;
+            }
+            return false;
+        }
 
         // 允许打开右键菜单
-        if (shouldOpenContextMenuFlag) {
+        if (shouldOpenContextMenuFlag && !isEmitByNodeWrapper()) {
             const mouseEvent = new MouseEvent('contextmenu', {
                 bubbles: true,
                 cancelable: true,
@@ -1024,7 +1034,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         };
     }) => {
         const { data } = this.props;
-        console.log(childPosMap)
         const posMaps = {
             ...nodeInfoList.reduce((prev, curr) => {
                 const [nodeId, position] = curr;
