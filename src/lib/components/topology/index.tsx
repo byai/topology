@@ -54,7 +54,7 @@ export interface ITopologyProps {
     showCenter?: boolean; // 是否显示工具栏中的定位中心
     showLayout?: boolean; // 是否显示工具栏中的自动布局
     showDownload?: boolean; // 是否显示工具栏中的下载图片
-    downloadImg?: (download?: boolean, name?: string) => void;
+    downloadImg?: (scopeType?: 'global' | 'selected', download?: boolean, name?: string) => void;
     canConnectMultiLines?: boolean; // 控制一个锚点是否可以连接多条线
     overlap?: boolean; // 是否允许节点覆盖，默认允许，设置 true 时不允许
     overlapCallback?: () => void; // overlap 回调
@@ -1311,17 +1311,32 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return downloadScale;
     }
 
-    downloadImg = async (openDownload?: boolean, imgName?: string) => {
+    /**
+     * @param scopeType 下载区域类型（整个画布数据|选中的数据）
+     * @param openDownload 是否开启下载
+     * @param imgName 图片名称
+     * @returns
+     */
+
+    downloadImg = async (scopeType?: 'global' | 'selected', openDownload?: boolean, imgName?: string) => {
         // openDownload && this.setState({ loading: true, })
+         const {
+            context: { selectedData }
+        } = this.state;
+
+        const isGlobal = scopeType === 'global';
+        const nodes = isGlobal ? this.props.data.nodes : selectedData && selectedData.nodes;
+
         const graphEl: any = document.querySelector(".topology-canvas");
         let imgBase64 = '';
-        const _this = this;
-        const { minX, maxX, minY, maxY } = computeMaxAndMin(_this.props.data.nodes)
-        const imgPadding = 50;
+
+        const { minX, maxX, minY, maxY } = computeMaxAndMin(nodes)
+        const imgPadding = isGlobal ? 50 : 0;
         const imgMinSize = 200;
         return html2canvas(graphEl, {
             onclone: function(documentClone){
                 // 背景色置为透明色
+
                 const nodeContentEls: HTMLCollectionOf<Element> = documentClone.getElementsByClassName('topology-node-content');
                 nodeContentEls && Array.from(nodeContentEls).forEach((node: HTMLElement) => {
                     const childNode: any = node.childNodes && node.childNodes[0];
@@ -1331,7 +1346,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     childNode.style.backgroundColor = 'white';
                     grandsonChildNode.style.boxShadow = 'none';
                 })
-                const {  minYId } = getMaxAndMinNodeId(_this.props.data.nodes);
+                const {  minYId } = getMaxAndMinNodeId(nodes);
                 // 定位画布中最顶层的节点，让其滚动在浏览器顶部，尽可能的多展示其它节点
                 let minYIdElement = documentClone.getElementById(`topology-node-${minYId}`);
                 minYIdElement.scrollIntoView({
@@ -1360,8 +1375,19 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         })
     }
 
+    /**
+     * 整个画布截图
+     */
     getImageBase64Url = async () => {
-        const url = await this.downloadImg();
+        const url = await this.downloadImg('global', false);
+        return url;
+    }
+
+    /**
+     * 选中数据截图
+     */
+    getImageBase64UrlWithSelectedData = async () => {
+        const url = await this.downloadImg('selected', false);
         return url;
     }
 
@@ -1434,7 +1460,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                             scaleNum: 1,
                             loading: true,
                         }, () => {
-                            downloadImg ? downloadImg() : this.downloadImg(true);
+                            downloadImg ? downloadImg() : this.downloadImg('global', true);
                         })
 
                     }}
