@@ -810,30 +810,30 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         // Step 1: 获取box(矩形选择框)的位置信息(boxPositionGroup)和需要筛选的DOM列表(nodeList)
         const boxPositionGroup = this.getBoxPositionGroup();
         const ret = {
-        nativeNodeList: [] as Element[],
-        selectedNodeList: [] as ITopologyNode[],
-        boxPositionGroup,
+            nativeNodeList: [] as Element[],
+            selectedNodeList: [] as ITopologyNode[],
+            boxPositionGroup,
         }
 
         // 如果没有筛选框的位置信息，则直接返回空；否则，获取框选中的节点列表进行下一步处理
         if (!boxPositionGroup) {
-        return ret;
+            return ret;
         }
         const nodeList: Element[] = this.getNodeDomList();
 
         // Step 2: 筛选出所有与box相交的节点(nativeNodeList)，以及属于这些节点所属的整合组合的集合(combineIdSet)
         const nativeNodeList = nodeList.filter(node => {
-        const info = node.getBoundingClientRect();
-        const nodePositionLeftTop: IPosition = {
-            x: info.x,
-            y: info.y,
-        }
-        const nodePositionRightBottom = {
-            x: info.x + info.width,
-            y: info.y + info.height,
-        }
-        const nodePositionGroup: [IPosition, IPosition] = [nodePositionLeftTop, nodePositionRightBottom];
-        return this.inSelection(boxPositionGroup, nodePositionGroup);
+            const info = node.getBoundingClientRect();
+            const nodePositionLeftTop: IPosition = {
+                x: info.x,
+                y: info.y,
+            }
+            const nodePositionRightBottom = {
+                x: info.x + info.width,
+                y: info.y + info.height,
+            }
+            const nodePositionGroup: [IPosition, IPosition] = [nodePositionLeftTop, nodePositionRightBottom];
+            return this.inSelection(boxPositionGroup, nodePositionGroup);
         }) as HTMLElement [];
         const combineIdSet = new Set(nativeNodeList.map(node => node.dataset.combineId).filter(id => !!id)); // 把每个有'data-combine-id'属性的HTML节点转化为数组后，筛选出仅由combileId的(无重复)集合combineIdSet
 
@@ -1012,6 +1012,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         };
     }) => {
         const { data } = this.props;
+        console.log(childPosMap)
         const posMaps = {
             ...nodeInfoList.reduce((prev, curr) => {
                 const [nodeId, position] = curr;
@@ -1723,18 +1724,20 @@ export default DropTarget(
              * Get the mapping relationship between the id and position of all child nodes of the current dragging node
              * @returns
              */
-            const getChildPosMap = () => {
+            const getChildPosMap = (idList: string[]) => {
                 const { lines, nodes } = props.data;
-                const curNode = nodes.find(n => n.id === item.id);
-                const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
-                if (!dragChild) return null;
-                const childIds = lines.filter(n => n.start.split('-')[0] === item.id).map(n => n.end);
+                const curNodeList = nodes.filter(n => idList.indexOf(n.id) > -1);
                 let childPosMap = {};
-                for (let childId of childIds) {
-                    let childNodeDom: HTMLElement = document.getElementById(`topology-node-${childId}`);
-                    if (!childNodeDom) return null;
-                    childPosMap[childId] = getNodePosition(childNodeDom, true);
-                }
+                curNodeList.forEach(curNode => {
+                    const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
+                    if (!dragChild) return null;
+                    const childIds = lines.filter(n => n.start.split('-')[0] === item.id).map(n => n.end);
+                    for (let childId of childIds) {
+                        let childNodeDom: HTMLElement = document.getElementById(`topology-node-${childId}`);
+                        if (!childNodeDom) return null;
+                        childPosMap[childId] = getNodePosition(childNodeDom, true);
+                    }
+                })
                 return childPosMap;
             }
 
@@ -1830,7 +1833,7 @@ export default DropTarget(
                         component.showBoxSelection();
                         return;
                     };
-                    component.handleNodeDraw(nodeProps, getChildPosMap());
+                    component.handleNodeDraw(nodeProps, getChildPosMap(nodeProps.map(n => n[0])));
                     // 存在移动动画时间
                     setTimeout(() => {
                         component.showBoxSelection();
