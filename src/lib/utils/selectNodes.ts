@@ -118,12 +118,13 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
             combineNodeList.push(node);
         }
         const hasChildNodeList = combineNodeList.filter(n => n.dragChild || isMatchKeyValue(n, 'dragChild', true));
+        const childNodeList = [];
         hasChildNodeList.forEach(curNode => {
             const childIds = data.lines.filter(n => n.start.split('-')[0] === curNode.id).map(n => n.end);
             const childNodes = data.nodes.filter(n => childIds.indexOf(n.id) > -1);
-
-            combineNodeList.push(...childNodes);
+            childNodeList.push(...childNodes);
         });
+        combineNodeList.push(...childNodeList.filter(n => combineNodeList.every(item => item.id !== n.id)));
         if (hasSelected(node)) {
             return cancelSelect({ selectedData, mode, node, nodeList: [...combineNodeList], data });
         }
