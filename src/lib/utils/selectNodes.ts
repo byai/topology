@@ -1,5 +1,6 @@
 /* eslint-disable no-debugger */
 import _ from 'lodash';
+import { isMatchKeyValue } from '.';
 import { ITopologyData, ITopologyNode, ITopologyLine } from '../declare';
 
 interface PremiseParams {
@@ -115,7 +116,14 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
         const hasCombineNode = combineNodeList.length > 0;
         if (!hasCombineNode) {
             combineNodeList.push(node);
-        };
+        }
+        const hasChildNodeList = combineNodeList.filter(n => n.dragChild || isMatchKeyValue(n, 'dragChild', true));
+        hasChildNodeList.forEach(curNode => {
+            const childIds = data.lines.filter(n => n.start.split('-')[0] === curNode.id).map(n => n.end);
+            const childNodes = data.nodes.filter(n => childIds.indexOf(n.id) > -1);
+
+            combineNodeList.push(...childNodes);
+        });
         if (hasSelected(node)) {
             return cancelSelect({ selectedData, mode, node, nodeList: [...combineNodeList], data });
         }

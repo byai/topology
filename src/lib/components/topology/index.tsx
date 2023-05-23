@@ -34,11 +34,11 @@ import {
     createHashFromObjectArray,
     getNodeSize,
     shouldAutoLayout,
-    isMatchKeyValue,
     getRealNodeDom,
     getMaxAndMinNodeId,
     isInViewPort,
     computeMaxAndMin,
+    isMatchKeyValue,
 } from '../../utils';
 // import layoutCalculation from '../../utils/layoutCalculation';
 import computeLayout from '../../utils/computeLayout';
@@ -851,7 +851,19 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         // Step 4: 把结果与props.data.nodes中的节点进行比较并存储下来(selectedNodeList是把筛选过的节点的详细信息添加到一个新对象(IWidgetNode)构成的列表里)
         const idSet = new Set(shouldSelectedNodeIdList);
+
         const selectedNodeList: ITopologyNode[] = [];
+
+        // 找到所有被选中的节点子节点
+        this.props.data.nodes.forEach(node => {
+            if (idSet.has(node.id) && isMatchKeyValue(node, 'dragChild', true)) {
+                this.props.data.lines.forEach(line => {
+                    if (line.start.split('-')[0] === node.id) {
+                        idSet.add(line.end);
+                    }
+                })
+            }
+        })
         this.props.data.nodes.forEach(node => {
             if (idSet.has(node.id)) {
                 selectedNodeList.push(node);
@@ -1731,7 +1743,7 @@ export default DropTarget(
                 curNodeList.forEach(curNode => {
                     const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
                     if (!dragChild) return null;
-                    const childIds = lines.filter(n => n.start.split('-')[0] === item.id).map(n => n.end);
+                    const childIds = lines.filter(n => n.start.split('-')[0] === curNode.id).map(n => n.end);
                     for (let childId of childIds) {
                         let childNodeDom: HTMLElement = document.getElementById(`topology-node-${childId}`);
                         if (!childNodeDom) return null;
