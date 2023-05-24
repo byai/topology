@@ -261,7 +261,7 @@ export default DragSource(
         },
         beginDrag(props: INodeWrapperProps) {
             const id = props.data ? props.data.id : null;
-            const { scaleNum=1, prevNodeStyle = {}, closeBoxSelection } = props;
+            const { prevNodeStyle = {}, closeBoxSelection } = props;
             closeBoxSelection();
             props.setDraggingId(id);
             // beginDrag 时机 处理预览节点样式问题
@@ -283,8 +283,8 @@ export default DragSource(
                 width = boxPosition.maxX - boxPosition.minX;
                 height = boxPosition.maxY - boxPosition.minY;
             }
-            const previewNodeWidth = scaleNum * width - 2; // border
-            const previewNodeHeight = scaleNum * height - 2;
+            const previewNodeWidth =  width - 2; // border
+            const previewNodeHeight = height - 2;
             draggingPreviewNode.style.background = prevNodeStyle.background || '#6f6fc7';
             draggingPreviewNode.style.border = prevNodeStyle.border || '1px dashed #1F8CEC';
             draggingPreviewNode.style.setProperty('--width', previewNodeWidth + 'px');
