@@ -77,6 +77,7 @@ export interface ITopologyContext {
         /** 原始值 */
         origin: ITopologyLine | null;
     } | null;
+    activeNode?: string;
     selectedData: {
         nodes: ITopologyNode[];
         lines: ITopologyLine[];

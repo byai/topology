@@ -9,11 +9,14 @@ interface PremiseParams {
 }
 
 export enum SelectMode {
+    /** 只会选中单个节点 */
+    SINGLE,
+    /** 会选中当前节点以及同组件其他节点 */
     NORMAL,
     MUL_NORMAL,
     MULTI,
     RIGHT_NORMAL,
-    // /** 框选 */
+    /** 框选 */
     BOX_SELECTION
 }
 
@@ -112,39 +115,49 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
     }
 
     return ({ node, mode }) => {
-        const combineNodeList = getCombineNodes(data, node.combineId);
-        const hasCombineNode = combineNodeList.length > 0;
-        if (!hasCombineNode) {
-            combineNodeList.push(node);
+        if (mode === SelectMode.SINGLE) {
+            return { nodes: [node], lines: [] };
         }
-        const hasChildNodeList = combineNodeList.filter(n => n.dragChild || isMatchKeyValue(n, 'dragChild', true));
+
+
+        const currWillSelectNodeList = getCombineNodes(data, node.combineId); // 当前节点的合并节点
+        const hasCombineNode = currWillSelectNodeList.length > 0;
+
+        // 选中的组件中是否有拖拽子节点的组件
+        const hasChildNodeList = currWillSelectNodeList.filter(n => n.dragChild || isMatchKeyValue(n, 'dragChild', true));
+        if (!hasCombineNode) {
+            currWillSelectNodeList.push(node);
+        }
+        const shouldSelectNodeSet = new Set(currWillSelectNodeList.map(item => item.id));
+
+        // 原先已经选择了的节点
+        const didSelectedNodesId = selectedData.nodes.map(item => item.id);
+        const didSelectedNodeIdSet = new Set(didSelectedNodesId);
         const childNodeList = [];
         hasChildNodeList.forEach(curNode => {
             const childIds = data.lines.filter(n => n.start.split('-')[0] === curNode.id).map(n => n.end);
-            const childNodes = data.nodes.filter(n => childIds.indexOf(n.id) > -1);
+            const childNodes = data.nodes.filter(n => !shouldSelectNodeSet.has(n.id) && childIds.indexOf(n.id) > -1);
             childNodeList.push(...childNodes);
         });
-        combineNodeList.push(...childNodeList.filter(n => combineNodeList.every(item => item.id !== n.id)));
+        childNodeList.forEach(node => {
+            if (shouldSelectNodeSet.has(node.id)) {
+                return;
+            }
+            currWillSelectNodeList.push(node);
+            shouldSelectNodeSet.add(node.id);
+        })
         if (hasSelected(node)) {
-            return cancelSelect({ selectedData, mode, node, nodeList: [...combineNodeList], data });
+            return cancelSelect({ selectedData, mode, node, nodeList: [...currWillSelectNodeList], data });
         }
         const children = getChildren(node.id, data.lines);
         const parents = getParents(node.id, data.lines);
-        const selectNodesId = selectedData.nodes.map(item => item.id);
-        const selectedChildren = _.intersection(children, selectNodesId);
-        const selectedParents = _.intersection(parents, selectNodesId);
-        const currNodeIdSet = new Set(node.id);
-        combineNodeList.forEach(n => currNodeIdSet.add(n.id));
-        const shouldSelectedLines = getLinesFromNode(data.lines, combineNodeList);
-
-        // const isCombined = !!node.combineId;
-        // const combinedNodeList = isCombined ? data.nodes.filter(n => n.combineId === node.combineId) : [];
-        // const combinedLineList = isCombined ? data.lines.filter(n => n.combineId === node.combineId) : [];
+        const selectedChildren = _.intersection(children, didSelectedNodesId);
+        const selectedParents = _.intersection(parents, didSelectedNodesId);
+        const shouldSelectedLines = getLinesFromNode(data.lines, currWillSelectNodeList);
 
         if (mode === SelectMode.NORMAL || mode === SelectMode.RIGHT_NORMAL) {
-
             return {
-                nodes: combineNodeList,
+                nodes: currWillSelectNodeList,
                 lines: shouldSelectedLines,
             };
         }
@@ -152,17 +165,17 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
             const selectlines = data.lines.filter((item) => {
                 const [parent] = item.start.split('-');
                 // 当前节点为父节点，并且子节点为已选择状态，则选中当前线段
-                if (currNodeIdSet.has(parent) && selectedChildren.indexOf(item.end) > -1) {
+                if (didSelectedNodeIdSet.has(parent) && selectedChildren.indexOf(item.end) > -1) {
                     return true;
                 }
                 // 当前节点为子节点，并且父节点为已选择状态，则选中当前线段
-                if (currNodeIdSet.has(item.end) && selectedParents.indexOf(parent) > -1) {
+                if (didSelectedNodeIdSet.has(item.end) && selectedParents.indexOf(parent) > -1) {
                     return true;
                 }
                 return false;
             });
             return {
-                nodes: [...selectedData.nodes, ...combineNodeList],
+                nodes: data.nodes.filter(item => shouldSelectNodeSet.has(item.id) || didSelectedNodeIdSet.has(item.id)),
                 lines: [...selectedData.lines, ...shouldSelectedLines, ...selectlines],
             };
         }
@@ -174,21 +187,21 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
                 return false;
             }
             // 当前节点为子节点，并且父节点为已选择状态，则选中当前线段
-            if (currNodeIdSet.has(item.end) && selectedParents.indexOf(parent) > -1) {
+            if (didSelectedNodeIdSet.has(item.end) && selectedParents.indexOf(parent) > -1) {
                 return true;
             }
-            if (currNodeIdSet.has(parent) && unSelectedChildren.indexOf(item.end) > -1) {
+            if (didSelectedNodeIdSet.has(parent) && unSelectedChildren.indexOf(item.end) > -1) {
                 return true;
             }
             return false;
         });
-        const nodes = data.nodes.filter(item => unSelectedChildren.indexOf(item.id) > -1);
+        data.nodes.filter(item => {
+            if (unSelectedChildren.indexOf(item.id) > -1) {
+                didSelectedNodeIdSet.add(item.id);
+            }
+        });
         return {
-            nodes: [
-                ...selectedData.nodes,
-                ...combineNodeList,
-                ...nodes,
-            ],
+            nodes: data.nodes.filter(item => shouldSelectNodeSet.has(item.id) || didSelectedNodeIdSet.has(item.id)),
             lines: [...selectedData.lines, ...shouldSelectedLines, ...lines],
         };
     };

@@ -402,7 +402,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     };
 
     clearSelectData = () => {
-        this.setContext({ selectedData: { nodes: [], lines: [] } }, () => {
+        this.setContext({ selectedData: { nodes: [], lines: [], }}, () => {
             const { onSelect } = this.props;
             if (onSelect) {
                 onSelect(this.state.context.selectedData);
@@ -549,7 +549,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 selectedData: selectNodes({ data, selectedData })({
                     node,
                     mode
-                })
+                }),
             },
             () => {
                 if (mode === SelectMode.BOX_SELECTION) {
@@ -1406,17 +1406,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     // 定位节点
     locateNodeById = (id) => {
-        const {
-            context: { selectedData }
-        } = this.state;
+
         const { nodes } =  this.props.data;
         const curNode = nodes && nodes.find(n => n.id === id)
-        const isSelect = selectedData.nodes.findIndex(n => n.id === id) !== -1;
         const ele = document.getElementById(`topology-node-${id}`);
-
         if (ele) {
             // 如果已选中，则不做处理
-            !isSelect && this.selectNode(curNode, SelectMode.NORMAL)
+            this.selectNode(curNode, SelectMode.SINGLE)
             ele.scrollIntoView({
                 block: "center",
                 inline: 'center'
@@ -1530,44 +1526,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     /**
      * Check whether the drag node overlaps
-     * @param drawId
-     * @param pos
+     * @param nodeInfo [string, IPosition][]
      * @returns
      */
-    // validateIsOverlap = (drawId, pos): boolean => {
-    //     const {
-    //         data: { nodes },
-    //         overlap,
-    //         overlapOffset = {}
-    //     } = this.props;
-
-    //     if (!overlap) return false;
-
-    //     const getNodeOffsetPos = (position: IPosition, id: string): IPosition => {
-    //         return {
-    //             x: position.x + getNodeSize(id).width + overlapOffset.offsetX || 0,
-    //             y: position.y + getNodeSize(id).height + overlapOffset.offsetY || 0,
-    //         }
-    //     }
-
-    //     const S1 = {
-    //         x: pos.x,
-    //         y: pos.y
-    //     }
-    //     const S2 = getNodeOffsetPos(pos, drawId);
-    //     const posMap: IPosMap[] = nodes && nodes.filter(n => n.id !== drawId && !n.filterOverlap).map(n => {
-    //         return {
-    //             T1: {
-    //                 x: n.position.x,
-    //                 y: n.position.y,
-    //             },
-    //             T2: getNodeOffsetPos(n.position, n.id)
-    //         }
-    //     })
-    //     const isOverlap = posMap.some((p: IPosMap) => !(S2.y < p.T1.y || S1.y > p.T2.y || S2.x < p.T1.x || S1.x > p.T2.x) === true);
-    //     return isOverlap;
-    // }
-
     validateIsOverlap = (nodeInfo: [string, IPosition][]): boolean => {
         const {
             data: { nodes },
@@ -1833,11 +1794,14 @@ export default DropTarget(
                             }
                             selectedPositionList.push([n.id, newPosition]);
                         })
-                        nodeProps = [...selectedPositionList, ...nodeProps]
+                        nodeProps = [...selectedPositionList, ...nodeProps];
+                        const positionMap = new Map(nodeProps);
                         component.onChange({
                             ...props.data,
                             nodes: [...props.data.nodes, ...item.data.nodes.map(n => {
-                                return { ...n, position: nodeProps.find(p => p[0] === n.id)[1] || n.position }
+                                const newPosition = positionMap.get(n.id);
+                                const p = newPosition ? newPosition : n.position;
+                                return { ...n, position: p  }
                             })],
                             lines: [...props.data.lines, ...item.data.lines ]
                         }, ChangeType.ADD_NODE);
