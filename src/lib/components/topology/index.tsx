@@ -906,9 +906,12 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             readOnly
         } = this.props;
         const { clientX, clientY, screenX, screenY, button, buttons } = e;
+        const {
+            boxSelectionInfo
+        } = this.state;
         const shouldOpenContextMenuFlag = this.couldDispatchContextMenuEvent(e);
         const isMultiClick = e.ctrlKey || e.metaKey || e.shiftKey;
-        const isDragBox = this.state?.boxSelectionInfo?.status === 'drag' && !shouldOpenContextMenuFlag;
+        const isDragBox = boxSelectionInfo && boxSelectionInfo.status === 'drag' && !shouldOpenContextMenuFlag;
         const isEmitByNodeWrapper = () => {
         let target = e.target as HTMLElement;
             while(target.className !== e.currentTarget.className && target !== document.body) {
@@ -1079,7 +1082,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             prevNodeStyle,
         } = this.props;
         const { context } = this.state;
-        const selectedNodes = context?.selectedData?.nodes || [];
+        const selectedNodes = context.selectedData.nodes || [];
         const {
             scaleNum,
             draggingId,
@@ -1798,7 +1801,7 @@ export default DropTarget(
                     component.$wrapper
                 )
             }
-            let nodeProps: [string, IPosition][] = [[(item as ITopologyNode).id ?? item?.data?.id, position]];
+            let nodeProps: [string, IPosition][] = [[(item as ITopologyNode).id || item && item.data && item.data.id, position]];
             const isOverlap = (nodeInfo: [string, IPosition][]) => {
                 return component.validateIsOverlap(nodeInfo);
             }
@@ -1833,7 +1836,7 @@ export default DropTarget(
                         component.onChange({
                             ...props.data,
                             nodes: [...props.data.nodes, ...item.data.nodes.map(n => {
-                                return { ...n, position: nodeProps.find(p => p[0] === n.id)[1] ?? n.position }
+                                return { ...n, position: nodeProps.find(p => p[0] === n.id)[1] || n.position }
                             })],
                             lines: [...props.data.lines, ...item.data.lines ]
                         }, ChangeType.ADD_NODE);

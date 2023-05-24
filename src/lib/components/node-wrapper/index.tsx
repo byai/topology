@@ -301,7 +301,7 @@ export default DragSource(
         endDrag(props: INodeWrapperProps) {
             props.setDraggingId(null);
             const id = props.data ? props.data.id : null;
-            props?.showBoxSelection?.();
+            props.showBoxSelection && props.showBoxSelection();
             const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
             if (!draggingPreviewNode) return null;
             draggingPreviewNode.style.setProperty('--width', '100%');
