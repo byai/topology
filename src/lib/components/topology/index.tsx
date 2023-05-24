@@ -1333,7 +1333,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     downloadImg = async (scopeType?: 'global' | 'selected', openDownload?: boolean, imgName?: string) => {
         // openDownload && this.setState({ loading: true, })
          const {
-            context: { selectedData }
+            context: { selectedData },
+            scaleNum
         } = this.state;
 
         const isGlobal = scopeType === 'global';
@@ -1368,9 +1369,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             },
             backgroundColor: 'white',
             useCORS: true, //支持图片跨域
-            scale: 1,
-            x: minX - imgPadding,
-            y: minY - imgPadding,
+            scale: 1 / scaleNum,
+            x: (minX - imgPadding) * scaleNum,
+            y: (minY - imgPadding) * scaleNum,
             width: maxX - minX + imgMinSize,
             height: maxY - minY + imgMinSize,
         }).then((canvas) => {
