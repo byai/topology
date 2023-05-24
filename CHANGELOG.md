@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.14](https://github.com/byai/topology/compare/v1.3.11...v1.3.14) (2023-05-24)
+
+
+### Features
+
+* 回退新特性写法 ([62987f1](https://github.com/byai/topology/commit/62987f113a1b3fdf491823be441fe61e22879530))
+
+
+### Bug Fixes
+
+* 修复可能导致出现两个右键菜单的问题 ([3c592a9](https://github.com/byai/topology/commit/3c592a94425067051db203c71cb02d345a756879))
+* 修复缩放坐标计算 ([850589a](https://github.com/byai/topology/commit/850589a15fafae3d33169848458f95c5c81cc90e))
+* 修复选中重复问题 ([63337a1](https://github.com/byai/topology/commit/63337a1e7b1530f2bcce30804f0e9bf08ec59bcd))
+
 ### [1.3.11](https://github.com/byai/topology/compare/v1.3.8...v1.3.11) (2023-05-23)
 
 
