@@ -41,16 +41,6 @@ function getChildren(parent: string, lines: ITopologyLine[]) {
     }).filter(item => item !== null);
 }
 
-function getParents(child: string, lines: ITopologyLine[]) {
-    return lines.map((item) => {
-        const [parent] = item.start.split('-');
-        if (item.end === child) {
-            return parent;
-        }
-        return null;
-    }).filter(item => item !== null);
-}
-
 /** 取消选中节点 */
 function cancelSelect(params: {
     selectedData: ITopologyData;
@@ -122,17 +112,19 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
 
         const currWillSelectNodeList = getCombineNodes(data, node.combineId); // 当前节点的合并节点
         const hasCombineNode = currWillSelectNodeList.length > 0;
-
-        // 选中的组件中是否有拖拽子节点的组件
-        const hasChildNodeList = currWillSelectNodeList.filter(n => n.dragChild || isMatchKeyValue(n, 'dragChild', true));
         if (!hasCombineNode) {
             currWillSelectNodeList.push(node);
         }
+        // 选中的组件中是否有拖拽子节点的组件
+        const hasChildNodeList = currWillSelectNodeList.filter(n => n.dragChild || isMatchKeyValue(n, 'dragChild', true));
+
         const shouldSelectNodeSet = new Set(currWillSelectNodeList.map(item => item.id));
 
         // 原先已经选择了的节点
         const didSelectedNodesId = selectedData.nodes.map(item => item.id);
         const didSelectedNodeIdSet = new Set(didSelectedNodesId);
+
+        // 子节点数组
         const childNodeList = [];
         hasChildNodeList.forEach(curNode => {
             const childIds = data.lines.filter(n => n.start.split('-')[0] === curNode.id).map(n => n.end);
@@ -150,9 +142,7 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
             return cancelSelect({ selectedData, mode, node, nodeList: [...currWillSelectNodeList], data });
         }
         const children = getChildren(node.id, data.lines);
-        const parents = getParents(node.id, data.lines);
         const selectedChildren = _.intersection(children, didSelectedNodesId);
-        const selectedParents = _.intersection(parents, didSelectedNodesId);
         const shouldSelectedLines = getLinesFromNode(data.lines, currWillSelectNodeList);
 
         if (mode === SelectMode.NORMAL || mode === SelectMode.RIGHT_NORMAL) {
@@ -162,47 +152,23 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
             };
         }
         if (mode === SelectMode.MUL_NORMAL || mode === SelectMode.BOX_SELECTION) {
-            const selectlines = data.lines.filter((item) => {
-                const [parent] = item.start.split('-');
-                // 当前节点为父节点，并且子节点为已选择状态，则选中当前线段
-                if (didSelectedNodeIdSet.has(parent) && selectedChildren.indexOf(item.end) > -1) {
-                    return true;
-                }
-                // 当前节点为子节点，并且父节点为已选择状态，则选中当前线段
-                if (didSelectedNodeIdSet.has(item.end) && selectedParents.indexOf(parent) > -1) {
-                    return true;
-                }
-                return false;
-            });
+            const resNodes = data.nodes.filter(item => shouldSelectNodeSet.has(item.id) || didSelectedNodeIdSet.has(item.id));
             return {
-                nodes: data.nodes.filter(item => shouldSelectNodeSet.has(item.id) || didSelectedNodeIdSet.has(item.id)),
-                lines: [...selectedData.lines, ...shouldSelectedLines, ...selectlines],
+                nodes: resNodes,
+                lines: getLinesFromNode(data.lines, resNodes),
             };
         }
         // 复选模式下选中节点同时选中节点的子节点及关系线段
         const unSelectedChildren = _.difference(children, selectedChildren);
-        const lines = data.lines.filter((item) => {
-            const [parent] = item.start.split('-');
-            if (_.some(selectedData.lines, item)) {
-                return false;
-            }
-            // 当前节点为子节点，并且父节点为已选择状态，则选中当前线段
-            if (didSelectedNodeIdSet.has(item.end) && selectedParents.indexOf(parent) > -1) {
-                return true;
-            }
-            if (didSelectedNodeIdSet.has(parent) && unSelectedChildren.indexOf(item.end) > -1) {
-                return true;
-            }
-            return false;
-        });
         data.nodes.filter(item => {
             if (unSelectedChildren.indexOf(item.id) > -1) {
                 didSelectedNodeIdSet.add(item.id);
             }
         });
+        const resNodes = data.nodes.filter(item => shouldSelectNodeSet.has(item.id) || didSelectedNodeIdSet.has(item.id));
         return {
-            nodes: data.nodes.filter(item => shouldSelectNodeSet.has(item.id) || didSelectedNodeIdSet.has(item.id)),
-            lines: [...selectedData.lines, ...shouldSelectedLines, ...lines],
+            nodes: resNodes,
+            lines: getLinesFromNode(data.lines, resNodes),
         };
     };
 };
