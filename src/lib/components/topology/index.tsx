@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { HTMLAttributes } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { DropTarget, ConnectDropTarget } from 'react-dnd';
 import _ from 'lodash';
@@ -102,6 +102,7 @@ export interface ITopologyProps {
     onShowMenu?: () => void;
     renderBoxSelectionTool?: () => React.ReactNode;
     autoRemoveSelected?: boolean | ((e: MouseEvent) => void);
+    customToolboxList?: { wrapperProps?: HTMLAttributes<HTMLDivElement>; content: React.ReactNode; tooltip: string; }[];
 }
 
 export interface ITopologyState {
@@ -1450,7 +1451,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     renderToolBars = () => {
         const { scaleNum, loading } = this.state;
-        const { showCenter, showLayout, showDownload, downloadImg } = this.props;
+        const { showCenter, showLayout, showDownload, downloadImg, customToolboxList } = this.props;
         /* eslint-disable */
         // @ts-ignore
         const zoomPercent = `${parseInt(String((scaleNum ? scaleNum : 1).toFixed(1) * 100))}%`;
@@ -1505,7 +1506,20 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     <img alt='' src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9IiM2MTYxNjEiIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPjxwYXRoIGQ9Ik01MTIgNjJsNS42LjRDNTM5LjggNjUuMSA1NTcgODQuMSA1NTcgMTA3YzAgMjQuOS0yMC4xIDQ1LTQ1IDQ1SDE3NC41bC00LjUuNWMtMTAuMyAyLjEtMTggMTEuMi0xOCAyMnY0OTcuOWwxNzIuOC0xNTguM2MyNy41LTI1LjIgNjguNy0yNy41IDk4LjYtNi4zbDUuOCA0LjUgMTUxLjkgMTMwLjIgMTA0LjQtMTA0LjNjMjYtMjYgNjYuMi0zMC4zIDk2LjktMTEuNGw2IDQuMSA4My41IDYyLjZWNTEyaDkwdjMzNy41bC0uMyA4LjRDOTU3LjQgOTE2LjEgOTA4LjggOTYyIDg0OS41IDk2MmgtNjc1bC04LjQtLjNDMTA3LjkgOTU3LjQgNjIgOTA4LjggNjIgODQ5LjV2LTY3NWwuMy04LjRDNjYuNiAxMDcuOSAxMTUuMiA2MiAxNzQuNSA2Mkg1MTJ6TTM3My4xIDU2MmwtMi43IDEuOUwxNTIgNzY0djg1LjVsLjUgNC41YzIuMSAxMC4zIDExLjIgMTggMjIgMThoNjc1YzEyLjQgMCAyMi41LTEwLjEgMjIuNS0yMi41VjY3Ny45bC0xMjQtOTNjLTMuNi0yLjctOC4zLTIuOS0xMi4xLS45bC0yLjYgMi0xMDAuNyAxMDAuNiA4MS40IDY5LjhjMTQuMiAxMi4xIDE1LjggMzMuNCAzLjcgNDcuNi0xMSAxMi45LTI5LjYgMTUuNC00My42IDYuNmwtNC0zLTI4NC43LTI0NGMtMy41LTMtOC4zLTMuNS0xMi4zLTEuNnpNOTE3IDQ2N2MyNC45IDAgNDUgMjAuMSA0NSA0NWgtOTBjMC0yNC45IDIwLjEtNDUgNDUtNDV6TTgwNC41IDczLjJjMTcuMSAwIDMxLjIgMTIuNyAzMy40IDI5LjJsLjMgNC42djE4OC41bDU0LjktNTQuOWMxMi0xMiAzMC43LTEzLjEgNDMuOS0zLjNsMy44IDMuM2MxMiAxMiAxMy4xIDMwLjcgMy4zIDQzLjlsLTMuMyAzLjgtMTEyLjQgMTEyLjYtMS44IDEuNi0uMy4yLS43LjctLjMuMi0uNS41LjQtLjQtMi42IDEuOWMtLjkuNi0xLjkgMS4xLTIuOSAxLjYtLjMuMS0uNi4zLS44LjQtMS4zLjYtMi42IDEuMS00IDEuNS0uNi4yLTEuMS4zLTEuNi41LTEuMS4zLTIuMy42LTMuNS43bC0uOS4xYy0xLjQuMi0yLjguMy00LjIuM2wtMi4zLS4xYy0yLjgtLjItNS42LS43LTguMi0xLjYtMS0uMy0xLjctLjYtMi4zLS45LTIuNS0xLTQuOS0yLjQtNy4yLTQuMS0uNy0uNS0xLjMtMS0xLjgtMS40bC0yLTEuOC0xMTIuOC0xMTIuNGMtMTMuMi0xMy4yLTEzLjItMzQuNSAwLTQ3LjcgMTItMTIgMzAuNy0xMy4xIDQzLjktMy4zbDMuOCAzLjMgNTQuOSA1NC45VjEwNy4xYy4xLTE4LjcgMTUuMi0zMy45IDMzLjgtMzMuOXoiLz48L3N2Zz4=' />
                     <div className="tooltip">{loading? '导出中...' : '导出图片'}</div>
                 </div>}
+                {Array.isArray(customToolboxList) &&
+                    customToolboxList.map(({wrapperProps={}, content, tooltip}) => {
+                        return (
+                            <div
+                                className="topology-tools-btn"
+                                {...wrapperProps}
 
+                            >
+                                {content}
+                                <div className="tooltip">{tooltip}</div>
+                            </div>
+                        );
+                    })
+                }
                 <div className="topology-tools-zoom" onClick={this.zoomIn}>
                     <img
                         src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNjIxOTIzNzE5OTI0IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEwOTIwIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgd2lkdGg9IjEyOCIgaGVpZ2h0PSIxMjgiPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTUxMi42MTY5NDIgNjQuMTg2NjczYzYxLjcyMDU1MyAwIDExOS43OTA3ODIgMTEuNzc5ODEzIDE3NC4yMTEwODUgMzUuMzM5NDRzMTAxLjcwNjA0MyA1NS40MTU0MjggMTQxLjg1NzQyMSA5NS41Njc0MDVjNDAuMTUxMzc3IDQwLjE1MTk3NyA3Mi4wMDcxNzkgODcuMjcxODMgOTUuNTY3NDA1IDE0MS4zNTk3NTggMjMuNTYwMjI2IDU0LjA4NzcyOSAzNS4zNDAwMzkgMTExLjk5MjI2OSAzNS4zMzk0NCAxNzMuNzEzNDIyLTAuMDAwNiA2MS43MjA5NTMtMTEuNzgwMjEzIDExOS43OTEzODEtMzUuMzM5NDQgMTc0LjIxMTA4NS0yMy41NTkwMjcgNTQuNDE5NzAzLTU1LjQxNTAyOSAxMDEuNzA1NDQ0LTk1LjU2NzQwNSAxNDEuODU3NDIxLTQwLjE1MjU3NyA0MC4xNTE5NzctODcuNDM4MzE3IDcyLjAwNzc3OS0xNDEuODU3NDIxIDk1LjU2NzQwNS01NC40MTkxMDQgMjMuNTU5NjI3LTExMi40ODkzMzIgMzUuMzM5NDQtMTc0LjIxMTA4NSAzNS4zMzk0NHMtMTE5LjYyNjA5NC0xMS43Nzk4MTMtMTczLjcxMzQyMi0zNS4zMzk0NGMtNTQuMDg3MzI5LTIzLjU1OTYyNy0xMDEuMjA3MTgyLTU1LjQxNTQyOC0xNDEuMzU5NzU4LTk1LjU2NzQwNS00MC4xNTI1NzctNDAuMTUxOTc3LTcyLjAwODM3OC04Ny40Mzc3MTctOTUuNTY3NDA1LTE0MS44NTc0MjFzLTM1LjMzODg0LTExMi40ODk5MzItMzUuMzM5NDQtMTc0LjIxMTA4NWMtMC4wMDA2LTYxLjcyMTE1MyAxMS43NzkyMTQtMTE5LjYyNTQ5NCAzNS4zMzk0NC0xNzMuNzEzNDIyczU1LjQxNjAyOC0xMDEuMjA3NzgxIDk1LjU2NzQwNS0xNDEuMzU5NzU4IDg3LjI3MTIzLTcyLjAwNzc3OSAxNDEuMzU5NzU4LTk1LjU2NzQwNVM0NTAuODk2NTg4IDY0LjE4Njg3MyA1MTIuNjE2OTQyIDY0LjE4NjY3M3pNNzM0LjYxMDgzIDU3MC44OTEzMjhjMTkuOTA5NzAxIDAgMzcuODI4NTUyLTUuMTQzMzEzIDUzLjc1NjE1My0xNS40Mjk5MzkgMTUuOTI3NjAxLTEwLjI4NjYyNiAyMy44OTE0MDItMjUuNzE2NTY0IDIzLjg5MTQwMi00Ni4yODk4MTYgMC0xOS45MDk3MDEtNy45NjM4MDEtMzQuNjc2Mjg5LTIzLjg5MTQwMi00NC4yOTkzNjUtMTUuOTI3NjAxLTkuNjIzMDc2LTMzLjg0NjI1Mi0xNC40MzQ2MTMtNTMuNzU2MTUzLTE0LjQzNDgxM0wyOTQuNjA0MTU0IDQ1MC40MzczOTVjLTE5LjkwOTcwMSAwLTM4LjE2MDUyNyA0LjgxMTUzOC01NC43NTIyNzggMTQuNDM0ODEzLTE2LjU5MTc1MSA5LjYyMzA3Ni0yNC44ODc1MjYgMjQuMzg5NjY0LTI0Ljg4NzUyNiA0NC4yOTkzNjUgMCAyMC41NzMyNTEgOC4yOTU3NzUgMzYuMDAzMTkgMjQuODg3NTI2IDQ2LjI4OTgxNiAxNi41OTE3NTEgMTAuMjg2NjI2IDM0Ljg0MjM3NyAxNS40Mjk5MzkgNTQuNzUyMjc4IDE1LjQyOTkzOUw3MzQuNjEwODMgNTcwLjg5MTMyOCA3MzQuNjEwODMgNTcwLjg5MTMyOHoiIHAtaWQ9IjEwOTIxIiBmaWxsPSIjOUZBMkE4Ij48L3BhdGg+PC9zdmc+"
