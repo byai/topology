@@ -137,7 +137,7 @@ interface IPosMap {
 
 const MAX_SCALE = 2;
 const MIN_SCALE = 0.1;
-
+const DRAG_CLASS = 'topology-canvas-drag';
 const initialTopologyState = {
     context: defaultContext,
     scaleNum: 1,
@@ -531,6 +531,26 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         });
     };
 
+    refreshSelectNode = (data: ITopologyData) => {
+        const {
+            context: { selectedData }
+        } = this.state;
+        const onSelect = this.props.onSelect;
+        const idSet = new Set(selectedData.nodes.map(item => item.id));
+        const newNodeInfo = data.nodes.filter(n => idSet.has(n.id));
+        const newInfo = {
+            nodes: newNodeInfo,
+            lines: selectedData.lines,
+        };
+        this.setContext({
+            selectedData: newInfo,
+        }, () => {
+            if (onSelect) {
+                onSelect(newInfo);
+            }
+        })
+    }
+
     selectNode = (node: ITopologyNode, mode: SelectMode) => {
         const { data, onSelect } = this.props;
         const {
@@ -542,14 +562,15 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             && selectNodesId.indexOf(node.id) !== -1
         ) {
             onSelect(selectedData);
-            return;
+            return selectedData;
         }
+        const selectData = selectNodes({ data, selectedData })({
+            node,
+            mode
+        });
         this.setContext(
             {
-                selectedData: selectNodes({ data, selectedData })({
-                    node,
-                    mode
-                }),
+                selectedData: selectData,
             },
             () => {
                 if (mode === SelectMode.BOX_SELECTION) {
@@ -560,6 +581,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 }
             }
         );
+        return selectData;
     };
 
     selectNodesForSelection = () => {
@@ -678,6 +700,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         switch (getClickType()) {
             case "CLICK_CANVAS":
                 this.dragCanvasPo = { x: e.clientX, y: e.clientY };
+                // this.$topology
+                this.$canvas.classList.add(DRAG_CLASS);
                 break;
             case "CLICK_LINE_POINT":
                 if (this.props.readOnly) {
@@ -731,6 +755,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 activeLine.type
             );
         const isDraggingCanvas = this.dragCanvasPo;
+        if (!isDraggingCanvas) {
+            this.$canvas.classList.remove(DRAG_CLASS);
+        }
         if (!isEditingLine && !isDraggingCanvas) {
             return;
         }
@@ -906,6 +933,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             readOnly
         } = this.props;
         const { clientX, clientY, screenX, screenY, button, buttons } = e;
+        this.$canvas.classList.remove(DRAG_CLASS);
         const {
             boxSelectionInfo
         } = this.state;
@@ -1599,7 +1627,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     }}
                     className={classnames({
                         "topology-wrapper": true,
-                        "topology-linking": context.linking
+                        "topology-linking": context.linking,
                     })}
                     onContextMenu={(e) => {
                         if (e.isTrusted) {

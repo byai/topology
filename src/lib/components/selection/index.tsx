@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React, { PureComponent } from 'react';
 import { computeCanvasPo } from '../../utils';
-import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed';
+// import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed';
 import './index.less';
 
 export type ISelectionProps = {
@@ -74,7 +74,12 @@ class Selection extends PureComponent<ISelectionProps, ISelectionState> {
           visible
       })} style={{ left: `${minX}px`, top: `${minY}px`, width: `${width}px`, height: `${height}px` }}>
         {this.props.toolVisible && this.props.renderTool &&
-            <div ref={(node) => node && scrollIntoViewIfNeeded(node, { behavior: 'smooth', scrollMode: 'if-needed', block: 'start'  })} onClick={this.props.onClick} className={classNames("byai-topology-selection-tool")} onMouseUp={e => e.stopPropagation()}>
+            <div key="box-selection" ref={(node) => {
+                // TODO: 还有点bug, 悬浮到其他节点时会触发
+                // setTimeout(() => {
+                //     node && scrollIntoViewIfNeeded(node, { behavior: 'smooth', scrollMode: 'if-needed', block: 'start'  })
+                // }, 0)
+            }} onClick={this.props.onClick} className={classNames("byai-topology-selection-tool")} onMouseUp={e => e.stopPropagation()}>
                 {this.props.renderTool()}
             </div>
         }

@@ -26,7 +26,7 @@ export interface INodeWrapperProps {
     draggingId?: string;
     context?: ITopologyContext;
     setDraggingId?: (id: string) => void;
-    onSelect: (node: ITopologyNode, mode: SelectMode) => void;
+    onSelect: (node: ITopologyNode, mode: SelectMode) => ITopologyNode;
     children: (wrapperOptions: IWrapperOptions) => React.ReactNode;
     onMouseEnter?: (node: ITopologyNode) => void;
     onMouseLeave?: () => void;
@@ -123,25 +123,9 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
 
     handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         // 避免一些交互上的冲突,改为mousedown触发
-        // const { onSelect, data } = this.props;
-        // if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
-        //     onSelect(data, SelectMode.MULTI);
-        //     return;
-        // }
-        // if (e.ctrlKey || e.metaKey) {
-        //     onSelect(data, SelectMode.MUL_NORMAL);
-        //     return;
-        // }
-        // onSelect(data, SelectMode.NORMAL);
-    };
+        const { data, onSelect, closeBoxSelection } = this.props;
+        closeBoxSelection();
 
-    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, isSelect=true) => {
-        const { data, onSelect } = this.props;
-        if (e.button === 2) {
-            e.preventDefault();
-            onSelect(data, SelectMode.RIGHT_NORMAL);
-            return;
-        }
         if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
             onSelect(data, SelectMode.MULTI);
             return;
@@ -154,9 +138,40 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             onSelect(data, SelectMode.BOX_SELECTION);
             return;
         }
-        if (!isSelect) {
-            onSelect(data, SelectMode.NORMAL);
+        onSelect(data, SelectMode.NORMAL);
+    };
+
+    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, isSelect=true) => {
+        const { data, onSelect, closeBoxSelection } = this.props;
+
+        if (e.button === 2) {
+            closeBoxSelection();
+            e.preventDefault();
+            onSelect(data, SelectMode.RIGHT_NORMAL);
+            return;
         }
+        // const { data, onSelect, closeBoxSelection } = this.props;
+        // closeBoxSelection();
+        // if (e.button === 2) {
+        //     e.preventDefault();
+        //     onSelect(data, SelectMode.RIGHT_NORMAL);
+        //     return;
+        // }
+        // if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+        //     onSelect(data, SelectMode.MULTI);
+        //     return;
+        // }
+        // if (e.ctrlKey || e.metaKey) {
+        //     onSelect(data, SelectMode.MUL_NORMAL);
+        //     return;
+        // }
+        // if (e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        //     onSelect(data, SelectMode.BOX_SELECTION);
+        //     return;
+        // }
+        // if (!isSelect) {
+        //     onSelect(data, SelectMode.NORMAL);
+        // }
     };
 
     handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -271,7 +286,11 @@ export default DragSource(
             if (!realNodeDom) return null;
             let distanceX = 0;
             let distanceY = 0;
-            const otherRealNodeDomList = props.selectedNodes.filter(item => item.id !== id).map(item => getRealNodeDom(item.id));
+            let source: ITopologyNode;
+            if (!props.isSelected) {
+                source = props.onSelect(props.data, SelectMode.NORMAL);
+            }
+            const otherRealNodeDomList = (source ? source.nodes: props.selectedNodes).filter(item => item.id !== id).map(item => getRealNodeDom(item.id));
             const allRealNodeDomList = [...otherRealNodeDomList, realNodeDom];
             let width = realNodeDom.offsetWidth;
             let height = realNodeDom.offsetHeight
