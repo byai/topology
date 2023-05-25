@@ -5045,6 +5045,11 @@ compression@^1.5.2:
     safe-buffer "5.1.2"
     vary "~1.1.2"
 
+compute-scroll-into-view@^3.0.2:
+  version "3.0.3"
+  resolved "https://registry.npmjs.org/compute-scroll-into-view/-/compute-scroll-into-view-3.0.3.tgz#c418900a5c56e2b04b885b54995df164535962b1"
+  integrity sha512-nadqwNxghAGTamwIqQSG433W6OADZx2vCo3UXHNrzTRHK/htu+7+L0zhjEoaeaQVNAi3YgqWDv8+tzf0hRfR+A==
+
 concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.npmmirror.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
@@ -13590,6 +13595,13 @@ schema-utils@^1.0.0:
     ajv "^6.1.0"
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
+
+scroll-into-view-if-needed@^3.0.10:
+  version "3.0.10"
+  resolved "https://registry.npmjs.org/scroll-into-view-if-needed/-/scroll-into-view-if-needed-3.0.10.tgz#38fbfe770d490baff0fb2ba34ae3539f6ec44e13"
+  integrity sha512-t44QCeDKAPf1mtQH3fYpWz8IM/DyvHLjs8wUvvwMYxk5moOqCzrMSxK6HQVD0QVmVjXFavoFIPRVrMuJPKAvtg==
+  dependencies:
+    compute-scroll-into-view "^3.0.2"
 
 select-hose@^2.0.0:
   version "2.0.0"

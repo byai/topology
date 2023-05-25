@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React, { PureComponent } from 'react';
 import { computeCanvasPo } from '../../utils';
+import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed';
 import './index.less';
 
 export type ISelectionProps = {
@@ -69,11 +70,11 @@ class Selection extends PureComponent<ISelectionProps, ISelectionState> {
     const { visible } = this.props;
     const { minX, minY, width, height } = this.state;
     return (
-      <div id="test" className={classNames('byai-topology-selection', {
+      <div className={classNames('byai-topology-selection', {
           visible
       })} style={{ left: `${minX}px`, top: `${minY}px`, width: `${width}px`, height: `${height}px` }}>
         {this.props.toolVisible && this.props.renderTool &&
-            <div onClick={this.props.onClick} className={classNames("byai-topology-selection-tool")} onMouseUp={e => e.stopPropagation()}>
+            <div ref={(node) => node && scrollIntoViewIfNeeded(node, { behavior: 'smooth', scrollMode: 'if-needed', block: 'start'  })} onClick={this.props.onClick} className={classNames("byai-topology-selection-tool")} onMouseUp={e => e.stopPropagation()}>
                 {this.props.renderTool()}
             </div>
         }
