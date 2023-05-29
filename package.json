@@ -99,7 +99,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.4.4",
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
-    "@svgr/webpack": "2.4.1",
+    "@svgr/webpack": "4.3.3",
     "@testing-library/react": "^8.0.1",
     "@types/classnames": "^2.2.7",
     "@types/invariant": "^2.2.35",
