@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { HTMLAttributes } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { DropTarget, ConnectDropTarget } from 'react-dnd';

@@ -31,7 +31,7 @@ const computeCanvasPoHelper = ($wrapper: HTMLDivElement) => {
         scrollLeft: $wrapper.scrollLeft,
         scrollTop: $wrapper.scrollTop
     };
-}
+};
 
 /**
  * 获取相对画布的坐标
@@ -41,7 +41,9 @@ const computeCanvasPoHelper = ($wrapper: HTMLDivElement) => {
  * 计算公式：找到中心点的位置 +（鼠标位置 - 中心点的距离) / 缩放）+（一些 dom 的偏离）/ 缩放
  */
 export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) => {
-    const { centerX, centerY, rect, zoom, scrollLeft, scrollTop } = computeCanvasPoHelper($wrapper);
+    const {
+        centerX, centerY, rect, zoom, scrollLeft, scrollTop
+    } = computeCanvasPoHelper($wrapper);
     const po = {
         x: centerX + (position.x - centerX) / zoom + (scrollLeft + window.pageXOffset - rect.left) / zoom,
         y: centerY + (position.y - centerY) / zoom + (scrollTop + window.pageYOffset - rect.top) / zoom,
@@ -50,7 +52,9 @@ export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) =
 };
 
 export const multiComputeCanvasPo = (positionList: IPosition[], $wrapper: HTMLDivElement) => {
-    const { centerX, centerY, rect, zoom, scrollLeft, scrollTop } = computeCanvasPoHelper($wrapper);
+    const {
+        centerX, centerY, rect, zoom, scrollLeft, scrollTop
+    } = computeCanvasPoHelper($wrapper);
     return positionList.map((position) => {
         const po = {
             x: centerX + (position.x - centerX) / zoom + (scrollLeft + window.pageXOffset - rect.left) / zoom,
@@ -359,6 +363,4 @@ export const isMatchKeyValue = (obj, matchKey?, matchValue?) => {
 
 export const TOPOLOGY_NODE_PREFIX = 'topology-node-';
 
-export const getRealNodeDom = (id: string) => {
-    return document.getElementById(`${TOPOLOGY_NODE_PREFIX}${id}`);
-}
+export const getRealNodeDom = (id: string) => document.getElementById(`${TOPOLOGY_NODE_PREFIX}${id}`);

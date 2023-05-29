@@ -5,3 +5,4 @@ dist/
 *.d.ts
 *.test.tsx
 react-app-env.d.ts
+src/lib/components/topology/index.tsx

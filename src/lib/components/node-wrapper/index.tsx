@@ -141,14 +141,13 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         onSelect(data, SelectMode.NORMAL);
     };
 
-    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, isSelect=true) => {
+    handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         const { data, onSelect, closeBoxSelection } = this.props;
 
         if (e.button === 2) {
             closeBoxSelection();
             e.preventDefault();
             onSelect(data, SelectMode.RIGHT_NORMAL);
-            return;
         }
         // const { data, onSelect, closeBoxSelection } = this.props;
         // closeBoxSelection();
@@ -235,6 +234,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
                 onClick={this.handleClick}
                 onContextMenu={this.handleRightClick}
                 onMouseDown={(e) => {
+                    // @ts-ignore
                     this.handleMouseDown(e, isSelected);
                 }}
                 onMouseEnter={() => { onMouseEnter(data) }}

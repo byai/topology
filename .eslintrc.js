@@ -61,7 +61,7 @@ module.exports = {
             "error",
             { vars: "all", args: "after-used", ignoreRestSiblings: true }
         ],
-        "quotes": 0,
+        quotes: 0,
         "comma-dangle": "off",
         "no-non-null-assertion": null,
         "no-else-return": ["error", { allowElseIf: true }],
@@ -69,6 +69,9 @@ module.exports = {
             "warn",
             "always",
             { ignoreClassFields: true }
-        ]
+        ],
+        "react/require-default-props": [0],
+        "react/destructuring-assignment": [0],
+        "react/no-unused-prop-types": [0],
     }
 };

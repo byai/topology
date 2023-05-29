@@ -11,5 +11,6 @@ export const Utils = {
 };
 
 export const topologyWrapper = DragDropContext(HTML5BackEnd);
+// eslint-disable-next-line import/named
 export { default as Topology } from './components/topology';
 export { default as TemplateWrapper } from './components/template-wrapper';

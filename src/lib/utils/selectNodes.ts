@@ -85,14 +85,14 @@ export const getLinesFromNode = (allLines: ITopologyLine[], nodes: ITopologyNode
     }
     const set = new Set(nodes.map(n => n.id));
     return allLines.filter(line => set.has(line.start.split('-')[0]) && set.has(line.end.split('-')[0]));
-}
+};
 
 const getCombineNodes = (data: ITopologyData, combineId: string) => {
     if (!combineId) {
         return [];
     }
     return data.nodes.filter(item => item.combineId === combineId);
-}
+};
 
 /**
  * 选中规则：
@@ -126,20 +126,22 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
 
         // 子节点数组
         const childNodeList = [];
-        hasChildNodeList.forEach(curNode => {
+        hasChildNodeList.forEach((curNode) => {
             const childIds = data.lines.filter(n => n.start.split('-')[0] === curNode.id).map(n => n.end);
             const childNodes = data.nodes.filter(n => !shouldSelectNodeSet.has(n.id) && childIds.indexOf(n.id) > -1);
             childNodeList.push(...childNodes);
         });
-        childNodeList.forEach(node => {
+        childNodeList.forEach((node) => {
             if (shouldSelectNodeSet.has(node.id)) {
                 return;
             }
             currWillSelectNodeList.push(node);
             shouldSelectNodeSet.add(node.id);
-        })
+        });
         if (hasSelected(node)) {
-            return cancelSelect({ selectedData, mode, node, nodeList: [...currWillSelectNodeList], data });
+            return cancelSelect({
+                selectedData, mode, node, nodeList: [...currWillSelectNodeList], data
+            });
         }
         const children = getChildren(node.id, data.lines);
         const selectedChildren = _.intersection(children, didSelectedNodesId);
@@ -160,7 +162,7 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
         }
         // 复选模式下选中节点同时选中节点的子节点及关系线段
         const unSelectedChildren = _.difference(children, selectedChildren);
-        data.nodes.filter(item => {
+        data.nodes.filter((item) => {
             if (unSelectedChildren.indexOf(item.id) > -1) {
                 didSelectedNodeIdSet.add(item.id);
             }
