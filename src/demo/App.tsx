@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
 import React from 'react';
-import { Topology, topologyWrapper, TemplateWrapper } from '../lib';
+import * as Lib from '../lib';
 import { ITopologyNode, ITopologyData, IWrapperOptions } from '../lib/declare';
 import './index.less';
 
+const { Topology, topologyWrapper, TemplateWrapper } = Lib;
 interface FlowState {
     data: ITopologyData;
     readonly: boolean;
