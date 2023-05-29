@@ -17,6 +17,7 @@
     "dist"
   ],
   "scripts": {
+    "preinstall": "node ./scripts/check-yarn.js",
     "build": "node remove-dist.js && tsc && gulp",
     "start": "node scripts/start.js",
     "release": "./scripts/release.sh",

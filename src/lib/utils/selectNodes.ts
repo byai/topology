@@ -131,6 +131,7 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
             const childNodes = data.nodes.filter(n => !shouldSelectNodeSet.has(n.id) && childIds.indexOf(n.id) > -1);
             childNodeList.push(...childNodes);
         });
+        // eslint-disable-next-line no-shadow
         childNodeList.forEach((node) => {
             if (shouldSelectNodeSet.has(node.id)) {
                 return;
@@ -162,6 +163,7 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
         }
         // 复选模式下选中节点同时选中节点的子节点及关系线段
         const unSelectedChildren = _.difference(children, selectedChildren);
+        // eslint-disable-next-line array-callback-return
         data.nodes.filter((item) => {
             if (unSelectedChildren.indexOf(item.id) > -1) {
                 didSelectedNodeIdSet.add(item.id);
