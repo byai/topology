@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { DropTarget, ConnectDropTarget } from 'react-dnd';
+import { DropTarget, ConnectDropTarget, DropTargetMonitor } from 'react-dnd';
 import _ from 'lodash';
 import classnames from 'classnames';
 import html2canvas from 'html2canvas';
@@ -104,17 +104,19 @@ export interface ITopologyProps {
     autoRemoveSelected?: boolean | ((e: MouseEvent) => void);
 }
 
+export interface BoxSelectionInfo {
+    initX: number;
+    initY: number;
+    x: number;
+    y: number;
+    status?: 'drag' | 'static' | 'none';
+}
+
 export interface ITopologyState {
     context: ITopologyContext;
     scaleNum: number;
-    boxSelectionInfo: {
-        initX: number;
-        initY: number;
-        x: number;
-        y: number;
-        status?: 'drag' | 'static' | 'none';
-    } | undefined;
-    draggingId: string;
+    boxSelectionInfo: BoxSelectionInfo | undefined;
+    draggingId: string | null;
     realDragNodeDomList?: Element[] | null;
     boxVisibleFlag?: boolean;
     loading: boolean;
@@ -142,15 +144,16 @@ const initialTopologyState = {
     context: defaultContext,
     scaleNum: 1,
     draggingId: null,
-    loading: false
+    loading: false,
+    boxSelectionInfo: undefined
 } as ITopologyState;
 
 class Topology extends React.Component<ITopologyProps, ITopologyState> {
-    $topology: HTMLDivElement | null;
+    $topology: HTMLDivElement | null = null;
 
-    $wrapper: HTMLDivElement | null;
+    $wrapper: HTMLDivElement | null = null;
 
-    $canvas: HTMLDivElement | null;
+    $canvas: HTMLDivElement | null = null;
 
     nodeSizeCache: NodeSizeCache = {};
 
@@ -265,7 +268,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     scaleNum = 1;
 
     clearSelectedWhenClickOutside = (e: MouseEvent) => {
-        if (this.$topology.contains(e.target as Node)) {
+        if (this.$topology?.contains(e.target as Node)) {
             return;
         }
         this.clearSelectData();
@@ -339,7 +342,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         };
         const defaultScrollTop = (canvasSize.height - wrapperSize.height) / 2;
         const defaultScrollLeft = (canvasSize.width - wrapperSize.width) / 2;
-        if (!contentPosition) {
+        if (!contentPosition || typeof this.props.customPostionHeight === 'undefined') {
             this.$wrapper.scrollTop = defaultScrollTop;
             this.$wrapper.scrollLeft = defaultScrollLeft;
         } else {
@@ -452,13 +455,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     getRealNodeDomByIdList = (ids: string[]) => {
-        return ids.map(getRealNodeDom)
+        return ids.map(getRealNodeDom).filter(Boolean) as Element[];
     }
 
 
 
     generateBoxByRealSelectedNodeDom = (elements: Element[] | null, offset=3) => {
-        const boundary = this.getBoundary(elements || this.state.realDragNodeDomList);
+        const boundary = this.getBoundary(elements ?? this.state.realDragNodeDomList ?? []);
         setTimeout(() => {
             this.generateBoxByBoundary(boundary, offset)
         }, 0)
@@ -482,7 +485,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         offset = offset || 3;
         if (nodes.length === 0) {
             this.setState({
-                boxSelectionInfo: null
+                boxSelectionInfo: undefined
             })
             return;
         }
@@ -516,7 +519,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         this.closeBoxSelection();
     };
 
-    setDraggingId = (id) => {
+    setDraggingId = (id: string | null) => {
         this.setState({
             draggingId: id,
         });
@@ -541,7 +544,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             mode === SelectMode.RIGHT_NORMAL
             && selectNodesId.indexOf(node.id) !== -1
         ) {
-            onSelect(selectedData);
+            onSelect?.(selectedData);
             return;
         }
         this.setContext(
@@ -619,7 +622,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         });
     };
 
-    handleHoverCurrentNode = (node) => {
+    handleHoverCurrentNode = (node?: ITopologyNode) => {
+        if (!node) {
+            return;
+        }
         this.setContext({
             hoverCurrentNode: node
         });
@@ -718,7 +724,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         ...prev.boxSelectionInfo,
                         x: e.clientX,
                         y: e.clientY,
-                    }
+                    } as BoxSelectionInfo
                 }
             });
             return;
@@ -749,7 +755,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return lines && lines.filter(item => item.start.split('-')[0] === curLine.start.split('-')[0] && item.end === curLine.end).length;
     }
 
-    getLineRepeatIndex = (curLine): {
+    getLineRepeatIndex = (curLine: ITopologyLine): {
         index?: number;
     } => {
         const {
@@ -795,6 +801,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     getNodeDomList = () => {
+        if (!this.$canvas) {
+            return [];
+        }
         return [...(this.$canvas.querySelectorAll('[id^="topology-node-"]') as any)] as Element[];
     }
 
@@ -888,7 +897,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     closeBoxSelection = () => {
-        this.setState(this.state.boxSelectionInfo ? { boxVisibleFlag: true, boxSelectionInfo: null } : {boxSelectionInfo: null});
+        this.setState(this.state.boxSelectionInfo ? { boxVisibleFlag: true, boxSelectionInfo: undefined } : {boxSelectionInfo: undefined});
     }
 
     showBoxSelection = () => {
@@ -913,12 +922,12 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const isMultiClick = e.ctrlKey || e.metaKey || e.shiftKey;
         const isDragBox = boxSelectionInfo && boxSelectionInfo.status === 'drag' && !shouldOpenContextMenuFlag;
         const isEmitByNodeWrapper = () => {
-        let target = e.target as HTMLElement;
-            while(target.className !== e.currentTarget.className && target !== document.body) {
-                if (target.className.indexOf('topology-node-content') > -1) {
+        let target: HTMLElement | null | undefined  = e.target as HTMLElement;
+            while(target && target?.className !== e.currentTarget.className && target !== document.body) {
+                if (target && target.className.indexOf('topology-node-content') > -1) {
                     return true;
                 }
-                target = target.parentElement;
+                target = target?.parentElement;
             }
             return false;
         }
@@ -935,7 +944,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 button,
                 buttons
             });
-            this.$wrapper.dispatchEvent(mouseEvent);
+            this.$wrapper?.dispatchEvent(mouseEvent);
         }
         // 单击且没有按住ctrl/meta/shift键时，清空框选框
         if (!isMultiClick) {
@@ -963,7 +972,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 }
             });
             this.setState({
-                boxSelectionInfo: {...this.state.boxSelectionInfo, status: 'none' as const}
+                boxSelectionInfo: {...this.state.boxSelectionInfo, status: 'none' as const} as BoxSelectionInfo
             });
             return;
         }
@@ -973,7 +982,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         if (isLineEdit && impactNode && !readOnly) {
             const { type, origin } = activeLine!;
             if (type === LineEditType.EDIT_END) {
-                const editLine = { start: origin.start, end: impactNode };
+                const editLine = { start: origin!.start, end: impactNode };
                 const repeatIndex = this.getLineRepeatIndex(editLine) || {};
                 const getNewline = (item: ITopologyLine) => {
                     if (!this.samePostionLinesLength(editLine)) {
@@ -1212,9 +1221,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const getLineStartPo = (line: ITopologyLine) => {
             if (
                 isEditing(line) &&
-                activeLine.type === LineEditType.EDIT_START
+                activeLine!.type === LineEditType.EDIT_START
             ) {
-                return activeLine.start;
+                return activeLine!.start;
             }
 
             // 这里特殊处理下，目的是保持所有锚点的起始点位置与 startPointAnchorId 锚点位置一致
@@ -1225,8 +1234,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             );
         };
         const getLineEndPo = (line: ITopologyLine) => {
-            if (isEditing(line) && activeLine.type === LineEditType.EDIT_END) {
-                return activeLine.end;
+            if (isEditing(line) && activeLine!.type === LineEditType.EDIT_END) {
+                return activeLine!.end;
             }
             return computeNodeInputPo(nodeHash[line.end]);
         };
@@ -1256,7 +1265,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     const defaultTextEl = lineTextColor && (
                         <text x={getTextXY().x} y={getTextXY().y} key={index} style={{
                             fill: lineTextColor[anchorId]
-                        }}>{anchorId === startPointAnchorId && !showText(line.start.split("-")[0]) ? null : lineTextMap[anchorId]}</text>);
+                        }}>{anchorId === startPointAnchorId && !showText?.(line.start.split("-")[0]) ? null : lineTextMap?.[anchorId]}</text>);
 
                     return (
                         <>
@@ -1288,14 +1297,14 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     };
 
     // TODO：系统计算设置一个合适的 scale，使所有节点均在可视化区域内
-    findScale = async (clonegraph) => {
+    findScale = async (clonegraph: HTMLElement) => {
         const { scaleNum } = this.state;
         let downloadScale: number = Number(scaleNum && scaleNum.toFixed(1));
 
-        let canvasEle = clonegraph.querySelector('#topology-canvas');
+        let canvasEle: HTMLElement = clonegraph.querySelector('#topology-canvas') as HTMLElement;
         canvasEle.style.transform = `scale(${downloadScale})`;
-        const { minXId, maxXId, minYId, maxYId } = getMaxAndMinNodeId(this.props.data.nodes);
-        let minYIdElement = clonegraph.querySelector(`#topology-node-${minYId}`);
+        const { minXId, maxXId, minYId, maxYId } = getMaxAndMinNodeId(this.props.data.nodes)!;
+        let minYIdElement = clonegraph.querySelector(`#topology-node-${minYId}`)!;
 
         minYIdElement.scrollIntoView({ block: "start" });
 
@@ -1343,14 +1352,14 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const graphEl: any = document.querySelector(".topology-canvas");
         let imgBase64 = '';
 
-        const { minX, maxX, minY, maxY } = computeMaxAndMin(nodes)
+        const { minX, maxX, minY, maxY } = computeMaxAndMin(nodes)!
         const imgPadding = isGlobal ? 50 : 0;
         const imgMinSize = 200;
         return html2canvas(graphEl, {
             onclone: function(documentClone){
                 // 背景色置为透明色
 
-                const nodeContentEls: HTMLCollectionOf<Element> = documentClone.getElementsByClassName('topology-node-content');
+                const nodeContentEls = documentClone.getElementsByClassName('topology-node-content') as HTMLCollectionOf<HTMLElement>;
                 nodeContentEls && Array.from(nodeContentEls).forEach((node: HTMLElement) => {
                     const childNode: any = node.childNodes && node.childNodes[0];
                     const grandsonChildNode: any = childNode && childNode.childNodes[0];
@@ -1359,10 +1368,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     childNode.style.backgroundColor = 'white';
                     grandsonChildNode.style.boxShadow = 'none';
                 })
-                const {  minYId } = getMaxAndMinNodeId(nodes);
+                const {  minYId } = getMaxAndMinNodeId(nodes)!;
                 // 定位画布中最顶层的节点，让其滚动在浏览器顶部，尽可能的多展示其它节点
                 let minYIdElement = documentClone.getElementById(`topology-node-${minYId}`);
-                minYIdElement.scrollIntoView({
+                minYIdElement?.scrollIntoView({
                     block: "start",
                     inline: 'center'
                 });
@@ -1405,12 +1414,12 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     // 定位节点
-    locateNodeById = (id) => {
+    locateNodeById = (id: string) => {
 
         const { nodes } =  this.props.data;
         const curNode = nodes && nodes.find(n => n.id === id)
         const ele = document.getElementById(`topology-node-${id}`);
-        if (ele) {
+        if (ele && curNode) {
             // 如果已选中，则不做处理
             this.selectNode(curNode, SelectMode.SINGLE)
             ele.scrollIntoView({
@@ -1544,8 +1553,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         const getNodeOffsetPos = (position: IPosition, id: string): IPosition => {
             return {
-                x: position.x + getNodeSize(id).width + overlapOffset.offsetX || 0,
-                y: position.y + getNodeSize(id).height + overlapOffset.offsetY || 0,
+                x: position.x + getNodeSize(id).width + (overlapOffset?.offsetX ?? 0),
+                y: position.y + getNodeSize(id).height + (overlapOffset?.offsetY ?? 0),
             }
         }
 
@@ -1555,10 +1564,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
             return {
                 T1: {
-                    x: n.position.x,
-                    y: n.position.y,
+                    x: n.position!.x,
+                    y: n.position!.y,
                 },
-                T2: getNodeOffsetPos(n.position, n.id)
+                T2: getNodeOffsetPos(n.position!, n.id)
             }
         })
         const isOverlap = Array.from(nodePosMap).some(([id, pos]) => {
@@ -1570,10 +1579,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             return posMap.some((p: IPosMap) => !(S2.y < p.T1.y || S1.y > p.T2.y || S2.x < p.T1.x || S1.x > p.T2.x) === true);
         });
         return isOverlap;
-    }
-
-    multiValidateIsOverlap = (drawId, pos): boolean => {
-        return false;
     }
 
     setRealDragNodeDomList = (element?: Element[] | null) => {
@@ -1633,9 +1638,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                             <Selection onClick={e => {
                                 e.stopPropagation();
                                 this.setState({
-                                    boxSelectionInfo: null
+                                    boxSelectionInfo: undefined
                                 })
-                            }} renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper} visible={!!boxSelectionInfo} />
+                            }} renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper!} visible={!!boxSelectionInfo} />
                         </Provider>
                     </div>
                 </div>
@@ -1645,7 +1650,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 }
 
-function hover(props: ITopologyProps, monitor, component: Topology) {
+function hover(props: ITopologyProps, monitor: DropTargetMonitor, component: Topology) {
     if (!monitor.getItem()) {
         return;
     }
@@ -1706,7 +1711,7 @@ export default DropTarget(
                 return;
             }
 
-            const getNodePosition = (nodeDom, isChild?) => {
+            const getNodePosition = (nodeDom: any, isChild?: boolean) => {
                 const nodePosition = {
                     top: nodeDom.style.top,
                     left: nodeDom.style.left
@@ -1720,8 +1725,8 @@ export default DropTarget(
                         clientOffset.y / component.scaleNum
                 };
                 const scrollPosition = computeCanvasPo(
-                    monitor.getSourceClientOffset(),
-                    component.$wrapper
+                    monitor.getSourceClientOffset()!,
+                    component.$wrapper!
                 )
                 /**
                  * TODO： scaleNum 缩放与窗口滚动时有冲突, isChild 为子节点联动时使用 scalePosition 定位
@@ -1739,13 +1744,13 @@ export default DropTarget(
             const getChildPosMap = (idList: string[]) => {
                 const { lines, nodes } = props.data;
                 const curNodeList = nodes.filter(n => idList.indexOf(n.id) > -1);
-                let childPosMap = {};
+                let childPosMap = {} as any;
                 curNodeList.forEach(curNode => {
                     const dragChild = curNode.dragChild || isMatchKeyValue(curNode, 'dragChild', true);
                     if (!dragChild) return null;
                     const childIds = lines.filter(n => n.start.split('-')[0] === curNode.id).map(n => n.end);
                     for (let childId of childIds) {
-                        let childNodeDom: HTMLElement = document.getElementById(`topology-node-${childId}`);
+                        let childNodeDom: HTMLElement = document.getElementById(`topology-node-${childId}`)!;
                         if (!childNodeDom) return null;
                         childPosMap[childId] = getNodePosition(childNodeDom, true);
                     }
@@ -1754,12 +1759,12 @@ export default DropTarget(
             }
 
             let position;
-            let nodeDom: HTMLElement = document.getElementById(`topology-node-${item.id}`);
+            let nodeDom: HTMLElement = document.getElementById(`topology-node-${item.id}`)!;
             if (nodeDom) {
                 position = getNodePosition(nodeDom);
             } else {
                 position = computeCanvasPo(
-                    monitor.getSourceClientOffset(),
+                    monitor.getSourceClientOffset()!,
                     component.$wrapper
                 )
             }
@@ -1773,24 +1778,27 @@ export default DropTarget(
                     if (!item.data) {
                         return;
                     }
-                    const isMultiInfo = item.data.nodes && Array.isArray(item.data.nodes) && item.data.lines && Array.isArray(item.data.lines);
+                    const currData = item.data;
+                    const isMultiInfo = (obj: any): obj is ITopologyData  => {
+                        return obj?.data?.nodes && Array.isArray(obj.data.nodes) && obj.data.lines && Array.isArray(obj.data.lines);
+                    }
                     /**
                      * TODO：Here first render the newly added node, if it overlaps, delete the node
                      * The main reason is that there is currently no good unified method to get the default width and height of the newly added nodes in the upper layer.
                      */
-                    if (isMultiInfo) {
+                    if (isMultiInfo(currData)) {
                         nodeProps = [];
-                        const minX = Math.min(...item.data.nodes.map(n => n.position.x));
-                        const minY = Math.min(...item.data.nodes.map(n => n.position.y));
+                        const minX = Math.min(...currData.nodes.map(n => n.position!.x));
+                        const minY = Math.min(...currData.nodes.map(n => n.position!.y));
                         const offset = {
                             x: position.x - minX,
                             y: position.y - minY
                         }
                         const selectedPositionList: [string, IPosition][] = [];
-                        item.data.nodes.forEach(n => {
+                        currData.nodes.forEach(n => {
                             const newPosition = {
-                                x: n.position.x + offset.x,
-                                y: n.position.y + offset.y
+                                x: n.position!.x + offset.x,
+                                y: n.position!.y + offset.y
                             }
                             selectedPositionList.push([n.id, newPosition]);
                         })
@@ -1798,17 +1806,17 @@ export default DropTarget(
                         const positionMap = new Map(nodeProps);
                         component.onChange({
                             ...props.data,
-                            nodes: [...props.data.nodes, ...item.data.nodes.map(n => {
+                            nodes: [...props.data.nodes, ...currData.nodes.map(n => {
                                 const newPosition = positionMap.get(n.id);
                                 const p = newPosition ? newPosition : n.position;
                                 return { ...n, position: p  }
                             })],
-                            lines: [...props.data.lines, ...item.data.lines ]
+                            lines: [...props.data.lines, ...currData.lines ]
                         }, ChangeType.ADD_NODE);
                     } else {
                         component.onChange({
                             ...props.data,
-                            nodes: [...props.data.nodes, { ...item.data, position }],
+                            nodes: [...props.data.nodes, { ...currData, position }],
                         }, ChangeType.ADD_NODE);
                     }
                     if (isOverlap(nodeProps)) {
@@ -1835,8 +1843,8 @@ export default DropTarget(
                         props.data.nodes.forEach(n => {
                             if (selectedIdSet.has(n.id)) {
                                 const newPosition = {
-                                    x: n.position.x + offset.x,
-                                    y: n.position.y + offset.y
+                                    x: n.position!.x + offset.x,
+                                    y: n.position!.y + offset.y
                                 }
                                 selectedPositionList.push([n.id, newPosition]);
                             }

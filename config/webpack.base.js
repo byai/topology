@@ -3,12 +3,12 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const webpack = require('webpack');
-
+const paths = require ('./paths');
 const isDev = process.env.NODE_ENV === 'development'
 
 module.exports = {
   // 入口文件
-  entry: path.resolve(__dirname, '../src/lib/index.tsx'),
+  entry: isDev ? paths.appIndexJs : path.resolve(__dirname, '../src/lib/index.tsx'),
   // 打包文件出口
   output: {
     filename: 'static/js/[name].[chunkhash:8].js', // 每个输出js的名称
@@ -94,6 +94,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../public/index.html'),
+      favicon: path.resolve(__dirname, '../public/favicon.ico'),
       inject: true
     }),
   ],

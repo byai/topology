@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { DragSource, DragElementWrapper } from 'react-dnd';
 import classnames from 'classnames';
 import { JsxElement } from 'typescript';
@@ -23,12 +23,12 @@ export interface INodeWrapperProps {
     id?: string;
     data?: ITopologyNode;
     scaleNum?: number;
-    draggingId?: string;
+    draggingId?: string | null;
     context?: ITopologyContext;
-    setDraggingId?: (id: string) => void;
+    setDraggingId?: (id: string | null) => void;
     onSelect: (node: ITopologyNode, mode: SelectMode) => void;
     children: (wrapperOptions: IWrapperOptions) => React.ReactNode;
-    onMouseEnter?: (node: ITopologyNode) => void;
+    onMouseEnter?: (node?: ITopologyNode) => void;
     onMouseLeave?: () => void;
     readOnly?: boolean;
     isReduceRender?: boolean;
@@ -62,10 +62,12 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
 
     private updateNumber: number = 0;
 
-    shouldComponentUpdate(nextprops) {
-        const { data: nextData, context: { selectedData: nextSelectedData, impactNode: nextImpactNode }, isReduceRender } = nextprops;
-        const { data, context: { selectedData, impactNode } } = this.props;
-
+    shouldComponentUpdate(nextprops: INodeWrapperProps) {
+        const oldContext = nextprops.context!;
+        const { selectedData: nextSelectedData, impactNode: nextImpactNode } = oldContext;
+        const { data: nextData, isReduceRender } = nextprops;
+        const newContext = this.props.context;
+        const { selectedData, impactNode } = newContext!;
         if (impactNode && impactNode === nextImpactNode) {
             this.updateNumber += 1;
         } else {
@@ -73,7 +75,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         }
 
         // 避免节点多次无用渲染
-        if (isReduceRender && !impactNode && nextData === data && nextSelectedData === selectedData) {
+        if (isReduceRender && !impactNode && nextData === this.props.data && nextSelectedData === selectedData) {
             return false;
         }
         if (this.updateNumber >= 2) {
@@ -101,7 +103,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     anchorDecorator = (options: { anchorId?: string }) => {
         const { id, readOnly } = this.props;
         const anchorId = options.anchorId || (this.increaseAnchorId += 1);
-        return (item: JsxElement) => (
+        return (item?: ReactNode ) => (
             <AnchorWrapper
                 key={`${id}-${anchorId}`}
                 id={`${id}-${anchorId}`}
@@ -137,6 +139,9 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
 
     handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, isSelect=true) => {
         const { data, onSelect } = this.props;
+        if (!data) {
+            return;
+        }
         if (e.button === 2) {
             e.preventDefault();
             onSelect(data, SelectMode.RIGHT_NORMAL);
@@ -168,7 +173,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
      */
     /* eslint-disable */
     getPreviewNodeStyle = () => {
-        const { data, scaleNum, id, draggingId } = this.props;
+        const { data, scaleNum=1, id, draggingId } = this.props;
         const realNodeDom = document.getElementById(`topology-node-${data && data.id}`);
         if (!realNodeDom) return null
         const previewNodeWidth = scaleNum * realNodeDom.offsetWidth - 2; // border
@@ -176,7 +181,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         let previewStyle = {};
         // 放大模式下拖动中 previewNode 样式处理
         if (scaleNum > 1 && draggingId === id) {
-            const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${draggingId}']`);
+            const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${draggingId}']`)!;
             if (!draggingPreviewNode) return null;
             setTimeout(() => {
                 draggingPreviewNode.style.background = 'transparent';
@@ -208,13 +213,13 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             onMouseEnter,
             onMouseLeave
         } = this.props;
-        const { selectedData, activeLine } = context;
+        const { selectedData, activeLine } = context!;
         const isSelected =
-            selectedData.nodes.find(item => item.id === data.id) !== undefined;
-        return connectDragSource(
+            selectedData.nodes.find(item => item.id === data!.id) !== undefined;
+        return connectDragSource?.(
             <div
                 id={data ? `topology-node-${data.id}` : ""}
-                data-combine-id={data.combineId}
+                data-combine-id={data?.combineId}
                 style={this.computeStyle()}
                 className="byai-topology-node-wrapper"
                 onClick={this.handleClick}
@@ -222,13 +227,13 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
                 onMouseDown={(e) => {
                     this.handleMouseDown(e, isSelected);
                 }}
-                onMouseEnter={() => { onMouseEnter(data) }}
-                onMouseLeave={() => { onMouseLeave() }}
+                onMouseEnter={() => { onMouseEnter?.(data) }}
+                onMouseLeave={() => { onMouseLeave?.() }}
             >
-                {connectDragPreview(
+                {connectDragPreview?.(
                     <div
                         data-id={`${id}`}
-                        style={this.getPreviewNodeStyle()}
+                        style={this.getPreviewNodeStyle() ?? {}}
                         className="topology-node-preview"
                     />
                 )}
@@ -260,18 +265,19 @@ export default DragSource(
             return canDragNode ? !canDragNode : (props.readOnly ? !props.readOnly: !canDragNode);
         },
         beginDrag(props: INodeWrapperProps) {
-            const id = props.data ? props.data.id : null;
+            const id = props?.data?.id;
+            if (!id) return { id };
             const { prevNodeStyle = {}, closeBoxSelection } = props;
             closeBoxSelection();
-            props.setDraggingId(id);
+            props?.setDraggingId?.(id!);
             // beginDrag 时机 处理预览节点样式问题
-            const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
-            if (!draggingPreviewNode) return null;
+            const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`)!;
+            if (!draggingPreviewNode) return { id };
             const realNodeDom = getRealNodeDom(id);
-            if (!realNodeDom) return null;
+            if (!realNodeDom) return { id };
             let distanceX = 0;
             let distanceY = 0;
-            const otherRealNodeDomList = props.selectedNodes.filter(item => item.id !== id).map(item => getRealNodeDom(item.id));
+            const otherRealNodeDomList = (props?.selectedNodes ?? []).filter(item => item.id !== id).map(item => getRealNodeDom(item.id)!);
             const allRealNodeDomList = [...otherRealNodeDomList, realNodeDom];
             let width = realNodeDom.offsetWidth;
             let height = realNodeDom.offsetHeight
@@ -299,10 +305,10 @@ export default DragSource(
             return { id };
         },
         endDrag(props: INodeWrapperProps) {
-            props.setDraggingId(null);
+            props?.setDraggingId?.(null);
             const id = props.data ? props.data.id : null;
             props.showBoxSelection && props.showBoxSelection();
-            const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);
+            const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`)!;
             if (!draggingPreviewNode) return null;
             draggingPreviewNode.style.setProperty('--width', '100%');
             draggingPreviewNode.style.setProperty('--height', '100%');

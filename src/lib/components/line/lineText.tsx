@@ -5,6 +5,6 @@ export default function LineText({
     position,
     line,
     data
-}) {
+}: any) {
     return useMemo(() => lineTextDecorator(position, line), [data]);
 }

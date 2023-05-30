@@ -20,10 +20,10 @@ class TopologyAnchorWrapper extends React.Component<IAnchorWrapperProps> {
             children,
             id,
         } = this.props;
-        return connectDragSource(
+        return connectDragSource?.(
             <div id={id} className="topology-anchor-wrapper">
                 {children}
-                {connectDragPreview(<div className="topology-anchor-wrapper-preview" />)}
+                {connectDragPreview?.(<div className="topology-anchor-wrapper-preview" />)}
             </div>,
         );
     }

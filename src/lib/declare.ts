@@ -69,7 +69,7 @@ export interface ITopologyContext {
     linking: boolean;
     impactNode: string | null;
     readOnly: boolean;
-    hoverCurrentNode: ITopologyNode;
+    hoverCurrentNode: ITopologyNode | null;
     activeLine: {
         start: IPosition;
         end: IPosition;

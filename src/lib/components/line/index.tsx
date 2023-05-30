@@ -53,7 +53,7 @@ class Line extends React.Component<ILineProps, ILineState> {
             data,
             onSelect,
         } = this.props;
-        const { lines } = context.selectedData;
+        const { lines } = context!.selectedData;
         const multi = e.metaKey || e.ctrlKey;
         if (!onSelect) {
             return;
@@ -61,16 +61,16 @@ class Line extends React.Component<ILineProps, ILineState> {
 
         if (!multi) {
             onSelect({
-                lines: selected ? [] : [data],
+                lines: selected ? [] : [data!],
                 nodes: [],
             });
             return;
         }
         onSelect({
-            ...context.selectedData,
+            ...context!.selectedData,
             lines: selected
                 ? lines.filter(item => !_.isEqual(item, data))
-                : [...lines, data],
+                : [...lines, data!],
         });
     }
 
@@ -83,14 +83,14 @@ class Line extends React.Component<ILineProps, ILineState> {
             data,
             readOnly,
             lineOffsetY,
-            context: { linking, activeLine },
+            context,
         } = this.props;
-
+        const { linking, activeLine } = context!;
         const { hover } = this.state;
         const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';
         const getTriangleStart = () => ({ ...end, y: end.y - config.line.triangleWidth });
         // 只高亮新增或者编辑的当前线
-        const curLinking = linking && !activeLine.origin && !data;
+        const curLinking = linking && !activeLine!.origin && !data;
         const lColor = highLight || selected || hover || curLinking ? Colors.ACTIVE : ((data && data.color) || Colors.NORMAL);
         const transition = linking ? 'none' : config.transition;
         return (

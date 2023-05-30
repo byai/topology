@@ -18,16 +18,16 @@ class TemplateWrapper extends React.Component<ITemplateWrapperProps> {
             children,
         } = this.props;
 
-        return connectDragSource((
+        return connectDragSource?.((
             <div className="topology-template-wrapper">
                 {children}
-                {connectDragPreview(<div className="topology-template-preview" />)}
+                {connectDragPreview?.(<div className="topology-template-preview" />)}
             </div>
         ));
     }
 }
 
-export default DragSource(
+export default DragSource<ITemplateWrapperProps>(
     NodeTypes.TEMPLATE_NODE,
     {
         canDrag(props) {

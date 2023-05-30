@@ -17,9 +17,9 @@ const computeCanvasPoHelper = ($wrapper: HTMLDivElement) => {
     // 缩放的容器
     const canvas = document.querySelector('.topology-canvas');
     // 可以获取到 svg 的宽高
-    const { width, height } = canvas.getBoundingClientRect();
+    const { width, height } = canvas!.getBoundingClientRect();
     // eslint-disable-next-line radix
-    const zoom = parseInt(document.querySelector('.topology-tools-percent').innerHTML) / 100;
+    const zoom = parseInt(document.querySelector('.topology-tools-percent')!.innerHTML) / 100;
     // 缩放后画布的中心点,还是需要用缩放前的比例计算中心点
     const centerX = width / zoom / 2;
     const centerY = height / zoom / 2;
@@ -187,7 +187,7 @@ export const computeMaxAndMin = (nodes: ITopologyNode[]) => {
     let maxY = -Infinity;
     nodes.forEach(({ position, id }) => {
         const nodeSize = getNodeSize(id);
-        const { x, y } = position;
+        const { x, y } = position!;
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x + nodeSize.width);
         minY = Math.min(minY, y);
@@ -206,7 +206,7 @@ export const getMaxAndMinNodeId = (nodes: ITopologyNode[]) => {
     if (!nodes.length || nodes.find(item => !item.position || [item.position.x, item.position.y].includes(undefined))) {
         return null;
     }
-    let minX = Infinity;
+    let minX: number = Infinity;
     let maxX = -Infinity;
     let minY = Infinity;
     let maxY = -Infinity;
@@ -216,7 +216,7 @@ export const getMaxAndMinNodeId = (nodes: ITopologyNode[]) => {
     let maxYId = null;
 
     nodes.forEach(({ position, id }) => {
-        const { x, y } = position;
+        const { x, y } = position!;
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x);
         minY = Math.min(minY, y);
@@ -240,6 +240,11 @@ export const getMaxAndMinNodeId = (nodes: ITopologyNode[]) => {
         maxXId,
         minYId,
         maxYId
+    } as unknown as {
+        minXId: string;
+        maxXId: string;
+        minYId: string;
+        maxYId: string;
     };
 };
 
@@ -250,7 +255,8 @@ export const getMaxAndMinNodeId = (nodes: ITopologyNode[]) => {
  * @param doc
  * @returns
  */
-export const isInViewPort = (nodeId, doc) => {
+export const isInViewPort = (nodeId: string, doc: Document) => {
+
     const viewWidth = window.innerWidth || document.documentElement.clientWidth;
     // const viewHeight = window.innerHeight || document.documentElement.clientHeight;
     const viewHeight = document.documentElement.offsetHeight;
@@ -259,17 +265,18 @@ export const isInViewPort = (nodeId, doc) => {
         right,
         bottom,
         left,
-    } = doc.getElementById(`topology-node-${nodeId}`).getBoundingClientRect();
+    } = doc.getElementById(`topology-node-${nodeId}`)!.getBoundingClientRect();
     return (
         top >= 0 && left >= 0 && right <= viewWidth && bottom <= viewHeight
     );
 };
 
 export const computeContentCenter = (nodes: ITopologyNode[]) => {
-    if (!computeMaxAndMin(nodes)) return null;
+    const res = computeMaxAndMin(nodes);
+    if (!res) return null;
     const {
         minX, maxX, minY, maxY
-    } = computeMaxAndMin(nodes);
+    } = res;
     return {
         x: (minX + maxX) / 2,
         y: (minY + maxY) / 2,
@@ -284,7 +291,7 @@ export const computeContentPostionY = (nodes: ITopologyNode[]) => {
     if (!computeMaxAndMin(nodes)) return null;
     const {
         minX, maxX, minY
-    } = computeMaxAndMin(nodes);
+    } = computeMaxAndMin(nodes)!;
     return {
         x: (minX + maxX) / 2,
         y: minY,
@@ -323,7 +330,7 @@ export const computeMouseClientToCanvas = (clientX: number, clientY: number, $wr
 
 type GetField = (obj: object) => string;
 export const createHashFromObjectArray = (arr: object[], field: string | GetField) => arr.reduce(
-    (pre, cur: object) => {
+    (pre, cur: any) => {
         const key = typeof field === 'string' ? cur[field] : field(cur);
         return { ...pre, [key]: cur };
     },
@@ -338,9 +345,9 @@ export const createHashFromObjectArray = (arr: object[], field: string | GetFiel
  * @param matchValue
  * @returns
  */
-export const isMatchKeyValue = (obj, matchKey?, matchValue?) => {
+export const isMatchKeyValue = (obj: any, matchKey?: any, matchValue?: any) => {
     let isMatch = false;
-    const loop = (param) => {
+    const loop = (param: any) => {
         // eslint-disable-next-line no-restricted-syntax
         for (const key in param) {
             if (Object.prototype.toString.call(param[key]) === '[object Object]' && param[key] !== null) {
