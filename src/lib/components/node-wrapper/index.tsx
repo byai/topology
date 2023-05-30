@@ -1,7 +1,6 @@
 import React from 'react';
 import { DragSource, DragElementWrapper } from 'react-dnd';
 import classnames from 'classnames';
-import { JsxElement } from 'typescript';
 import AnchorWrapper from '../anchor-wrapper';
 import { Consumer } from '../context';
 import {
@@ -101,7 +100,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     anchorDecorator = (options: { anchorId?: string }) => {
         const { id, readOnly } = this.props;
         const anchorId = options.anchorId || (this.increaseAnchorId += 1);
-        return (item: JsxElement) => (
+        return (item: React.ReactNode) => (
             <AnchorWrapper
                 key={`${id}-${anchorId}`}
                 id={`${id}-${anchorId}`}

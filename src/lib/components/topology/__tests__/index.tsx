@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import 'jest-dom/extend-expect';
 import { wrapInTestContext } from 'react-dnd-test-utils';
 import TestRenderer from 'react-test-renderer';
+// eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import Topology from '..';
 
 afterEach(cleanup);
