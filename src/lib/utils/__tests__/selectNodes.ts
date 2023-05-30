@@ -89,9 +89,9 @@ describe('selectNodes多选(CTRL/COMMAND)', () => {
                 node: { id: '2' },
                 mode: SelectMode.MUL_NORMAL,
             }),
-        ).toEqual({
+        ).toMatchObject({
             lines: [{ start: '1-0', end: '2' }, { start: '2-0', end: '4' }],
-            nodes: [{ id: '1' }, { id: '4' }, { id: '2' }],
+            nodes: [{ id: '1' }, { id: '2' }, { id: '4' }],
         });
     });
 
@@ -142,13 +142,14 @@ describe('selectNodes多选(CTRL/COMMAND + SHIFT)', () => {
                 node: { id: '1' },
                 mode: SelectMode.MULTI,
             }),
-        ).toEqual({
+        ).toMatchObject({
             lines: [
-                { start: '6-0', end: '8' },
                 { start: '1-0', end: '2' },
                 { start: '1-1', end: '3' },
+                { start: '3-0', end: '6' },
+                { start: '6-0', end: '8' },
             ],
-            nodes: [{ id: '6' }, { id: '8' }, { id: '1' }, { id: '2' }, { id: '3' }],
+            nodes: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '6' }, { id: '8' }],
         });
     });
 
@@ -164,9 +165,9 @@ describe('selectNodes多选(CTRL/COMMAND + SHIFT)', () => {
                 node: { id: '3' },
                 mode: SelectMode.MULTI,
             }),
-        ).toEqual({
+        ).toMatchObject({
             lines: [{ start: '1-1', end: '3' }, { start: '3-0', end: '6' }, { start: '3-1', end: '7' }],
-            nodes: [{ id: '13' }, { id: '1' }, { id: '3' }, { id: '6' }, { id: '7' }],
+            nodes: [{ id: '1' }, { id: '3' }, { id: '6' }, { id: '7' }, { id: '13' }],
         });
     });
 

@@ -123,7 +123,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         // 避免一些交互上的冲突,改为mousedown触发
         const { data, onSelect, closeBoxSelection } = this.props;
-        closeBoxSelection();
+        closeBoxSelection?.();
 
         if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
             onSelect(data, SelectMode.MULTI);
@@ -144,7 +144,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         const { data, onSelect, closeBoxSelection } = this.props;
 
         if (e.button === 2) {
-            closeBoxSelection();
+            closeBoxSelection?.();
             e.preventDefault();
             onSelect(data, SelectMode.RIGHT_NORMAL);
         }
@@ -227,7 +227,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         return connectDragSource(
             <div
                 id={data ? `topology-node-${data.id}` : ""}
-                data-combine-id={data.combineId}
+                data-combine-id={data?.combineId}
                 style={this.computeStyle()}
                 className="byai-topology-node-wrapper"
                 onClick={this.handleClick}
@@ -276,7 +276,7 @@ export default DragSource(
         beginDrag(props: INodeWrapperProps) {
             const id = props.data ? props.data.id : null;
             const { prevNodeStyle = {}, closeBoxSelection } = props;
-            closeBoxSelection();
+            closeBoxSelection?.();
             props.setDraggingId(id);
             // beginDrag 时机 处理预览节点样式问题
             const draggingPreviewNode: HTMLElement = document.querySelector(`div[data-id='${id}']`);

@@ -12,6 +12,7 @@ exports[`topology basic render 1`] = `
       >
         <div
           class="topology-canvas topology-zoom"
+          id="topology-canvas"
           style="width: 40000px; height: 40000px;"
         >
           <div
@@ -34,10 +35,15 @@ exports[`topology basic render 1`] = `
           <svg
             class="topology-svg"
           />
+          <div
+            class="byai-topology-selection"
+            style="left: 0px; top: 0px; width: 0px; height: 0px;"
+          />
         </div>
       </div>
       <div
         class="topology-tools"
+        data-html2canvas-ignore="false"
       >
         <div
           class="topology-tools-btn"
