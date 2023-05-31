@@ -10,6 +10,7 @@ interface FlowState {
     readonly: boolean;
     overlap?: boolean;
     showBar?: boolean;
+    snapline?: boolean;
     canConnectMultiLines?: boolean;
 }
 class Flow extends React.Component<{}, FlowState> {
@@ -50,7 +51,8 @@ class Flow extends React.Component<{}, FlowState> {
         readonly: false,
         overlap: false,
         showBar: true,
-        canConnectMultiLines: false
+        canConnectMultiLines: false,
+        snapline: true,
     };
     // eslint-disable-next-line
     topology: any = null;
@@ -97,7 +99,7 @@ class Flow extends React.Component<{}, FlowState> {
     render() {
         const {
             data, readonly, showBar, overlap,
-            canConnectMultiLines
+            canConnectMultiLines, snapline
         } = this.state;
         const mockLineColor = {
             0: '#82BEFF',
@@ -118,6 +120,7 @@ class Flow extends React.Component<{}, FlowState> {
                         readOnly={readonly}
                         scaleNum={1}
                         showBar={showBar}
+                        snapline={snapline}
                         showDownload
                         downloadImg={() => {
                             this.topology.downloadImg(true, '测试图片名称');
@@ -171,6 +174,13 @@ class Flow extends React.Component<{}, FlowState> {
                         type="button"
                     >
                         {`锚点${canConnectMultiLines ? '不可' : '可'}连接多条线`}
+                    </button>
+                    <button
+                        onClick={() => this.setState({ snapline: !snapline })}
+                        style={{ marginBottom: 20 }}
+                        type="button"
+                    >
+                        展示辅助对齐线
                     </button>
                     <TemplateWrapper generator={() => this.generatorNodeData(true)}>
                         <div className="topology-templates-item">宽节点</div>

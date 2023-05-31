@@ -51,6 +51,12 @@ http://localhost:3000
             <td>数据</td>
         </tr>
         <tr>
+            <td>snapline</td>
+            <td>bool</td>
+            <td>true</td>
+            <td>是否显示辅助对齐线</td>
+        </tr>
+        <tr>
             <td>lineLinkageHighlight</td>
             <td>boolean</td>
             <td>false</td>

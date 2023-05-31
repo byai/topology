@@ -210,6 +210,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         };
     };
 
+
     render() {
         const {
             connectDragSource,
@@ -237,8 +238,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
                     this.handleMouseDown(e, isSelected);
                 }}
                 onMouseEnter={() => { onMouseEnter(data) }}
-                onMouseLeave={() => { onMouseLeave() }}
-            >
+                onMouseLeave={() => { onMouseLeave() }}>
                 {connectDragPreview(
                     <div
                         data-id={`${id}`}

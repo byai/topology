@@ -47,10 +47,12 @@ import deleteSelectedData from '../../utils/deleteSelectedData';
 import config from '../../config';
 import './index.less';
 import Selection from '../selection';
+import SnapLine from '../snapline';
 
 export interface ITopologyProps {
     data: ITopologyData; // 数据 { nodes: []; lines: [] }
     readOnly?: boolean; // 只读模式，为true时不可编辑
+    snapline?: boolean; // 是否显示辅助对齐线，默认现实
     showBar?: boolean; // 是否显示工具栏
     showCenter?: boolean; // 是否显示工具栏中的定位中心
     showLayout?: boolean; // 是否显示工具栏中的自动布局
@@ -120,6 +122,7 @@ export interface ITopologyState {
     realDragNodeDomList?: Element[] | null;
     boxVisibleFlag?: boolean;
     loading: boolean;
+    alignmentLines: any;
 }
 
 interface NodeSizeCache {
@@ -144,7 +147,8 @@ const initialTopologyState = {
     context: defaultContext,
     scaleNum: 1,
     draggingId: null,
-    loading: false
+    loading: false,
+    alignmentLines: {}
 } as ITopologyState;
 
 class Topology extends React.Component<ITopologyProps, ITopologyState> {
@@ -1197,17 +1201,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         setTimeout(this.cacheNodeSize, 1000);
     };
 
-    // renderSelection = () => {
-    //     const selectionInfo = this.state.boxSelectionInfo;
-    //     const { x: initX, y: initY } = computeCanvasPo({x: selectionInfo.initX, y: selectionInfo.initY}, this.$wrapper);
-    //     const { x, y } = computeCanvasPo({x: selectionInfo.x, y: selectionInfo.y}, this.$wrapper);
-    //     const maxX = Math.min(initX, x);
-    //     const maxY = Math.min(initY, y);
-    //     const width = Math.abs(x - initX);
-    //     const height = Math.abs(y - initY);
-    //     return <div style={{ position: 'absolute', zIndex: 1010, opacity: 0.5, left: `${maxX}px`, top: `${maxY}px`, width: `${width}px`, height: `${height}px`, background: 'blue' }}></div>
-    // }
-
     renderLines = () => {
         const {
             data: { lines, nodes },
@@ -1625,11 +1618,49 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         })
     }
 
+    setAlignmentLines = (alignmentLines) => {
+        this.setState({
+            alignmentLines,
+        })
+    }
+
+    // 获取 drag 时节点坐标
+    getNodePosition = (monitor, nodeDom, isChild?) => {
+        if (!monitor) return;
+        const { scaleNum } = this.state;
+        const clientOffset = monitor.getDifferenceFromInitialOffset() || {};
+        const nodePosition = {
+            top: nodeDom.style.top,
+            left: nodeDom.style.left
+        };
+
+        const scalePosition = {
+            x:
+                Number(nodePosition.left.replace(/[px]+/g, "")) +
+                clientOffset.x / scaleNum || 0,
+            y:
+                Number(nodePosition.top.replace(/[px]+/g, "")) +
+                clientOffset.y / scaleNum || 0
+        };
+        const scrollPosition = computeCanvasPo(
+            monitor.getSourceClientOffset() || {},
+            this.$wrapper
+        )
+        /**
+         * TODO： scaleNum 缩放与窗口滚动时有冲突, isChild 为子节点联动时使用 scalePosition 定位
+         */
+        const position = scaleNum === 1 ? (
+            isChild ? scalePosition : scrollPosition
+        ) : scalePosition
+        return position;
+    }
+
     render() {
-        const { connectDropTarget, showBar } = this.props;
-        const { context, scaleNum, boxSelectionInfo } = this.state;
+        const { connectDropTarget, showBar, snapline } = this.props;
+        const { context, scaleNum, boxSelectionInfo, alignmentLines } = this.state;
         const xPos = boxSelectionInfo ? `${boxSelectionInfo.x},${boxSelectionInfo.initX}` : '';
         const yPos = boxSelectionInfo ? `${boxSelectionInfo.y},${boxSelectionInfo.initY}` : '';
+
         return connectDropTarget!(
             <div className="byai-topology"
                 ref={r => {
@@ -1679,6 +1710,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                                     boxSelectionInfo: null
                                 })
                             }} renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper} visible={!!boxSelectionInfo} />
+                            {snapline !== false && <SnapLine alignmentLines={alignmentLines}/>}
                         </Provider>
                     </div>
                 </div>
@@ -1695,7 +1727,9 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
 
     const { context } = component.state;
     const clientOffset = monitor.getClientOffset();
-    const { id, type } = monitor.getItem();
+    const { id } = monitor.getItem();
+    const type = monitor.getItemType();
+
     switch (type) {
         case NodeTypes.ANCHOR:
             if (clientOffset) {
@@ -1725,6 +1759,72 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
                 });
             }
             break;
+
+        case NodeTypes.NORMAL_NODE: {
+            const { nodes } = props.data;
+            const nodeDom: HTMLElement = document.getElementById(`topology-node-${id}`);
+
+            const ALIGNMENT_THRESHOLD = 2;
+
+            // 计算两个节点之间的距离
+            const getDistance = (node1, node2) => {
+                const dx = Math.abs(node1.position.x - node2.position.x);
+                const dy = Math.abs(node1.position.y - node2.position.y);
+                return { dx, dy };
+            };
+
+            // 根据两个节点之间的距离信息，判断它们是否在水平或垂直方向上对齐
+            const getAlignment = (node1, node2) => {
+                const distance = getDistance(node1, node2);
+
+                if (distance.dx < ALIGNMENT_THRESHOLD) {
+                    return { vertical: true, x: node2.position.x };
+                }
+
+                if (distance.dy < ALIGNMENT_THRESHOLD) {
+                    return { horizontal: true, y: node2.position.y };
+                }
+
+                return null;
+            };
+
+            const position = component.getNodePosition(monitor, nodeDom)
+
+            const draggedNode = {
+                id,
+                position
+            }
+
+            // 计算所有节点之间的对齐关系，并更新对齐线的位置信息
+            const newAlignmentLines = {};
+            // 过滤掉当前拖动的节点
+            nodes?.filter(n => n.id !== id)?.forEach((node) => {
+                const alignment = getAlignment(draggedNode, node);
+                if (alignment) {
+                    // 过滤掉因为设置了 ALIGNMENT_THRESHOLD，而重复的辅助线
+                    if (alignment.vertical && !Object.keys(newAlignmentLines).some(key => key.includes("line-vertical"))) {
+                        // 垂直线
+                        newAlignmentLines[`line-vertical-${node.id}`] = {
+                            left: alignment.x,
+                            top: 0,
+                            height: "100%"
+                        };
+                    }
+
+                    // 水平线
+                    if (alignment.horizontal && !Object.keys(newAlignmentLines).some(key => key.includes("line-horizontal"))) {
+                        newAlignmentLines[`line-horizontal-${node.id}`] = {
+                            left: 0,
+                            top: alignment.y,
+                            width: "100%"
+                        };
+                    }
+                }
+            })
+
+            component.setAlignmentLines(newAlignmentLines)
+            break;
+        }
         default:
             break;
     }
@@ -1749,32 +1849,6 @@ export default DropTarget(
                 return;
             }
 
-            const getNodePosition = (nodeDom, isChild?) => {
-                const nodePosition = {
-                    top: nodeDom.style.top,
-                    left: nodeDom.style.left
-                };
-                const scalePosition = {
-                    x:
-                        Number(nodePosition.left.replace(/[px]+/g, "")) +
-                        clientOffset.x / component.scaleNum,
-                    y:
-                        Number(nodePosition.top.replace(/[px]+/g, "")) +
-                        clientOffset.y / component.scaleNum
-                };
-                const scrollPosition = computeCanvasPo(
-                    monitor.getSourceClientOffset(),
-                    component.$wrapper
-                )
-                /**
-                 * TODO： scaleNum 缩放与窗口滚动时有冲突, isChild 为子节点联动时使用 scalePosition 定位
-                 */
-                const position = component.scaleNum === 1 ? (
-                    isChild ? scalePosition : scrollPosition
-                ) : scalePosition
-                return position;
-            }
-
             /**
              * Get the mapping relationship between the id and position of all child nodes of the current dragging node
              * @returns
@@ -1790,7 +1864,7 @@ export default DropTarget(
                     for (let childId of childIds) {
                         let childNodeDom: HTMLElement = document.getElementById(`topology-node-${childId}`);
                         if (!childNodeDom) return null;
-                        childPosMap[childId] = getNodePosition(childNodeDom, true);
+                        childPosMap[childId] = component.getNodePosition(monitor, childNodeDom, true);
                     }
                 })
                 return childPosMap;
@@ -1799,7 +1873,7 @@ export default DropTarget(
             let position;
             let nodeDom: HTMLElement = document.getElementById(`topology-node-${item.id}`);
             if (nodeDom) {
-                position = getNodePosition(nodeDom);
+                position = component.getNodePosition(monitor, nodeDom);
             } else {
                 position = computeCanvasPo(
                     monitor.getSourceClientOffset(),
@@ -1892,6 +1966,7 @@ export default DropTarget(
                         return;
                     };
                     component.handleNodeDraw(nodeProps, getChildPosMap(nodeProps.map(n => n[0])));
+                    component.setAlignmentLines({});
                     // 存在移动动画时间
                     setTimeout(() => {
                         component.showBoxSelection();
