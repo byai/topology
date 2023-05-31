@@ -39,6 +39,9 @@ exports[`topology basic render 1`] = `
             class="byai-topology-selection"
             style="left: 0px; top: 0px; width: 0px; height: 0px;"
           />
+          <svg
+            class="snap-line-svg"
+          />
         </div>
       </div>
       <div
