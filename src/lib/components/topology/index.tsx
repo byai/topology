@@ -1729,7 +1729,6 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
     const clientOffset = monitor.getClientOffset();
     const { id } = monitor.getItem();
     const type = monitor.getItemType();
-
     switch (type) {
         case NodeTypes.ANCHOR:
             if (clientOffset) {
@@ -1760,6 +1759,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
             }
             break;
 
+        case NodeTypes.TEMPLATE_NODE:
         case NodeTypes.NORMAL_NODE: {
             const { nodes } = props.data;
             const nodeDom: HTMLElement = document.getElementById(`topology-node-${id}`);
@@ -1788,8 +1788,10 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
                 return null;
             };
 
-            const position = component.getNodePosition(monitor, nodeDom)
-
+            const position = type === NodeTypes.TEMPLATE_NODE ? computeCanvasPo(
+                    monitor.getSourceClientOffset(),
+                    component.$wrapper
+                ) : component.getNodePosition(monitor, nodeDom)
             const draggedNode = {
                 id,
                 position
@@ -1825,6 +1827,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
             component.setAlignmentLines(newAlignmentLines)
             break;
         }
+
         default:
             break;
     }
@@ -1936,6 +1939,7 @@ export default DropTarget(
                         }, ChangeType.ADD_NODE);
                         props.overlapCallback && props.overlapCallback();
                     };
+                    component.setAlignmentLines({});
                     break;
                 case NodeTypes.NORMAL_NODE:
                     const targetNodeInfo = props.data.nodes.find(node => {
