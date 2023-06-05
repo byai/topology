@@ -19,7 +19,6 @@
   "scripts": {
     "build": "node remove-dist.js && tsc && gulp",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
-    "preinstall": "node ./scripts/check-yarn.js",
     "lint": "eslint src --ext .tsx,.ts ",
     "lint-fix": "eslint --fix src --ext .tsx,.ts ",
     "precommit": "",
