@@ -19,7 +19,7 @@
     "noImplicitReturns": true,
     "allowSyntheticDefaultImports": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "declaration": true,
     "strict": false,
     "paths": {

@@ -1,4 +1,6 @@
 /* eslint-disable react/require-default-props */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 import React from 'react';
 import _ from 'lodash';
 import {
@@ -17,6 +19,7 @@ import './index.less';
 const Colors = { ACTIVE: '#1F8CEC', NORMAL: '#AAB7C4' };
 
 interface ILineProps {
+    isReduceRender?: boolean;
     start: IPosition;
     end: IPosition;
     color?: string;
@@ -37,6 +40,18 @@ interface ILineState {
 
 class Line extends React.Component<ILineProps, ILineState> {
     state: ILineState = { hover: false };
+
+    shouldComponentUpdate(nextProps) {
+        const { data: currentData } = this.props;
+        const { data: nextData, isReduceRender } = nextProps;
+        const { dragging } = nextProps.context;
+        if (isReduceRender && nextData === currentData) {
+            if (dragging) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     handleMouseEnter = () => {
         this.setState({ hover: true });
@@ -130,7 +145,6 @@ class Line extends React.Component<ILineProps, ILineState> {
         );
     }
 }
-
 export default (props: ILineProps) => (
     <Consumer>
         {context => <Line {...props} context={context} />}

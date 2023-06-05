@@ -70,7 +70,6 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         } else {
             this.updateNumber = 0;
         }
-
         // 避免节点多次无用渲染
         if (isReduceRender && !impactNode && nextData === data && nextSelectedData === selectedData) {
             return false;
