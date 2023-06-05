@@ -14,8 +14,8 @@ export const defaultContext: ITopologyContext = {
 };
 
 const Context = React.createContext(defaultContext);
-
 export const {
     Provider,
     Consumer,
 } = Context;
+export const useContext = () => React.useContext(Context);

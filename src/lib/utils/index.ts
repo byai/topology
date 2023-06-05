@@ -364,3 +364,28 @@ export const isMatchKeyValue = (obj, matchKey?, matchValue?) => {
 export const TOPOLOGY_NODE_PREFIX = 'topology-node-';
 
 export const getRealNodeDom = (id: string) => document.getElementById(`${TOPOLOGY_NODE_PREFIX}${id}`);
+
+export const getBoundary = (elements: Element[]) => {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    elements.forEach(e => {
+        const { x, y, height, width } = e.getBoundingClientRect();
+        minX = Math.min(x, minX);
+        minY = Math.min(y, minY);
+        maxX = Math.max(x + width, maxX);
+        maxY = Math.max(y + height, maxY);
+    });
+    return {
+        minX,
+        minY,
+        maxX,
+        maxY
+    }
+}
+
+
+export const isLineEqual = (sourceLine: { start: string; end: string}, targetLine: { start: string; end: string }) => {
+    return sourceLine.start === targetLine.start && sourceLine.end === targetLine.end;
+}

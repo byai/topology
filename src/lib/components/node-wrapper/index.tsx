@@ -8,10 +8,12 @@ import {
     ITopologyContext,
     ITopologyNode,
     IWrapperOptions,
+    ITopologyData,
 } from '../../declare';
 import './index.less';
 import { SelectMode } from '../../utils/selectNodes';
 import {
+    getBoundary,
     getRealNodeDom,
     isMatchKeyValue
 } from '../../utils';
@@ -25,22 +27,16 @@ export interface INodeWrapperProps {
     draggingId?: string;
     context?: ITopologyContext;
     setDraggingId?: (id: string) => void;
-    onSelect: (node: ITopologyNode, mode: SelectMode) => ITopologyNode;
+    onSelect: (node: ITopologyNode, mode: SelectMode) => ITopologyData;
     children: (wrapperOptions: IWrapperOptions) => React.ReactNode;
     onMouseEnter?: (node: ITopologyNode) => void;
     onMouseLeave?: () => void;
     readOnly?: boolean;
     isReduceRender?: boolean;
     isSelected?: boolean;
-    getBoundary: (elements: Element[]) => {
-        minX: number;
-        minY: number;
-        maxX: number;
-        maxY: number;
-    };
     closeBoxSelection: () => void;
     showBoxSelection?: () => void;
-    selectedNodes?: ITopologyNode[];
+    selectedNodeIdList?: string[];
     combineId?: string;
     prevNodeStyle?: {
         // 暂时支持这两个属性
@@ -148,28 +144,6 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             e.preventDefault();
             onSelect(data, SelectMode.RIGHT_NORMAL);
         }
-        // const { data, onSelect, closeBoxSelection } = this.props;
-        // closeBoxSelection();
-        // if (e.button === 2) {
-        //     e.preventDefault();
-        //     onSelect(data, SelectMode.RIGHT_NORMAL);
-        //     return;
-        // }
-        // if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
-        //     onSelect(data, SelectMode.MULTI);
-        //     return;
-        // }
-        // if (e.ctrlKey || e.metaKey) {
-        //     onSelect(data, SelectMode.MUL_NORMAL);
-        //     return;
-        // }
-        // if (e.shiftKey && !e.ctrlKey && !e.metaKey) {
-        //     onSelect(data, SelectMode.BOX_SELECTION);
-        //     return;
-        // }
-        // if (!isSelect) {
-        //     onSelect(data, SelectMode.NORMAL);
-        // }
     };
 
     handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -218,16 +192,16 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             children,
             data,
             context,
+            isSelected,
             id,
             onMouseEnter,
             onMouseLeave
         } = this.props;
-        const { selectedData, activeLine } = context;
-        const isSelected =
-            selectedData.nodes.find(item => item.id === data.id) !== undefined;
+        const { activeLine } = context;
         return connectDragSource(
             <div
                 id={data ? `topology-node-${data.id}` : ""}
+                key={data.id}
                 data-combine-id={data?.combineId}
                 style={this.computeStyle()}
                 className="byai-topology-node-wrapper"
@@ -285,16 +259,16 @@ export default DragSource(
             if (!realNodeDom) return null;
             let distanceX = 0;
             let distanceY = 0;
-            let source: ITopologyNode;
+            let source: ITopologyData;
             if (!props.isSelected) {
                 source = props.onSelect(props.data, SelectMode.NORMAL);
             }
-            const otherRealNodeDomList = (source ? source.nodes: props.selectedNodes).filter(item => item.id !== id).map(item => getRealNodeDom(item.id));
+            const otherRealNodeDomList = (source ? source.nodes.map(n => n.id) : props.selectedNodeIdList).filter(currId => currId !== id).map(currId => getRealNodeDom(currId));
             const allRealNodeDomList = [...otherRealNodeDomList, realNodeDom];
             let width = realNodeDom.offsetWidth;
             let height = realNodeDom.offsetHeight
             if (otherRealNodeDomList.length > 0) {
-                const boxPosition = props.getBoundary(allRealNodeDomList);
+                const boxPosition = getBoundary(allRealNodeDomList);
                 const { x , y } = realNodeDom.getBoundingClientRect();
                 distanceX = x - boxPosition.minX;
                 distanceY = y - boxPosition.minY;

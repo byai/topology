@@ -8,8 +8,6 @@ import html2canvas from 'html2canvas';
 import selectNodes, { getLinesFromNode, SelectMode } from '../../utils/selectNodes';
 import { Provider, defaultContext } from '../context';
 import NodeWrapper from '../node-wrapper';
-import Line from '../line';
-import LineText from '../line/lineText';
 
 import {
     KeyCode,
@@ -29,10 +27,8 @@ import {
     computeCanvasPo,
     impactCheck,
     computeAnchorPo,
-    computeNodeInputPo,
     computeContentCenter,
     computeContentPostionY,
-    createHashFromObjectArray,
     getNodeSize,
     shouldAutoLayout,
     getRealNodeDom,
@@ -48,11 +44,13 @@ import config from '../../config';
 import './index.less';
 import Selection from '../selection';
 import SnapLine from '../snapline';
+import NodeGroup from '../node-group';
+import LineGroup from '../line-group/indtex';
 
 export interface ITopologyProps {
     data: ITopologyData; // 数据 { nodes: []; lines: [] }
     readOnly?: boolean; // 只读模式，为true时不可编辑
-    snapline?: boolean; // 是否显示辅助对齐线，默认现实
+    snapline?: boolean; // 是否显示辅助对齐线
     showBar?: boolean; // 是否显示工具栏
     showCenter?: boolean; // 是否显示工具栏中的定位中心
     showLayout?: boolean; // 是否显示工具栏中的自动布局
@@ -171,6 +169,22 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         super(props);
         this.shouldAutoLayout = shouldAutoLayout(props.data.nodes);
     }
+
+    static defaultProps = {
+        snapline: false
+    }
+
+    get nodeMap() {
+        const m = new Map<string, ITopologyNode>();
+        this.props.data?.nodes?.forEach(e => {
+            m.set(e.id, e);
+        });
+        return m;
+    }
+
+    // get lineMap() {
+
+    // }
 
     componentWillMount() {
         this.renderDomMap();
@@ -648,6 +662,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     };
 
     handleHoverCurrentNode = (node) => {
+        if (this.state?.boxSelectionInfo?.status === 'drag') {
+            return;
+        }
         this.setContext({
             hoverCurrentNode: node
         });
@@ -980,6 +997,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         // 拖动框选box结束时
         if (isDragBox) {
+            console.log('getShouldSelectedNodeList')
             const { selectedNodeList: nodeList, nativeNodeList } = this.getShouldSelectedNodeList();
             if (nodeList.length === 0) { // 没有选中任何节点
                 this.setState({
@@ -1201,114 +1219,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         setTimeout(this.cacheNodeSize, 1000);
     };
 
-    renderLines = () => {
-        const {
-            data: { lines, nodes },
-            startPointAnchorId,
-            lineTextMap,
-            lineOffsetY,
-            readOnly,
-            lineTextColor,
-            lineLinkageHighlight,
-            lineTextDecorator,
-            showText
-        } = this.props;
-        const { activeLine, selectedData, hoverCurrentNode } = this.state.context;
-        const nodeHash = createHashFromObjectArray(nodes, "id") as {
-            [id: string]: ITopologyNode;
-        };
-
-        const isEditing = (line: ITopologyLine) =>
-            activeLine &&
-            activeLine.origin &&
-            _.isEqual(line, activeLine.origin);
-        const isSelected = (line: ITopologyLine) =>
-            isEditing(line) || _.some(selectedData.lines, line);
-
-        // @ts-ignore
-        const isHighLight = (line: ITopologyLine) => {
-            if (!hoverCurrentNode || !lineLinkageHighlight) return false;
-            const { id } = hoverCurrentNode;
-            if (line.start.split("-")[0] === id || line.end === id) return true;
-        }
-
-        const getLineStartPo = (line: ITopologyLine) => {
-            if (
-                isEditing(line) &&
-                activeLine.type === LineEditType.EDIT_START
-            ) {
-                return activeLine.start;
-            }
-
-            // 这里特殊处理下，目的是保持所有锚点的起始点位置与 startPointAnchorId 锚点位置一致
-            return computeAnchorPo(
-                // `dom-map-${line.start}`,
-                `dom-map-${startPointAnchorId === undefined ? line.start : `${line.start.split("-")[0]}-${startPointAnchorId}`}`,
-                nodeHash[line.start.split("-")[0]]
-            );
-        };
-        const getLineEndPo = (line: ITopologyLine) => {
-            if (isEditing(line) && activeLine.type === LineEditType.EDIT_END) {
-                return activeLine.end;
-            }
-            return computeNodeInputPo(nodeHash[line.end]);
-        };
-
-        return (
-            <svg className="topology-svg">
-                {lines.map((line, index) => {
-                    const start = getLineStartPo(line);
-                    const end = getLineEndPo(line);
-                    if (!start || !end) {
-                        return null;
-                    }
-
-                    const key = `${line.start}-${line.end}`;
-                    const anchorId = line.start.split("-")[1];
-                    const getTextXY = () => {
-                        const minX = Math.min(start.x, end.x);
-                        const minY = Math.min(start.y, end.y);
-                        const x = minX + Math.abs((start.x - end.x) / 2);
-                        const y = minY + Math.abs((start.y - end.y) / 2)
-                        return {
-                            x,
-                            y
-                        }
-                    }
-
-                    const defaultTextEl = lineTextColor && (
-                        <text x={getTextXY().x} y={getTextXY().y} key={index} style={{
-                            fill: lineTextColor[anchorId]
-                        }}>{anchorId === startPointAnchorId && !showText(line.start.split("-")[0]) ? null : lineTextMap[anchorId]}</text>);
-
-                    return (
-                        <>
-                            <Line
-                                scaleNum={this.state.scaleNum}
-                                key={key}
-                                lineOffsetY={lineOffsetY}
-                                data={line}
-                                start={start}
-                                end={end}
-                                onSelect={this.selectLine}
-                                selected={isSelected(line)}
-                                highLight={isHighLight(line)}
-                                readOnly={readOnly}
-                            />
-                            {
-                                lineTextDecorator ? <LineText data={this.props.data} lineTextDecorator={lineTextDecorator} position={getTextXY()} line={line} /> : defaultTextEl
-                            }
-                        </>
-
-                    );
-                })}
-                {/* 拖动效果的线条 */}
-                {activeLine && activeLine.type === LineEditType.ADD && (
-                    <Line {...activeLine} scaleNum={this.state.scaleNum} />
-                )}
-            </svg>
-        );
-    };
 
     // TODO：系统计算设置一个合适的 scale，使所有节点均在可视化区域内
     findScale = async (clonegraph) => {
@@ -1626,7 +1536,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     // 获取 drag 时节点坐标
     getNodePosition = (monitor, nodeDom, isChild?) => {
-        if (!monitor) return;
+        if (!monitor) return undefined;
         const { scaleNum } = this.state;
         const clientOffset = monitor.getDifferenceFromInitialOffset() || {};
         const nodePosition = {
@@ -1656,11 +1566,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     render() {
-        const { connectDropTarget, showBar, snapline } = this.props;
+        const { connectDropTarget, showBar, snapline, renderTreeNode, readOnly, isReduceRender, prevNodeStyle, startPointAnchorId, lineTextMap, lineOffsetY, lineTextColor, lineLinkageHighlight, lineTextDecorator, showText } = this.props;
         const { context, scaleNum, boxSelectionInfo, alignmentLines } = this.state;
         const xPos = boxSelectionInfo ? `${boxSelectionInfo.x},${boxSelectionInfo.initX}` : '';
         const yPos = boxSelectionInfo ? `${boxSelectionInfo.y},${boxSelectionInfo.initY}` : '';
-
         return connectDropTarget!(
             <div className="byai-topology"
                 ref={r => {
@@ -1702,8 +1611,38 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         onClick={this.handleCanvasClick}
                     >
                         <Provider value={context}>
-                            {this.renderNodes()}
-                            {this.renderLines()}
+                            <NodeGroup
+                                data={this.props.data}
+                                selectNode={this.selectNode}
+                                closeBoxSelection={this.closeBoxSelection}
+                                setDraggingId={this.setDraggingId}
+                                clearHoverCurrentNode={this.clearHoverCurrentNode}
+                                handleHoverCurrentNode={this.handleHoverCurrentNode}
+                                draggingId={this.state.draggingId}
+                                selectedIdList={this.state.context?.selectedData?.nodes?.map(d => d.id)?.join?.(',')}
+                                scaleNum={this.state.scaleNum}
+                                renderTreeNode={renderTreeNode}
+                                readOnly={readOnly}
+                                isReduceRender={isReduceRender}
+                                prevNodeStyle={prevNodeStyle}
+                            />
+                            <LineGroup
+                                data={this.props.data}
+                                startPointAnchorId={startPointAnchorId}
+                                lineTextMap={lineTextMap}
+                                lineOffsetY={lineOffsetY}
+                                lineTextColor={lineTextColor}
+                                lineLinkageHighlight={lineLinkageHighlight}
+                                lineTextDecorator={lineTextDecorator}
+                                showText={showText}
+                                selectLine={this.selectLine}
+                                selectedLines={this.state.context.selectedData.lines}
+                                scaleNum={this.state.scaleNum}
+                                readOnly={readOnly}
+                                activeLine={this.state.context.activeLine}
+                                hoverCurrentNodeId={this.state.context?.hoverCurrentNode?.id}
+                            />
+                            {/* {this.renderLines()} */}
                             <Selection onClick={e => {
                                 e.stopPropagation();
                                 this.setState({
@@ -1724,7 +1663,9 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
     if (!monitor.getItem()) {
         return;
     }
-
+    if (component.state?.boxSelectionInfo?.status === 'drag') {
+        return;
+    }
     const { context } = component.state;
     const clientOffset = monitor.getClientOffset();
     const { id } = monitor.getItem();
@@ -1800,7 +1741,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
             // 计算所有节点之间的对齐关系，并更新对齐线的位置信息
             const newAlignmentLines = {};
             // 过滤掉当前拖动的节点
-            nodes?.filter(n => n.id !== id)?.forEach((node) => {
+            !!this.props?.snapline && nodes?.filter(n => n.id !== id)?.forEach((node) => {
                 const alignment = getAlignment(draggedNode, node);
                 if (alignment) {
                     // 过滤掉因为设置了 ALIGNMENT_THRESHOLD，而重复的辅助线
