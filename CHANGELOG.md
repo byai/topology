@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.21](https://github.com/byai/topology/compare/v1.3.14...v1.3.21) (2023-06-05)
+
+
+### Features
+
+* add babel config ([8adbf55](https://github.com/byai/topology/commit/8adbf55078635283ed84242d099e1152a26fed2b))
+* add snapline ([79f3626](https://github.com/byai/topology/commit/79f3626980b2bfc61e7a969c7e2655e9e5ebf197))
+* add template node type snapline ([511dcf9](https://github.com/byai/topology/commit/511dcf9b919e1d150d667ced66908d536851572e))
+* 保持工具类能出现在画布中 ([a7353dd](https://github.com/byai/topology/commit/a7353dd19f64eb5fcf6569f8921719e115634a8b))
+* 自定义工具栏 ([52aba39](https://github.com/byai/topology/commit/52aba39d36bf8f9425b30068fb5847ed5ec6655d))
+
+
+### Bug Fixes
+
+* 修复定位问题 ([8aa8bd2](https://github.com/byai/topology/commit/8aa8bd23589aaab34e1bf8984abba5756dc670c4))
+* 修复缩放导致的拖拽预览错误问题 ([eebdc6f](https://github.com/byai/topology/commit/eebdc6fba30c133b33f8ae536b609a0a9c03946e))
+* 框选造成的锚点失效问题 ([bf7a8f4](https://github.com/byai/topology/commit/bf7a8f4502a6e69c58f16c585c81f258f179caff))
+* 选中子节点 ([15af1ec](https://github.com/byai/topology/commit/15af1ec013bffded349284367a64d38c71757eb8))
+
 ### [1.3.14](https://github.com/byai/topology/compare/v1.3.11...v1.3.14) (2023-05-24)
 
 
