@@ -1,0 +1,22 @@
+{
+    "name": "@types/asap",
+    "version": "2.0.0",
+    "description": "TypeScript definitions for asap",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "fpascutti",
+            "url": "https://github.com/fpascutti",
+            "githubUsername": "fpascutti"
+        }
+    ],
+    "main": "",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git"
+    },
+    "scripts": {},
+    "dependencies": {},
+    "typesPublisherContentHash": "0aac4ebbff3af1af5852901805fcc05b92efd480e1ac5ab3b1c863124b5122bb",
+    "typeScriptVersion": "2.0"
+}
