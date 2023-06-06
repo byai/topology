@@ -66,7 +66,6 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         } else {
             this.updateNumber = 0;
         }
-
         // 避免节点多次无用渲染
         if (isReduceRender && !impactNode && nextData === data && nextSelectedData === selectedData) {
             return false;
@@ -249,7 +248,7 @@ export default DragSource(
         },
         beginDrag(props: INodeWrapperProps) {
             const id = props.data ? props.data.id : null;
-            const { prevNodeStyle = {}, closeBoxSelection } = props;
+            const { prevNodeStyle = {}, closeBoxSelection, scaleNum=1 } = props;
             closeBoxSelection?.();
             props.setDraggingId(id);
             // beginDrag 时机 处理预览节点样式问题
@@ -265,8 +264,8 @@ export default DragSource(
             }
             const otherRealNodeDomList = (source ? source.nodes.map(n => n.id) : props.selectedNodeIdList).filter(currId => currId !== id).map(currId => getRealNodeDom(currId));
             const allRealNodeDomList = [...otherRealNodeDomList, realNodeDom];
-            let width = realNodeDom.offsetWidth;
-            let height = realNodeDom.offsetHeight
+            let width = realNodeDom.offsetWidth * scaleNum;
+            let height = realNodeDom.offsetHeight* scaleNum;
             if (otherRealNodeDomList.length > 0) {
                 const boxPosition = getBoundary(allRealNodeDomList);
                 const { x , y } = realNodeDom.getBoundingClientRect();
@@ -281,8 +280,8 @@ export default DragSource(
             draggingPreviewNode.style.border = prevNodeStyle.border || '1px dashed #1F8CEC';
             draggingPreviewNode.style.setProperty('--width', previewNodeWidth + 'px');
             draggingPreviewNode.style.setProperty('--height', previewNodeHeight + 'px');
-            draggingPreviewNode.style.setProperty('--transformX', `${-distanceX}px`);
-            draggingPreviewNode.style.setProperty('--transformY', `${-distanceY}px`);
+            draggingPreviewNode.style.setProperty('--transformX', `${-distanceX / scaleNum}px`);
+            draggingPreviewNode.style.setProperty('--transformY', `${-distanceY / scaleNum}px`);
             // 恢复
             setTimeout(() => {
                 draggingPreviewNode.style.background = 'transparent';

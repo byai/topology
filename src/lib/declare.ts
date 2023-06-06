@@ -67,6 +67,7 @@ export interface ITopologyLine {
 
 export interface ITopologyContext {
     linking: boolean;
+    dragging: boolean;
     impactNode: string | null;
     readOnly: boolean;
     hoverCurrentNode: ITopologyNode;

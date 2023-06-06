@@ -44,7 +44,7 @@ class Flow extends React.Component<{}, FlowState> {
                         x: 19629.79557800293,
                         y: 19696.197512626648,
                     },
-                    canDrag: false,
+                    // canDrag: false,
                 },
             ],
         },
@@ -108,8 +108,9 @@ class Flow extends React.Component<{}, FlowState> {
         };
         return (
             <div className="topology">
-                <div style={{ width: '100%', height: 800 }}>
+                <div style={{ width: '100%', height: '100%' }}>
                     <Topology
+                        isReduceRender
                         data={data}
                         autoLayout
                         lineColor={mockLineColor}

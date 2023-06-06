@@ -422,12 +422,17 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     };
 
     clearSelectData = () => {
+        const {
+            nodes, lines
+        } = this.state.context.selectedData;
+        if (nodes?.length === 0 && lines?.length === 0) return;
         this.setContext({ selectedData: { nodes: [], lines: [], }}, () => {
             const { onSelect } = this.props;
             if (onSelect) {
                 onSelect(this.state.context.selectedData);
             }
         });
+
     }
 
     autoLayout = () => {
@@ -608,7 +613,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     }
 
-    selectLine = (data: ITopologyData) => {
+    selectLine = (data: ITopologyData, merge?: boolean) => {
+        if (merge) {
+            data = {
+                ...this.state.context.selectedData,
+                ...data,
+            }
+        }
         this.setContext(
             {
                 selectedData: data
@@ -1536,7 +1547,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     // 获取 drag 时节点坐标
     getNodePosition = (monitor, nodeDom, isChild?) => {
-        if (!monitor) return undefined;
+        if (!monitor) return {};
         const { scaleNum } = this.state;
         const clientOffset = monitor.getDifferenceFromInitialOffset() || {};
         const nodePosition = {
@@ -1634,6 +1645,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                                 lineTextColor={lineTextColor}
                                 lineLinkageHighlight={lineLinkageHighlight}
                                 lineTextDecorator={lineTextDecorator}
+                                linking={this.state.context.linking}
                                 showText={showText}
                                 selectLine={this.selectLine}
                                 selectedLines={this.state.context.selectedData.lines}
@@ -1766,6 +1778,10 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
             })
 
             component.setAlignmentLines(newAlignmentLines)
+
+            component.setContext({
+                dragging: true,
+            });
             break;
         }
 
@@ -1881,6 +1897,9 @@ export default DropTarget(
                         props.overlapCallback && props.overlapCallback();
                     };
                     component.setAlignmentLines({});
+                    component.setContext({
+                        dragging: false,
+                    });
                     break;
                 case NodeTypes.NORMAL_NODE:
                     const targetNodeInfo = props.data.nodes.find(node => {
@@ -1912,6 +1931,9 @@ export default DropTarget(
                     };
                     component.handleNodeDraw(nodeProps, getChildPosMap(nodeProps.map(n => n[0])));
                     component.setAlignmentLines({});
+                    component.setContext({
+                        dragging: false,
+                    });
                     // 存在移动动画时间
                     setTimeout(() => {
                         component.showBoxSelection();

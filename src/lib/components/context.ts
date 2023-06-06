@@ -7,6 +7,7 @@ export const defaultContext: ITopologyContext = {
     impactNode: null,
     readOnly: false,
     hoverCurrentNode: null,
+    dragging: false,
     selectedData: {
         nodes: [],
         lines: [],

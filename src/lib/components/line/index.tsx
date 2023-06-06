@@ -1,4 +1,3 @@
-/* eslint-disable react/require-default-props */
 import _ from 'lodash';
 import React, { useState } from 'react';
 import config from '../../config';
@@ -15,6 +14,7 @@ import './index.less';
 const Colors = { ACTIVE: '#1F8CEC', NORMAL: '#AAB7C4' };
 
 interface ILineProps {
+    isReduceRender?: boolean;
     start: IPosition;
     end: IPosition;
     color?: string;
@@ -25,11 +25,14 @@ interface ILineProps {
     context?: ITopologyContext;
     selected?: boolean;
     highLight?: boolean;
-    onSelect?: (data: ITopologyData) => void;
+    onSelect?: (data: ITopologyData, merge?: boolean) => void;
     scaleNum?: number;
+    selectedLines?: ITopologyLine[];
+    curLinking?: boolean;
+    transition?: string;
 }
 
-const Line: React.FC<ILineProps> = (props) => {
+const Line: React.FC<ILineProps> = React.memo((props) => {
     const {
         start,
         end,
@@ -38,10 +41,11 @@ const Line: React.FC<ILineProps> = (props) => {
         data,
         readOnly,
         lineOffsetY,
-        onSelect
+        onSelect,
+        selectedLines,
+        curLinking,
+        transition
     } = props;
-    const ctx = useContext();
-    const { selectedData, linking, activeLine } = ctx;
     const [hover, setHover] = useState(false);
     const handleMouseEnter = () => {
         setHover(true);
@@ -51,7 +55,6 @@ const Line: React.FC<ILineProps> = (props) => {
         setHover(false);
     };
     const handleClick = (e) => {
-        const { lines } = selectedData;
         const multi = e.metaKey || e.ctrlKey;
         if (!onSelect) {
             return;
@@ -65,18 +68,15 @@ const Line: React.FC<ILineProps> = (props) => {
             return;
         }
         onSelect({
-            ...selectedData,
             lines: selected
-                ? lines.filter(item => !_.isEqual(item, data))
-                : [...lines, data],
-        });
+                ? selectedLines.filter(item => !_.isEqual(item, data))
+                : [...selectedLines, data],
+        } as ITopologyData, true);
     };
 
     const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';
     const getTriangleStart = () => ({ ...end, y: end.y - config.line.triangleWidth });
-    const curLinking = linking && !activeLine.origin && !data;
     const lColor = highLight || selected || hover || curLinking ? Colors.ACTIVE : ((data && data.color) || Colors.NORMAL);
-    const transition = linking ? 'none' : config.transition;
 
     return (
         <>
@@ -113,5 +113,5 @@ const Line: React.FC<ILineProps> = (props) => {
             />
         </>
     );
-};
+});
 export default Line;
