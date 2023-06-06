@@ -45,10 +45,8 @@ class Line extends React.Component<ILineProps, ILineState> {
         const { data: currentData } = this.props;
         const { data: nextData, isReduceRender } = nextProps;
         const { dragging } = nextProps.context;
-        if (isReduceRender && nextData === currentData) {
-            if (dragging) {
-                return false;
-            }
+        if (isReduceRender && nextData === currentData && dragging) {
+            return false;
         }
         return true;
     }
