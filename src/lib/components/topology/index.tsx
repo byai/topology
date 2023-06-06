@@ -45,7 +45,7 @@ import './index.less';
 import Selection from '../selection';
 import SnapLine from '../snapline';
 import NodeGroup from '../node-group';
-import LineGroup from '../line-group/indtex';
+import LineGroup from '../line-group';
 
 export interface ITopologyProps {
     data: ITopologyData; // 数据 { nodes: []; lines: [] }
@@ -173,18 +173,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     static defaultProps = {
         snapline: false
     }
-
-    get nodeMap() {
-        const m = new Map<string, ITopologyNode>();
-        this.props.data?.nodes?.forEach(e => {
-            m.set(e.id, e);
-        });
-        return m;
-    }
-
-    // get lineMap() {
-
-    // }
 
     componentWillMount() {
         this.renderDomMap();
@@ -1682,11 +1670,12 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
     const clientOffset = monitor.getClientOffset();
     const { id } = monitor.getItem();
     const type = monitor.getItemType();
+    console.time('start');
     switch (type) {
         case NodeTypes.ANCHOR:
             if (clientOffset) {
                 const nodeId = id.split('-')[0];
-                const parentNode = props.data.nodes.find(item => item.id === nodeId);
+                const parentNode =  props.data.nodes.find(item => item.id === nodeId);
                 const hasAnchorExistLine = !props.canConnectMultiLines && props.data.lines.find(item => item.start === id);
                 if (hasAnchorExistLine || !parentNode || !component.$wrapper) { return; }
 
@@ -1710,6 +1699,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
                     }
                 });
             }
+            console.timeEnd('start');
             break;
 
         case NodeTypes.TEMPLATE_NODE:

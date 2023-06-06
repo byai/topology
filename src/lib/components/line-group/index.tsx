@@ -107,7 +107,7 @@ const LineGroup: FC<ILineGroupProps> = React.memo(({
                 getTextXY,
             }
         })
-    }, [data, activeLine?.origin?.start, activeLine?.origin?.end]);
+    }, [data, activeLine?.origin?.start, activeLine?.origin?.end, activeLine?.type]);
     const transition = linking ? 'none' : config.transition;
 
     return (

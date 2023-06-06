@@ -151,6 +151,30 @@ export const getNodeSize = (dom: string | HTMLElement) => {
     }
     return (dom as HTMLElement).getBoundingClientRect();
 };
+// export const getNodeSize = (() => {
+//     const cache = new WeakMap<HTMLElement, DOMRect>();
+//     return (dom: string | HTMLElement) => {
+//         if (['string', 'number'].indexOf(typeof dom) > -1) {
+//             // eslint-disable-next-line no-param-reassign
+//             dom = document.getElementById(`dom-map-${dom}`) as HTMLElement;
+//         }
+//         const rect = cache.get(dom as HTMLElement);
+//         if (rect) {
+//             return rect;
+//         }
+//         if (!dom) {
+//             return {
+//                 width: 0,
+//                 height: 0,
+//                 left: 0,
+//                 top: 0,
+//             } as ClientRect;
+//         }
+//         const newRect = (dom as HTMLElement).getBoundingClientRect();
+//         cache.set(dom as HTMLElement, newRect);
+//         return newRect;
+//     };
+// })();
 
 export const impactCheck = (point: IPosition, size: { width: number; height: number }, position: IPosition) => {
     const withinX = point.x >= position.x && point.x <= position.x + size.width;
