@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.23](https://github.com/byai/topology/compare/v1.3.22...v1.3.23) (2023-06-06)
+
+
+### Bug Fixes
+
+* update line render condition ([21771e5](https://github.com/byai/topology/commit/21771e5ec7fe0a7ed7914feab3c11e0c7d6c22e4))
+
 ### [1.3.22](https://github.com/byai/topology/compare/v1.3.21...v1.3.22) (2023-06-05)
 
 ### [1.3.21](https://github.com/byai/topology/compare/v1.3.14...v1.3.21) (2023-06-05)
