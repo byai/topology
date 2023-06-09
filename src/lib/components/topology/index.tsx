@@ -1851,7 +1851,7 @@ export default DropTarget(
         canDrop(props: ITopologyProps) {
             return !props.readOnly;
         },
-        hover: _.throttle(hover, 40),
+        hover: (...args) => requestAnimationFrame(() => hover(...(args as [props: ITopologyProps, monitor: any, component: Topology]))),
         drop(props: ITopologyProps, monitor, component: Topology) {
             if (monitor.didDrop() || !component.$wrapper) {
                 return;
