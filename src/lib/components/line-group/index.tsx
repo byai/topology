@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
-import React, { FC, useMemo } from 'react';
+import React, { FC, useMemo, useRef } from 'react';
 import config from '../../config';
-import { ITopologyContext, ITopologyData, ITopologyLine, ITopologyNode, LineEditType } from '../../declare';
+import { IPosition, ITopologyContext, ITopologyData, ITopologyLine, ITopologyNode, LineEditType } from '../../declare';
 import { computeAnchorPo, computeNodeInputPo, createHashFromObjectArray } from '../../utils';
 import Line from '../line';
 import LineText from '../line/lineText';
@@ -37,10 +37,12 @@ const LineGroup: FC<ILineGroupProps> = React.memo(({
             [id: string]: ITopologyNode;
         };
     }, [nodes]);
-    const isEditing = (line: ITopologyLine) =>
-        activeLine &&
-        activeLine.origin &&
-        _.isEqual(line, activeLine.origin);
+    const isEditing = (line: ITopologyLine) => {
+        const ret = activeLine &&
+            activeLine.origin &&
+            _.isEqual(line, activeLine.origin);
+        return ret;
+        }
     const isSelected = (line: ITopologyLine) =>
         isEditing(line) || _.some(selectedLines, line);
 
@@ -49,8 +51,9 @@ const LineGroup: FC<ILineGroupProps> = React.memo(({
         if (!hoverCurrentNodeId || !lineLinkageHighlight) return false;
         if (line.start.split("-")[0] === hoverCurrentNodeId || line.end === hoverCurrentNodeId) return true;
     }
+    const lineMapRef = useRef(new WeakMap<ITopologyLine, [IPosition, IPosition]>());
 
-    const getLineStartPo = (line: ITopologyLine) => {
+    const  getLineStartPo = (line: ITopologyLine) => {
         if (
             isEditing(line) &&
             activeLine.type === LineEditType.EDIT_START
@@ -74,12 +77,22 @@ const LineGroup: FC<ILineGroupProps> = React.memo(({
 
     const lineInfoList = useMemo(() => {
         return lines.map((line, index) => {
-            const start = getLineStartPo(line);
-            const end = getLineEndPo(line);
-            if (!start || !end) {
+            const newStart = getLineStartPo(line);
+            const newEnd = getLineEndPo(line);
+            const oldPositionGroup = lineMapRef.current.get(line);
+            const [oldStart, oldEnd] = oldPositionGroup ?? [];
+            if (!newStart || !newEnd) {
+                lineMapRef.current.set(line, undefined);
                 return null;
             }
-
+            let start = newStart;
+            let end = newEnd;
+            if (oldStart?.x === newStart?.x && oldStart?.y === newStart?.y && oldEnd.x === newEnd.x && oldEnd.y === newEnd.y) {
+                start = oldStart;
+                end = oldEnd;
+            } else {
+                lineMapRef.current.set(line, [newStart, newEnd]);
+            }
             const key = `${line.start}-${line.end}`;
             const anchorId = line.start.split("-")[1];
             const getTextXY = () => {
@@ -101,22 +114,31 @@ const LineGroup: FC<ILineGroupProps> = React.memo(({
                 line,
                 index,
                 key,
-                start,
-                end,
+                startX: start.x,
+                startY: start.y,
+                endX: end.x,
+                endY: end.y,
                 defaultTextEl,
                 getTextXY,
             }
         })
-    }, [data, activeLine?.origin?.start, activeLine?.origin?.end, activeLine?.type]);
+    }, [data, activeLine]);
     const transition = linking ? 'none' : config.transition;
-
+    const activeProps = {
+        type: activeLine?.type,
+        origin: activeLine?.origin,
+        startX: activeLine?.start?.x,
+        startY: activeLine?.start?.y,
+        endX: activeLine?.end?.x,
+        endY: activeLine?.end?.y,
+    }
     return (
         <svg className="topology-svg">
             {lineInfoList.map((lineData) => {
                 if (!lineData) {
                     return null;
                 }
-                const { key, line, start, end, getTextXY, defaultTextEl } = lineData;
+                const { key, line, startX, startY, endX, endY, getTextXY, defaultTextEl } = lineData;
                 const isHighlight = isHighLight(line);
                 const selected = isSelected(line);
                 const curLinking = linking && !activeLine.origin && !data;
@@ -128,8 +150,10 @@ const LineGroup: FC<ILineGroupProps> = React.memo(({
                             lineOffsetY={lineOffsetY}
                             data={line}
                             curLinking={curLinking}
-                            start={start}
-                            end={end}
+                            startX={startX}
+                            startY={startY}
+                            endX={endX}
+                            endY={endY}
                             transition={transition}
                             onSelect={selectLine}
                             selected={selected}
@@ -145,7 +169,7 @@ const LineGroup: FC<ILineGroupProps> = React.memo(({
             })}
             {/* 拖动效果的线条 */}
             {activeLine && activeLine.type === LineEditType.ADD && (
-                <Line {...activeLine} transition={transition} curLinking={linking} scaleNum={scaleNum} />
+                <Line {...activeProps} transition={transition} curLinking={linking} scaleNum={scaleNum} />
             )}
         </svg>
     );

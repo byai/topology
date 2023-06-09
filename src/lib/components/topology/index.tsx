@@ -1670,7 +1670,6 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
     const clientOffset = monitor.getClientOffset();
     const { id } = monitor.getItem();
     const type = monitor.getItemType();
-    console.time('start');
     switch (type) {
         case NodeTypes.ANCHOR:
             if (clientOffset) {
@@ -1699,7 +1698,6 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
                     }
                 });
             }
-            console.timeEnd('start');
             break;
 
         case NodeTypes.TEMPLATE_NODE:
@@ -1787,7 +1785,8 @@ export default DropTarget(
         canDrop(props: ITopologyProps) {
             return !props.readOnly;
         },
-        hover: _.throttle(hover, 40),
+        // hover: _.throttle(hover, 40),
+        hover: (...args) => requestAnimationFrame(() => hover(...args as [ITopologyProps,  any, Topology])),
         drop(props: ITopologyProps, monitor, component: Topology) {
             if (monitor.didDrop() || !component.$wrapper) {
                 return;

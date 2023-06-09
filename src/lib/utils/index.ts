@@ -13,11 +13,11 @@ export const shouldAutoLayout = (nodes: ITopologyNode[]) => {
 
 const computeCanvasPoHelper = ($wrapper: HTMLDivElement) => {
     // 当窗口有滚动时，需加上窗口的滚动
-    const rect = $wrapper.getBoundingClientRect();
+    const rect = getNodeSize($wrapper);
     // 缩放的容器
     const canvas = document.querySelector('.topology-canvas');
     // 可以获取到 svg 的宽高
-    const { width, height } = canvas.getBoundingClientRect();
+    const { width, height } = getNodeSize(canvas as HTMLElement);
     // eslint-disable-next-line radix
     const zoom = parseInt(document.querySelector('.topology-tools-percent').innerHTML) / 100;
     // 缩放后画布的中心点,还是需要用缩放前的比例计算中心点
@@ -151,7 +151,7 @@ export const getNodeSize = (dom: string | HTMLElement) => {
     }
     return (dom as HTMLElement).getBoundingClientRect();
 };
-// export const getNodeSize = (() => {
+// export const getNodeSize = ((refresh?: boolean) => {
 //     const cache = new WeakMap<HTMLElement, DOMRect>();
 //     return (dom: string | HTMLElement) => {
 //         if (['string', 'number'].indexOf(typeof dom) > -1) {
@@ -159,7 +159,7 @@ export const getNodeSize = (dom: string | HTMLElement) => {
 //             dom = document.getElementById(`dom-map-${dom}`) as HTMLElement;
 //         }
 //         const rect = cache.get(dom as HTMLElement);
-//         if (rect) {
+//         if (rect && !refresh) {
 //             return rect;
 //         }
 //         if (!dom) {

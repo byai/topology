@@ -7,7 +7,6 @@ import {
     LineEditType
 } from '../../declare';
 import { computeLinePath, computeTrianglePath } from '../../utils';
-import { useContext } from '../context';
 import './index.less';
 
 
@@ -15,8 +14,12 @@ const Colors = { ACTIVE: '#1F8CEC', NORMAL: '#AAB7C4' };
 
 interface ILineProps {
     isReduceRender?: boolean;
-    start: IPosition;
-    end: IPosition;
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    start?: IPosition;
+    end?: IPosition;
     color?: string;
     lineOffsetY?: number;
     data?: ITopologyLine;
@@ -31,11 +34,14 @@ interface ILineProps {
     curLinking?: boolean;
     transition?: string;
 }
-
 const Line: React.FC<ILineProps> = React.memo((props) => {
     const {
-        start,
-        end,
+        startX,
+        startY,
+        endX,
+        endY,
+        start: propsStart,
+        end: propsEnd,
         selected,
         highLight,
         data,
@@ -46,6 +52,14 @@ const Line: React.FC<ILineProps> = React.memo((props) => {
         curLinking,
         transition
     } = props;
+    const start: IPosition = propsStart ?? {
+        x: startX,
+        y: startY,
+    }
+    const end: IPosition = propsEnd ?? {
+        x: endX,
+        y: endY,
+    }
     const [hover, setHover] = useState(false);
     const handleMouseEnter = () => {
         setHover(true);
@@ -77,7 +91,6 @@ const Line: React.FC<ILineProps> = React.memo((props) => {
     const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';
     const getTriangleStart = () => ({ ...end, y: end.y - config.line.triangleWidth });
     const lColor = highLight || selected || hover || curLinking ? Colors.ACTIVE : ((data && data.color) || Colors.NORMAL);
-
     return (
         <>
             <path

@@ -13,8 +13,10 @@ describe('line', () => {
         const svg = document.createElement('svg');
         const { baseElement } = render(
             <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
+                startX={0}
+                startY={0}
+                endX={100}
+                endY={100}
             />,
             {
                 container: document.body.appendChild(svg),
@@ -26,8 +28,10 @@ describe('line', () => {
         const svg = document.createElement('svg');
         const { baseElement } = render(
             <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
+                startX={0}
+                startY={0}
+                endX={100}
+                endY={100}
                 selected
             />,
             {
@@ -40,8 +44,10 @@ describe('line', () => {
         const svg = document.createElement('svg');
         const { baseElement } = render(
             <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
+                startX={0}
+                startY={0}
+                endX={100}
+                endY={100}
                 selected
                 data={{ start: '1-0', end: '2' }}
             />,
@@ -55,8 +61,10 @@ describe('line', () => {
         const svg = document.createElement('svg');
         const { asFragment, container } = render(
             <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
+                startX={0}
+                startY={0}
+                endX={100}
+                endY={100}
                 data={{ start: '1-0', end: '2' }}
             />,
             {
@@ -80,8 +88,10 @@ describe('line', () => {
         const svg = document.createElement('svg');
         const { asFragment, container } = render(
             <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
+                startX={0}
+                startY={0}
+                endX={100}
+                endY={100}
                 data={{ start: '1-0', end: '2' }}
             />,
             {
@@ -101,8 +111,10 @@ describe('line', () => {
         const svg = document.createElement('svg');
         const { container } = render(
             <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
+                startX={0}
+                startY={0}
+                endX={100}
+                endY={100}
                 data={{ start: '1-0', end: '2' }}
                 onSelect={() => null}
             />,
@@ -123,8 +135,10 @@ describe('line', () => {
         const svg = document.createElement('svg');
         const { container } = render(
             <Line
-                start={{ x: 0, y: 0 }}
-                end={{ x: 100, y: 100 }}
+                startX={0}
+                startY={0}
+                endX={100}
+                endY={100}
                 selected
                 data={{ start: '1-0', end: '2' }}
                 onSelect={() => null}
