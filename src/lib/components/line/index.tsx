@@ -14,10 +14,10 @@ const Colors = { ACTIVE: '#1F8CEC', NORMAL: '#AAB7C4' };
 
 interface ILineProps {
     isReduceRender?: boolean;
-    startX: number;
-    startY: number;
-    endX: number;
-    endY: number;
+    startX?: number;
+    startY?: number;
+    endX?: number;
+    endY?: number;
     start?: IPosition;
     end?: IPosition;
     color?: string;
@@ -55,11 +55,11 @@ const Line: React.FC<ILineProps> = React.memo((props) => {
     const start: IPosition = propsStart ?? {
         x: startX,
         y: startY,
-    }
+    } ?? { x: 0, y: 0 };
     const end: IPosition = propsEnd ?? {
         x: endX,
         y: endY,
-    }
+    } ?? { x: 0, y: 0 };
     const [hover, setHover] = useState(false);
     const handleMouseEnter = () => {
         setHover(true);
