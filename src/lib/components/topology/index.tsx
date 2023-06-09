@@ -1701,77 +1701,77 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
             break;
 
         case NodeTypes.TEMPLATE_NODE:
-        // case NodeTypes.NORMAL_NODE: {
-        //     const { nodes } = props.data;
-        //     const nodeDom: HTMLElement = document.getElementById(`topology-node-${id}`);
+        case NodeTypes.NORMAL_NODE: {
+            const { nodes } = props.data;
+            const nodeDom: HTMLElement = document.getElementById(`topology-node-${id}`);
 
-        //     const ALIGNMENT_THRESHOLD = 2;
+            const ALIGNMENT_THRESHOLD = 2;
 
-        //     // 计算两个节点之间的距离
-        //     const getDistance = (node1, node2) => {
-        //         const dx = Math.abs(node1.position.x - node2.position.x);
-        //         const dy = Math.abs(node1.position.y - node2.position.y);
-        //         return { dx, dy };
-        //     };
+            // 计算两个节点之间的距离
+            const getDistance = (node1, node2) => {
+                const dx = Math.abs(node1.position.x - node2.position.x);
+                const dy = Math.abs(node1.position.y - node2.position.y);
+                return { dx, dy };
+            };
 
-        //     // 根据两个节点之间的距离信息，判断它们是否在水平或垂直方向上对齐
-        //     const getAlignment = (node1, node2) => {
-        //         const distance = getDistance(node1, node2);
+            // 根据两个节点之间的距离信息，判断它们是否在水平或垂直方向上对齐
+            const getAlignment = (node1, node2) => {
+                const distance = getDistance(node1, node2);
 
-        //         if (distance.dx < ALIGNMENT_THRESHOLD) {
-        //             return { vertical: true, x: node2.position.x };
-        //         }
+                if (distance.dx < ALIGNMENT_THRESHOLD) {
+                    return { vertical: true, x: node2.position.x };
+                }
 
-        //         if (distance.dy < ALIGNMENT_THRESHOLD) {
-        //             return { horizontal: true, y: node2.position.y };
-        //         }
+                if (distance.dy < ALIGNMENT_THRESHOLD) {
+                    return { horizontal: true, y: node2.position.y };
+                }
 
-        //         return null;
-        //     };
+                return null;
+            };
 
-        //     const position = type === NodeTypes.TEMPLATE_NODE ? computeCanvasPo(
-        //             monitor.getSourceClientOffset(),
-        //             component.$wrapper
-        //         ) : component.getNodePosition(monitor, nodeDom)
-        //     const draggedNode = {
-        //         id,
-        //         position
-        //     }
+            const position = type === NodeTypes.TEMPLATE_NODE ? computeCanvasPo(
+                    monitor.getSourceClientOffset(),
+                    component.$wrapper
+                ) : component.getNodePosition(monitor, nodeDom)
+            const draggedNode = {
+                id,
+                position
+            }
 
-        //     // 计算所有节点之间的对齐关系，并更新对齐线的位置信息
-        //     const newAlignmentLines = {};
-        //     // 过滤掉当前拖动的节点
-        //     !!this.props?.snapline && nodes?.filter(n => n.id !== id)?.forEach((node) => {
-        //         const alignment = getAlignment(draggedNode, node);
-        //         if (alignment) {
-        //             // 过滤掉因为设置了 ALIGNMENT_THRESHOLD，而重复的辅助线
-        //             if (alignment.vertical && !Object.keys(newAlignmentLines).some(key => key.includes("line-vertical"))) {
-        //                 // 垂直线
-        //                 newAlignmentLines[`line-vertical-${node.id}`] = {
-        //                     left: alignment.x,
-        //                     top: 0,
-        //                     height: "100%"
-        //                 };
-        //             }
+            // 计算所有节点之间的对齐关系，并更新对齐线的位置信息
+            const newAlignmentLines = {};
+            // 过滤掉当前拖动的节点
+            !!this.props?.snapline && nodes?.filter(n => n.id !== id)?.forEach((node) => {
+                const alignment = getAlignment(draggedNode, node);
+                if (alignment) {
+                    // 过滤掉因为设置了 ALIGNMENT_THRESHOLD，而重复的辅助线
+                    if (alignment.vertical && !Object.keys(newAlignmentLines).some(key => key.includes("line-vertical"))) {
+                        // 垂直线
+                        newAlignmentLines[`line-vertical-${node.id}`] = {
+                            left: alignment.x,
+                            top: 0,
+                            height: "100%"
+                        };
+                    }
 
-        //             // 水平线
-        //             if (alignment.horizontal && !Object.keys(newAlignmentLines).some(key => key.includes("line-horizontal"))) {
-        //                 newAlignmentLines[`line-horizontal-${node.id}`] = {
-        //                     left: 0,
-        //                     top: alignment.y,
-        //                     width: "100%"
-        //                 };
-        //             }
-        //         }
-        //     })
+                    // 水平线
+                    if (alignment.horizontal && !Object.keys(newAlignmentLines).some(key => key.includes("line-horizontal"))) {
+                        newAlignmentLines[`line-horizontal-${node.id}`] = {
+                            left: 0,
+                            top: alignment.y,
+                            width: "100%"
+                        };
+                    }
+                }
+            })
 
-        //     component.setAlignmentLines(newAlignmentLines)
+            component.setAlignmentLines(newAlignmentLines)
 
-        //     component.setContext({
-        //         dragging: true,
-        //     });
-        //     break;
-        // }
+            component.setContext({
+                dragging: true,
+            });
+            break;
+        }
 
         default:
             break;
