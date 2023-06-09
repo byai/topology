@@ -13,11 +13,11 @@ export const shouldAutoLayout = (nodes: ITopologyNode[]) => {
 
 const computeCanvasPoHelper = ($wrapper: HTMLDivElement) => {
     // 当窗口有滚动时，需加上窗口的滚动
-    const rect = getNodeSize($wrapper);
+    const rect = $wrapper.getBoundingClientRect();
     // 缩放的容器
     const canvas = document.querySelector('.topology-canvas');
     // 可以获取到 svg 的宽高
-    const { width, height } = getNodeSize(canvas as HTMLElement);
+    const { width, height } = canvas.getBoundingClientRect();
     // eslint-disable-next-line radix
     const zoom = parseInt(document.querySelector('.topology-tools-percent').innerHTML) / 100;
     // 缩放后画布的中心点,还是需要用缩放前的比例计算中心点
@@ -45,8 +45,8 @@ export const computeCanvasPo = (position: IPosition, $wrapper: HTMLDivElement) =
         centerX, centerY, rect, zoom, scrollLeft, scrollTop
     } = computeCanvasPoHelper($wrapper);
     const po = {
-        x: centerX + (position.x - centerX) / zoom + (scrollLeft + window.pageXOffset - rect.left) / zoom,
-        y: centerY + (position.y - centerY) / zoom + (scrollTop + window.pageYOffset - rect.top) / zoom,
+        x: centerX + (position?.x - centerX) / zoom + (scrollLeft + window.pageXOffset - rect.left) / zoom,
+        y: centerY + (position?.y - centerY) / zoom + (scrollTop + window.pageYOffset - rect.top) / zoom,
     } as IPosition;
     return po;
 };

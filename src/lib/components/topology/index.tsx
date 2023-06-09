@@ -1741,7 +1741,7 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
             // 计算所有节点之间的对齐关系，并更新对齐线的位置信息
             const newAlignmentLines = {};
             // 过滤掉当前拖动的节点
-            !!this.props?.snapline && nodes?.filter(n => n.id !== id)?.forEach((node) => {
+            nodes?.filter(n => n.id !== id)?.forEach((node) => {
                 const alignment = getAlignment(draggedNode, node);
                 if (alignment) {
                     // 过滤掉因为设置了 ALIGNMENT_THRESHOLD，而重复的辅助线
