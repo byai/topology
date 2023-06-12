@@ -1,6 +1,6 @@
 {
   "name": "@byai/topology",
-  "version": "1.3.23-beta-5",
+  "version": "1.3.23-beta-6",
   "description": "拓扑图组件",
   "bugs": {
     "url": "https://github.com/byai/topology/issues"
@@ -105,6 +105,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.22.1",
+    "@babel/helper-string-parser": "^7.22.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/plugin-transform-modules-commonjs": "^7.4.4",

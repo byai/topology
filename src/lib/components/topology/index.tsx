@@ -166,6 +166,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     shouldAutoLayout: boolean = false;
 
+    hoverThreshold = this.props?.data?.nodes?.length >= 200 ? 350 : 40;
 
     constructor(props: ITopologyProps) {
         super(props);
@@ -184,7 +185,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const {
             getInstance, readOnly, customPostionHeight, scaleNum
         } = this.props;
-        this.editLine = _.throttle(this.editLine, 40);
+        this.editLine = _.throttle(this.editLine, this.hoverThreshold);
         if (!readOnly) {
             this.initDomEvents();
         }
@@ -1727,7 +1728,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 }
 
-function hover(props: ITopologyProps, monitor, component: Topology) {
+const hover = (props: ITopologyProps, monitor, component: Topology) => {
     if (!monitor.getItem()) {
         return;
     }
@@ -1844,6 +1845,9 @@ function hover(props: ITopologyProps, monitor, component: Topology) {
     }
 }
 
+const throttle350 = _.throttle(hover, 350)
+
+const throttle40 = _.throttle(hover, 40)
 
 export default DropTarget(
     [NodeTypes.NORMAL_NODE, NodeTypes.TEMPLATE_NODE, NodeTypes.ANCHOR],
@@ -1851,7 +1855,12 @@ export default DropTarget(
         canDrop(props: ITopologyProps) {
             return !props.readOnly;
         },
-        hover: _.throttle(hover, 40),
+        hover: (props: ITopologyProps, monitor, component: Topology) => {
+            const { nodes } = props.data;
+            // 节点数量大于 200，降低刷新频率
+            const update = nodes?.length >= 200 ? throttle350 : throttle40;
+            return update?.(props, monitor, component);
+        },
         drop(props: ITopologyProps, monitor, component: Topology) {
             if (monitor.didDrop() || !component.$wrapper) {
                 return;
