@@ -41,13 +41,33 @@ interface ILineState {
 class Line extends React.Component<ILineProps, ILineState> {
     state: ILineState = { hover: false };
 
-    shouldComponentUpdate(nextProps) {
-        const { data: currentData } = this.props;
-        const { data: nextData, isReduceRender } = nextProps;
-        const { dragging } = nextProps.context;
+    shouldComponentUpdate(nextProps, nextStates) {
+        const { data: currentData, highLight: currentHighLight, selected: currentSelected } = this.props;
+        const {
+            data: nextData, isReduceRender, highLight: nextHighLight, selected: nextSelected
+        } = nextProps;
+
+        const { hover: currentHover } = this.state;
+        const { hover: nextHover } = nextStates;
+
+        const { linking: currentLinkiing } = this.props.context;
+        const { dragging, activeLine, linking: nextLinking } = nextProps.context;
+
         if (isReduceRender && nextData === currentData && dragging) {
             return false;
         }
+
+        const isStableLink = (currentLinkiing === nextLinking) && !activeLine?.origin;
+        const isStableHightLight = Boolean(currentHighLight) === Boolean(nextHighLight);
+        const isStableSelected = currentSelected === nextSelected;
+        const isStableHover = currentHover === nextHover;
+
+        // TODO：自动布局需要更新线条
+        if (isReduceRender && nextData === currentData && isStableLink && isStableHightLight && isStableSelected && isStableHover) {
+            // console.log('阻止 nextHighLight');
+            return false;
+        }
+
         return true;
     }
 
@@ -99,6 +119,7 @@ class Line extends React.Component<ILineProps, ILineState> {
             context: { linking, activeLine },
         } = this.props;
 
+        // console.log('---line render---');
         const { hover } = this.state;
         const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';
         const getTriangleStart = () => ({ ...end, y: end.y - config.line.triangleWidth });

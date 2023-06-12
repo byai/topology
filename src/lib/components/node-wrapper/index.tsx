@@ -221,6 +221,9 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             onMouseEnter,
             onMouseLeave
         } = this.props;
+
+        // console.log('---node render---');
+
         const { selectedData, activeLine } = context;
         const isSelected =
             selectedData.nodes.find(item => item.id === data.id) !== undefined;
