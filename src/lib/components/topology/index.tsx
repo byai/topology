@@ -408,18 +408,17 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return impactNode ? impactNode.id : null;
     };
 
-    clearSelectData = () => {
+    clearSelectData = (updated?: boolean) => {
         const {
             nodes, lines
         } = this.state.context.selectedData;
-        if (nodes?.length === 0 && lines?.length === 0) return;
+        if (!updated && nodes?.length === 0 && lines?.length === 0) return;
         this.setContext({ selectedData: { nodes: [], lines: [], }}, () => {
             const { onSelect } = this.props;
             if (onSelect) {
                 onSelect(this.state.context.selectedData);
             }
         });
-
     }
 
     autoLayout = () => {
@@ -432,7 +431,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             },
             ChangeType.LAYOUT
         );
-        this.clearSelectData(); // refresh
+        this.clearSelectData(true); // refresh
     };
 
     initDomEvents = () => {
