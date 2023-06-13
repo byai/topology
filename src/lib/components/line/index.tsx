@@ -42,29 +42,34 @@ class Line extends React.Component<ILineProps, ILineState> {
     state: ILineState = { hover: false };
 
     shouldComponentUpdate(nextProps, nextStates) {
-        const { data: currentData, highLight: currentHighLight, selected: currentSelected } = this.props;
         const {
-            data: nextData, isReduceRender, highLight: nextHighLight, selected: nextSelected
+            data: currentData, highLight: currentHighLight,
+            selected: currentSelected, start: currentStart, end: currentEnd,
+        } = this.props;
+        const {
+            data: nextData, isReduceRender, highLight: nextHighLight,
+            selected: nextSelected, start: nextStart, end: nextEnd
         } = nextProps;
 
         const { hover: currentHover } = this.state;
         const { hover: nextHover } = nextStates;
 
-        const { linking: currentLinkiing } = this.props.context;
+        const { dragging: currentDragging, linking: currentLinkiing } = this.props.context;
         const { dragging, activeLine, linking: nextLinking } = nextProps.context;
 
-        if (isReduceRender && nextData === currentData && dragging) {
-            return false;
+        if (!_.isEqual(currentStart, nextStart) || !_.isEqual(currentEnd, nextEnd)) {
+            return true;
         }
 
+        const isStableDragging = currentDragging === dragging;
         const isStableLink = (currentLinkiing === nextLinking) && !activeLine?.origin;
         const isStableHightLight = Boolean(currentHighLight) === Boolean(nextHighLight);
         const isStableSelected = currentSelected === nextSelected;
         const isStableHover = currentHover === nextHover;
 
-        // TODO：自动布局需要更新线条
-        if (isReduceRender && nextData === currentData && isStableLink && isStableHightLight && isStableSelected && isStableHover) {
-            // console.log('阻止 nextHighLight');
+        const isStopUpdate = isStableDragging && isStableLink && isStableHightLight && isStableSelected && isStableHover;
+
+        if (isReduceRender && nextData === currentData && isStopUpdate) {
             return false;
         }
 
