@@ -1379,7 +1379,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return html2canvas(graphEl, {
             onclone: function(documentClone){
                 // 背景色置为透明色
-
                 const nodeContentEls: HTMLCollectionOf<Element> = documentClone.getElementsByClassName('topology-node-content');
                 nodeContentEls && Array.from(nodeContentEls).forEach((node: HTMLElement) => {
                     const childNode: any = node.childNodes && node.childNodes[0];
@@ -1388,6 +1387,20 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     node.style.border = '1px solid #fff';
                     childNode.style.backgroundColor = 'white';
                     grandsonChildNode.style.boxShadow = 'none';
+                    /**
+                     * 处理文本域内的文字
+                     * https://github.com/niklasvh/html2canvas/issues/2008#issuecomment-990597427
+                     */
+                    const textarea = grandsonChildNode.querySelector('textarea');
+                    if (textarea) {
+                        const text = textarea.value;
+                        const div = documentClone.createElement('div')
+                        div.innerText = text;
+                        div.style.maxHeight = '285px';
+                        div.style.overflow = 'hidden';
+                        textarea.style.display = 'none'
+                        textarea.parentElement.append(div)
+                    }
                 })
                 const {  minYId } = getMaxAndMinNodeId(nodes);
                 // 定位画布中最顶层的节点，让其滚动在浏览器顶部，尽可能的多展示其它节点
