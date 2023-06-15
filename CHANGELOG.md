@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/byai/topology/compare/v1.3.23...v1.4.0) (2023-06-15)
+
+
+### Features
+
+* autoLayout refresh node ([0b9f779](https://github.com/byai/topology/commit/0b9f779830699cbb28adef02bf4e0a2612481fba))
+* optimize code ([521a63c](https://github.com/byai/topology/commit/521a63c44020334c84b7d4a58abed8249cc329c3))
+* update nodes & lines ([82297b3](https://github.com/byai/topology/commit/82297b32df454663d3cd17fa182a23dc3096dd8b))
+* 减少线条无用渲染 ([5c3ea25](https://github.com/byai/topology/commit/5c3ea252c530dccf742c606e3bcd7bccc1788d53))
+* 控制 hover 频率 ([e1ca640](https://github.com/byai/topology/commit/e1ca640a051ea553a535b006f658710bded2b7e9))
+
 ### [1.3.23](https://github.com/byai/topology/compare/v1.3.22...v1.3.23) (2023-06-06)
 
 
