@@ -124,7 +124,6 @@ class Line extends React.Component<ILineProps, ILineState> {
             context: { linking, activeLine },
         } = this.props;
 
-        // console.log('---line render---');
         const { hover } = this.state;
         const dataJson = data ? JSON.stringify({ origin: data, po: { start, end } }) : '';
         const getTriangleStart = () => ({ ...end, y: end.y - config.line.triangleWidth });

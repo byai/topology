@@ -62,8 +62,6 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
     private updateNumber: number = 0;
 
     shouldComponentUpdate(nextprops) {
-        // TODO: 第一次自动布局节点没有更新
-        // console.log('nextprops =>', this.props, nextprops);
         const { data: nextData, context: { selectedData: nextSelectedData, impactNode: nextImpactNode }, isReduceRender } = nextprops;
         const { data, context: { selectedData, impactNode } } = this.props;
 
@@ -223,8 +221,6 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             onMouseEnter,
             onMouseLeave
         } = this.props;
-
-        // console.log('---node render---');
 
         const { selectedData, activeLine } = context;
         const isSelected =
