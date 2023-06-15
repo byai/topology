@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.1](https://github.com/byai/topology/compare/v1.4.0...v1.4.1) (2023-06-15)
+
+
+### Bug Fixes
+
+* fixed textarea content loss when screenshot ([9849846](https://github.com/byai/topology/commit/984984619db623633480f7c919393c591916b105))
+
 ## [1.4.0](https://github.com/byai/topology/compare/v1.3.23...v1.4.0) (2023-06-15)
 
 
