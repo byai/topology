@@ -11,6 +11,9 @@ import NodeWrapper from '../node-wrapper';
 import Line from '../line';
 import LineText from '../line/lineText';
 
+import Minimap from 'react-minimap';
+import 'react-minimap/dist/react-minimap.css';
+
 import {
     KeyCode,
     NodeTypes,
@@ -1687,53 +1690,60 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     this.$topology = r;
                 }}
             >
-                <div
-                    ref={r => {
-                        this.$wrapper = r;
-                    }}
-                    className={classnames({
-                        "topology-wrapper": true,
-                        "topology-linking": context.linking,
-                    })}
-                    onContextMenu={(e) => {
-                        if (e.isTrusted) {
-                            e.stopPropagation();
-                            e.preventDefault();
-                        }
-                    }}
-                    onMouseDown={this.handleMouseDown}
-                    onMouseMove={this.handleMouseMove}
-                    onMouseUp={this.handleMouseUp}
-                    onMouseLeave={this.clearMouseEventData}
+                <Minimap
+                    selector=".byai-topology-node-wrapper"
+                    // childComponent={this.renderChild}
                 >
                     <div
                         ref={r => {
-                            this.$canvas = r;
+                            this.$wrapper = r;
                         }}
-                        id='topology-canvas'
-                        className="topology-canvas topology-zoom"
-                        // @ts-ignore
-                        style={{
-                            width: config.canvas.width,
-                            height: config.canvas.height,
-                            // @ts-ignore
-                            "--scaleNum": scaleNum
-                        }}
-                        onClick={this.handleCanvasClick}
-                    >
-                        <Provider value={context}>
-                            {this.renderNodes()}
-                            {this.renderLines()}
-                            <Selection onClick={e => {
+                        className={classnames({
+                            "topology-wrapper": true,
+                            "topology-linking": context.linking,
+                        })}
+                        onContextMenu={(e) => {
+                            if (e.isTrusted) {
                                 e.stopPropagation();
-                                this.setState({
-                                    boxSelectionInfo: null
-                                })
-                            }} renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper} visible={!!boxSelectionInfo} />
-                            {snapline !== false && <SnapLine alignmentLines={alignmentLines}/>}
-                        </Provider>
+                                e.preventDefault();
+                            }
+                        }}
+                        onMouseDown={this.handleMouseDown}
+                        onMouseMove={this.handleMouseMove}
+                        onMouseUp={this.handleMouseUp}
+                        onMouseLeave={this.clearMouseEventData}
+                    >
+
+                        <div
+                            ref={r => {
+                                this.$canvas = r;
+                            }}
+                            id='topology-canvas'
+                            className="topology-canvas topology-zoom"
+                            // @ts-ignore
+                            style={{
+                                width: config.canvas.width,
+                                height: config.canvas.height,
+                                // @ts-ignore
+                                "--scaleNum": scaleNum
+                            }}
+                            onClick={this.handleCanvasClick}
+                        >
+                            <Provider value={context}>
+                                {this.renderNodes()}
+                                {this.renderLines()}
+                                <Selection onClick={e => {
+                                    e.stopPropagation();
+                                    this.setState({
+                                        boxSelectionInfo: null
+                                    })
+                                }} renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper} visible={!!boxSelectionInfo} />
+                                {snapline !== false && <SnapLine alignmentLines={alignmentLines}/>}
+                            </Provider>
+                        </div>
+
                     </div>
-                </div>
+                </Minimap>
                 {showBar !== false && this.renderToolBars()}
             </div>
         );
