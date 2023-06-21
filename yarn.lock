@@ -11948,6 +11948,13 @@ react-is@^16.13.1, react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.4, react-i
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-minimap@^0.7.4:
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/react-minimap/-/react-minimap-0.7.4.tgz#8ba3b21629fd4c954adcd91570e3c798d835126f"
+  integrity sha512-U/qHs0QKc6oyuPlroRQ9ymM8HvM2N2hmmv59Y2nyQ2+obqZlTPhB/t/FBfxn4B2lv2f28MoC5NBXEVDjw/cilw==
+  dependencies:
+    lodash "^4.17.4"
+
 react-test-renderer@^16.0.0-0, react-test-renderer@^16.8.6:
   version "16.14.0"
   resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-16.14.0.tgz#e98360087348e260c56d4fe2315e970480c228ae"
