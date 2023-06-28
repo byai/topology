@@ -6,7 +6,7 @@
     // 小地图
     .minimap-container {
         .minimap {
-            overflow: hidden;
+            // overflow: hidden;
             bottom: 0;
             background-color: #f6f6f6;
 
@@ -14,6 +14,13 @@
             .minimap-viewport {
                 // display: none;
             }
+        }
+
+        .minimap-container-scroll {
+            position: absolute;
+            // &::-webkit-scrollbar {
+            //     display: none;
+            // }
         }
 
     }
@@ -34,7 +41,7 @@
         }
     }
     .topology-wrapper {
-        position: absolute;
+        // position: absolute;
         height: 100%;
         width: 100%;
         overflow: scroll;
@@ -44,7 +51,7 @@
         }
 
         .topology-canvas {
-            border: 1px solid rgb(115, 0, 255);
+            // border: 1px solid rgb(115, 0, 255);
             position: relative;
             background: #F7F7F7;
             z-index: 0;
