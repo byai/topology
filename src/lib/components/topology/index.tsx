@@ -10,9 +10,7 @@ import { Provider, defaultContext } from '../context';
 import NodeWrapper from '../node-wrapper';
 import Line from '../line';
 import LineText from '../line/lineText';
-
-import Minimap from 'react-minimap';
-import 'react-minimap/dist/react-minimap.css';
+import Minimap from '../minimap';
 
 import {
     KeyCode,
@@ -1365,10 +1363,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
      * @param imgName 图片名称
      * @returns
      */
-
     downloadImg = async (scopeType?: 'global' | 'selected', openDownload?: boolean, imgName?: string) => {
         // openDownload && this.setState({ loading: true, })
-         const {
+        const {
             context: { selectedData },
             scaleNum
         } = this.state;
@@ -1376,7 +1373,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const isGlobal = scopeType === 'global';
         const nodes = isGlobal ? this.props.data.nodes : selectedData && selectedData.nodes;
 
-        const graphEl: any = document.querySelector(".topology-canvas");
+        const graphEl: HTMLDivElement = document.querySelector(".topology-canvas");
         let imgBase64 = '';
 
         const { minX, maxX, minY, maxY } = computeMaxAndMin(nodes)
@@ -1387,8 +1384,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 // 背景色置为透明色
                 const nodeContentEls: HTMLCollectionOf<Element> = documentClone.getElementsByClassName('topology-node-content');
                 nodeContentEls && Array.from(nodeContentEls).forEach((node: HTMLElement) => {
-                    const childNode: any = node.childNodes && node.childNodes[0];
-                    const grandsonChildNode: any = childNode && childNode.childNodes[0];
+                    const childNode = node.childNodes && node.childNodes[0] as HTMLElement;
+                    const grandsonChildNode = childNode && childNode.childNodes[0] as HTMLElement;
                     node.style.backgroundColor = 'transparent';
                     node.style.border = '1px solid #fff';
                     childNode.style.backgroundColor = 'white';
@@ -1720,11 +1717,23 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         {/* 第二种：minimap 内可交互，但比例太小了 */}
                         <Minimap
                         // keepAspectRatio
-                        // width={600}
-                        // height={600}
+                        // width={20000}
+                        // height={20000}
                         // onMountCenterOnX
                         // onMountCenterOnY
                             selector=".byai-topology-node-wrapper"
+                            childComponent={({ node, ...props }) => {
+                                console.log('--node', node, props)
+                                return (
+                                    <div
+                                        style={{
+                                        ...props,
+                                        position: "absolute",
+                                        backgroundColor: 'red'
+                                        }}
+                                    />
+                                )
+                            }}
                         >
                             <div
                                 ref={r => {
