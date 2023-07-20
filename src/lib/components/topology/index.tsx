@@ -107,6 +107,7 @@ export interface ITopologyProps {
     renderBoxSelectionTool?: () => React.ReactNode;
     autoRemoveSelected?: boolean | ((e: MouseEvent) => void);
     customToolboxList?: { wrapperProps?: HTMLAttributes<HTMLDivElement>; content: React.ReactNode; tooltip: string; }[];
+    renderMinimapChild?: (params) => React.ReactNode;
 }
 
 export interface ITopologyState {
@@ -192,7 +193,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         }
 
         //  $wrapper 赋值
-        this.$wrapper = document.querySelector('.minimap-container-scroll');
+        // this.$wrapper = document.querySelector('.minimap-container-scroll');
 
         if (this.$wrapper) {
             // 自定义节点距离画布顶部高度
@@ -1679,10 +1680,25 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     render() {
-        const { connectDropTarget, showBar, snapline } = this.props;
+        const { connectDropTarget, showBar, snapline, renderMinimapChild } = this.props;
         const { context, scaleNum, boxSelectionInfo, alignmentLines } = this.state;
         const xPos = boxSelectionInfo ? `${boxSelectionInfo.x},${boxSelectionInfo.initX}` : '';
         const yPos = boxSelectionInfo ? `${boxSelectionInfo.y},${boxSelectionInfo.initY}` : '';
+
+        const defaultChild = ({ node, ...props }) => {
+            const id = node.getAttribute('id')?.split('-')?.[2];
+            return (
+                <div
+                    onClick={() => { this.locateNodeById(id) }}
+                    style={{
+                        ...props,
+                        position: "absolute",
+                        backgroundColor: '#CCC',
+                        border: '1px solid black',
+                    }}
+                />
+            )
+        }
 
         return connectDropTarget!(
             <div className="byai-topology"
@@ -1690,15 +1706,15 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     this.$topology = r;
                 }}
             >
-                {/* 第一种：minimap 内无法交互，且画布外数据无法展示 */}
-                {/* <Minimap
+                {/* 第一种：以可视化区域尺寸比例缩放，第二种：以原画布大小尺寸缩放 */}
+                <Minimap
                     selector=".byai-topology-node-wrapper"
-                    // childComponent={this.renderChild}
-                > */}
+                    childComponent={renderMinimapChild ? renderMinimapChild : defaultChild}
+                >
                     <div
-                        // ref={r => {
-                        //     this.$wrapper = r;
-                        // }}
+                        ref={r => {
+                            this.$wrapper = r;
+                        }}
                         className={classnames({
                             "topology-wrapper": true,
                             "topology-linking": context.linking,
@@ -1714,57 +1730,35 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         onMouseUp={this.handleMouseUp}
                         onMouseLeave={this.clearMouseEventData}
                     >
-                        {/* 第二种：minimap 内可交互，但比例太小了 */}
-                        <Minimap
-                        // keepAspectRatio
-                        // width={20000}
-                        // height={20000}
-                        // onMountCenterOnX
-                        // onMountCenterOnY
-                            selector=".byai-topology-node-wrapper"
-                            childComponent={({ node, ...props }) => {
-                                console.log('--node', node, props)
-                                return (
-                                    <div
-                                        style={{
-                                        ...props,
-                                        position: "absolute",
-                                        backgroundColor: 'red'
-                                        }}
-                                    />
-                                )
+                        <div
+                            ref={r => {
+                                this.$canvas = r;
                             }}
-                        >
-                            <div
-                                ref={r => {
-                                    this.$canvas = r;
-                                }}
-                                id='topology-canvas'
-                                className="topology-canvas topology-zoom"
+                            id='topology-canvas'
+                            className="topology-canvas topology-zoom"
+                            // @ts-ignore
+                            style={{
+                                width: config.canvas.width,
+                                height: config.canvas.height,
                                 // @ts-ignore
-                                style={{
-                                    width: config.canvas.width,
-                                    height: config.canvas.height,
-                                    // @ts-ignore
-                                    "--scaleNum": scaleNum
-                                }}
-                                onClick={this.handleCanvasClick}
-                            >
-                                <Provider value={context}>
-                                    {this.renderNodes()}
-                                    {this.renderLines()}
-                                    <Selection onClick={e => {
-                                        e.stopPropagation();
-                                        this.setState({
-                                            boxSelectionInfo: null
-                                        })
-                                    }} renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper} visible={!!boxSelectionInfo} />
-                                    {snapline !== false && <SnapLine alignmentLines={alignmentLines}/>}
-                                </Provider>
-                            </div>
-                        </Minimap>
+                                "--scaleNum": scaleNum
+                            }}
+                            onClick={this.handleCanvasClick}
+                        >
+                            <Provider value={context}>
+                                {this.renderNodes()}
+                                {this.renderLines()}
+                                <Selection onClick={e => {
+                                    e.stopPropagation();
+                                    this.setState({
+                                        boxSelectionInfo: null
+                                    })
+                                }} renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper} visible={!!boxSelectionInfo} />
+                                {snapline !== false && <SnapLine alignmentLines={alignmentLines}/>}
+                            </Provider>
+                        </div>
                     </div>
-                {/* </Minimap> */}
+                </Minimap>
                 {showBar !== false && this.renderToolBars()}
             </div>
         );
