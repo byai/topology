@@ -216,6 +216,8 @@ class Minimap extends React.Component<any, any> {
     synchronize(options) {
         const { width, height } = this.state;
 
+        if (!this.source) return;
+
         const rect = this.source.getBoundingClientRect();
 
         const dims = [rect.width, rect.height];

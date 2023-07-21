@@ -8,40 +8,56 @@ exports[`topology basic render 1`] = `
       class="byai-topology"
     >
       <div
-        class="topology-wrapper"
+        class="minimap-container "
       >
         <div
-          class="topology-canvas topology-zoom"
-          id="topology-canvas"
-          style="width: 40000px; height: 40000px;"
+          class="minimap"
+          style="width: 200px; height: 200px;"
         >
           <div
-            class="byai-topology-node-wrapper"
-            id="topology-node-1"
-            style="position: absolute; left: 20000px; top: 20000px; transition: .2s; z-index: 999;"
+            style="position: absolute; background-color: rgb(204, 204, 204); border: 1px solid black;"
+          />
+        </div>
+        <div
+          class="minimap-container-scroll"
+        >
+          <div
+            class="topology-wrapper"
           >
             <div
-              class="topology-node-preview"
-              data-id="1"
-            />
-            <div
-              class="topology-node-content"
+              class="topology-canvas topology-zoom"
+              id="topology-canvas"
+              style="width: 40000px; height: 40000px;"
             >
-              <div>
-                1
+              <div
+                class="byai-topology-node-wrapper"
+                id="topology-node-1"
+                style="position: absolute; left: 20000px; top: 20000px; transition: .2s; z-index: 999;"
+              >
+                <div
+                  class="topology-node-preview"
+                  data-id="1"
+                />
+                <div
+                  class="topology-node-content"
+                >
+                  <div>
+                    1
+                  </div>
+                </div>
               </div>
+              <svg
+                class="topology-svg"
+              />
+              <div
+                class="byai-topology-selection"
+                style="left: 0px; top: 0px; width: 0px; height: 0px;"
+              />
+              <svg
+                class="snap-line-svg"
+              />
             </div>
           </div>
-          <svg
-            class="topology-svg"
-          />
-          <div
-            class="byai-topology-selection"
-            style="left: 0px; top: 0px; width: 0px; height: 0px;"
-          />
-          <svg
-            class="snap-line-svg"
-          />
         </div>
       </div>
       <div
