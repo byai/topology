@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/byai/topology/compare/v1.4.1...v1.5.0) (2023-07-21)
+
+
+### Features
+
+* add minimap ([70130f7](https://github.com/byai/topology/commit/70130f70b651986ffe0c53f7a10ea081157e2f2b))
+* minimap ([0aaca9e](https://github.com/byai/topology/commit/0aaca9e1132b85de08324260e19dacd390c0f319))
+* minimap dev ([880c425](https://github.com/byai/topology/commit/880c4250a883c3eb8105c110d78dbb907e11ce62))
+* minimap optimize ([c985f24](https://github.com/byai/topology/commit/c985f241e899aa12b53374dde8eef4b8398119a4))
+
+
+### Bug Fixes
+
+* delete useless code ([3ccf922](https://github.com/byai/topology/commit/3ccf9223b3244aff07e5b3d07c3672c86218e0ee))
+
 ### [1.4.1](https://github.com/byai/topology/compare/v1.4.0...v1.4.1) (2023-06-15)
 
 
