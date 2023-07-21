@@ -105,10 +105,6 @@ class Minimap extends React.Component<any, any> {
 
         let { width, height } = this.props;
 
-        /**
-         * 假设节点都在可视区域内，缩放比 width / this.source.getBoundingClientRect().width;
-         * 假设节点不在可视内，
-         */
         let ratioX = (width / scrollWidth);
         let ratioY = (height / scrollHeight);
 
