@@ -97,6 +97,7 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "d3-path": "^2.0.0",
+    "dagre": "^0.8.5",
     "html2canvas": "^1.4.1",
     "lodash": "^4.17.11",
     "react-dnd": "^2.5.4",
