@@ -4,6 +4,7 @@ import dagre from 'dagre';
 import { ITopologyData, ITopologyNode } from '../declare';
 import { getNodeSize } from '.';
 import config from '../config';
+import { Graph } from './Graph';
 
 type SortChilren = (parent: ITopologyNode, childrenList: ITopologyNode[]) => ITopologyNode[];
 
@@ -13,49 +14,30 @@ interface LayoutOptions {
 
 function computeLayout(data: ITopologyData, options: LayoutOptions) {
     console.log(options);
-    const g = new dagre.graphlib.Graph({});
-    g.setGraph({ ranksep: config.autoLayout.verticalSpacing, nodesep: config.autoLayout.horizontalSpacing });
-    g.setDefaultEdgeLabel(() => ({}));
-    data.nodes.forEach((node) => {
+    const layoutGraph = new Graph();
+    layoutGraph.setNodeList(data.nodes.map((node) => {
         const nodeSize = getNodeSize(node.id);
-        g.setNode(node.id, {
+        return [node.id, {
             label: node.id,
             width: nodeSize.width,
             height: nodeSize.height,
-        });
-    });
-    data.lines.forEach((line) => {
-        g.setEdge(line.start.split('-')?.[0], line.end);
-    });
-    dagre.layout(g);
+        }];
+    }));
+    layoutGraph.setEdgeList(data.lines.map((line) => {
+        return [line.start.split('-')?.[0], line.end];
+    }));
+    layoutGraph.layout();
+    const boundary = layoutGraph.getBoundary();
     const nodeMap = new Map();
-    const bar = g.nodes().reduce((prev, curr) => {
-        const {
-            width, height, x, y
-        } = g.node(curr);
-        nodeMap.set(curr, { x, y });
-        const top = Math.min(prev.top, y);
-        const left = Math.min(prev.left, x);
-        const bottom = Math.max(prev.bottom, y + height);
-        const right = Math.max(prev.right, x + width);
-        return {
-            top,
-            left,
-            bottom,
-            right,
-        };
-    }, {
-        top: Infinity,
-        left: Infinity,
-        bottom: -Infinity,
-        right: -Infinity
+    layoutGraph.getNodes().map(node => {
+        nodeMap.set(node.label, node);
     });
     const containerSize = {
-        width: bar.right - bar.left,
-        height: bar.bottom - bar.top
+        width: boundary.width,
+        height: boundary.height
     };
-    const leftOffset = bar.left + containerSize.width / 2;
-    const topOffset = bar.top + containerSize.height / 2;
+    const leftOffset = containerSize.width / 2;
+    const topOffset = containerSize.height / 2;
     return data.nodes.map((node) => {
         const infoPos = nodeMap.get(node.id);
         const newPosition = {
