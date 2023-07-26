@@ -1,10 +1,9 @@
 /* eslint-disable no-debugger */
 /* eslint-disable no-param-reassign */
-import dagre from 'dagre';
 import { ITopologyData, ITopologyNode } from '../declare';
 import { getNodeSize } from '.';
 import config from '../config';
-import { Graph } from './Graph';
+import Graph from './Graph';
 
 type SortChilren = (parent: ITopologyNode, childrenList: ITopologyNode[]) => ITopologyNode[];
 
@@ -23,13 +22,11 @@ function computeLayout(data: ITopologyData, options: LayoutOptions) {
             height: nodeSize.height,
         }];
     }));
-    layoutGraph.setEdgeList(data.lines.map((line) => {
-        return [line.start.split('-')?.[0], line.end];
-    }));
+    layoutGraph.setEdgeList(data.lines.map(line => [line.start.split('-')?.[0], line.end]));
     layoutGraph.layout();
     const boundary = layoutGraph.getBoundary();
     const nodeMap = new Map();
-    layoutGraph.getNodes().map(node => {
+    layoutGraph.getNodes().forEach((node) => {
         nodeMap.set(node.label, node);
     });
     const containerSize = {
