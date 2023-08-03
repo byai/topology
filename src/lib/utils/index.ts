@@ -4,6 +4,13 @@ import {
     ITopologyNode,
 } from '../declare';
 
+export enum DagreDirection {
+    TB = 'TB',
+    BT = 'BT',
+    LR = 'LR',
+    RL = 'RL',
+}
+
 export const shouldAutoLayout = (nodes: ITopologyNode[]) => {
     if (nodes.length === 0) {
         return false;

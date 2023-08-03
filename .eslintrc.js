@@ -38,6 +38,10 @@ module.exports = {
         "react/sort-comp": 0,
         "react/prop-types": 0,
         "import/no-unresolved": 0,
+        "import/extensions": 0,
+        "arrow-body-style": 0,
+        "arrow-parens": 0,
+        "import/prefer-default-export": 1,
         "import/no-cycle": 0,
         "react/jsx-indent": ["error", 4],
         "react/no-did-update-set-state": 0,
@@ -63,7 +67,6 @@ module.exports = {
         ],
         quotes: 0,
         "comma-dangle": "off",
-        "no-non-null-assertion": null,
         "no-else-return": ["error", { allowElseIf: true }],
         "react/destructuring-assignment": [
             "warn",

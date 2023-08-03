@@ -50,6 +50,11 @@ import './index.less';
 import Selection from '../selection';
 import SnapLine from '../snapline';
 
+export interface AutoLayoutOptions {
+    preprocess?: (data: ITopologyData) => ITopologyData;
+    resultProcess?: (data: ITopologyData) => ITopologyData;
+}
+
 export interface ITopologyProps {
     data: ITopologyData; // 数据 { nodes: []; lines: [] }
     readOnly?: boolean; // 只读模式，为true时不可编辑
@@ -108,6 +113,7 @@ export interface ITopologyProps {
     autoRemoveSelected?: boolean | ((e: MouseEvent) => void);
     customToolboxList?: { wrapperProps?: HTMLAttributes<HTMLDivElement>; content: React.ReactNode; tooltip: string; }[];
     renderMinimapChild?: (params) => React.ReactNode;
+    autoLayoutOption?: AutoLayoutOptions;
 }
 
 export interface ITopologyState {
@@ -210,7 +216,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         if (this.shouldAutoLayout) {
             this.shouldAutoLayout = false;
-            this.autoLayout();
+            this.autoLayout(this.props.autoLayoutOption);
         }
 
         if (getInstance) {
@@ -250,7 +256,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     componentDidUpdate() {
         if (this.shouldAutoLayout) {
             this.shouldAutoLayout = false;
-            this.autoLayout();
+            this.autoLayout(this.props.autoLayoutOption);
         }
     }
 
@@ -426,14 +432,17 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         });
     }
 
-    autoLayout = () => {
+    autoLayout = (options?: AutoLayoutOptions) => {
+        const { preprocess, resultProcess } = options ?? {};
         const { data, sortChildren } = this.props;
+        const newData = preprocess ? preprocess(data) : data;
         this.resetScale();
+        const result = {
+            ...newData,
+            nodes: computeLayout(newData, { sortChildren })
+        };
         this.onChange(
-            {
-                ...data,
-                nodes: computeLayout(data, { sortChildren })
-            },
+            resultProcess ? resultProcess(result) : result,
             ChangeType.LAYOUT
         );
         this.clearSelectData(true); // refresh
@@ -1496,7 +1505,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 {showLayout !== false && <div
                     className="topology-tools-btn"
                     id="auto-layout"
-                    onClick={this.autoLayout}
+                    onClick={() => this.autoLayout(this.props.autoLayoutOption)}
                 >
                     <img
                         src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTYwMzI3NjU0MDc4IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEwMjIiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj48L3N0eWxlPjwvZGVmcz48cGF0aCBkPSJNODg1LjkyNzYxNyA2NzQuMzAwMTMyVjQ5Ny42NDYxMTNINTQwLjc3MTIyVjM1My44Mjk5MjRoMzQ1LjE1NzQyMVYxMjMuNjk3MDA2SDEzOC4wNzAzMzZ2MjMwLjEzMjkxOGgzNDUuMTU3NDIxdjE0My44MTYxODlIMTM4LjA3MDMzNnYxNzYuNjU0MDE5Yy00OS40Nzc3NzkgMTIuODYyOTMzLTg2LjI4ODA3NiA1Ny40OTc0MTQtODYuMjg4MDc2IDExMC45NTA3MjkgMCA2My40NTMwNDQgNTEuNTk4MDY1IDExNS4wNTIxMzMgMTE1LjA1NDE3OSAxMTUuMDUyMTMzIDYzLjQ1MjAyMSAwIDExNS4wNTAwODYtNTEuNTk5MDg5IDExNS4wNTAwODYtMTE1LjA1MjEzMyAwLTUzLjQ1MzMxNi0zNi44MTAyOTctOTguMDg3Nzk2LTg2LjI4ODA3Ni0xMTAuOTUwNzI5VjU1NS4xNDQ1NWgyODcuNjMwMzMxdjExOS4xNTQ1NTljLTQ5LjQ5MTA4MiAxMi44NjI5MzMtODYuMjg4MDc2IDU3LjQ5NzQxNC04Ni4yODgwNzYgMTEwLjk1MDcyOSAwIDYzLjQ1MzA0NCA1MS41OTkwODkgMTE1LjA1MjEzMyAxMTUuMDY2NDU5IDExNS4wNTIxMzMgNjMuNDI1NDE1IDAgMTE1LjA1NDE3OS01MS41OTkwODkgMTE1LjA1NDE3OS0xMTUuMDUyMTMzIDAtNTMuNDUzMzE2LTM2Ljc5ODAxNy05OC4wODc3OTYtODYuMjg5MDk5LTExMC45NTA3MjlWNTU1LjE0NDU1aDI4Ny42MzAzMzF2MTE5LjE1NDU1OWMtNDkuNDkzMTI5IDEyLjg2MjkzMy04Ni4yODcwNTMgNTcuNDk3NDE0LTg2LjI4NzA1MyAxMTAuOTUwNzI5IDAgNjMuNDUzMDQ0IDUxLjU2OTQxMyAxMTUuMDUyMTMzIDExNS4wNTExMSAxMTUuMDUyMTMzIDYzLjQyNDM5MSAwIDExNS4wNTMxNTYtNTEuNTk5MDg5IDExNS4wNTMxNTYtMTE1LjA1MjEzMy0wLjAwMjA0Ny01My40NTMzMTYtMzYuODAwMDY0LTk4LjA4Njc3My04Ni4yOTIxNy0xMTAuOTQ5NzA2ek0xOTUuNTk3NDI2IDE4MS4yMjQwOTZoNjMyLjgwNDEyNXYxMTUuMDUyMTMySDE5NS41OTc0MjZWMTgxLjIyNDA5NnogbTI4Ljc2NDA1NiA2MDQuMDI2NzY1YzAgMzEuNzEyMTk2LTI1LjgxNDg5NCA1Ny41NTQ3MTktNTcuNTI2MDY2IDU3LjU1NDcxOS0zMS43MTQyNDIgMC01Ny41MjcwOS0yNS44NDI1MjMtNTcuNTI3MDktNTcuNTU0NzE5IDAtMzEuNzE0MjQyIDI1LjgxMjg0Ny01Ny40OTg0MzcgNTcuNTI3MDktNTcuNDk4NDM3IDMxLjcxMjE5Ni0wLjAwMTAyMyA1Ny41MjYwNjYgMjUuNzgzMTcxIDU3LjUyNjA2NiA1Ny40OTg0Mzd6IG0zNDUuMTcxNzQ3IDBjMCAzMS43MTIxOTYtMjUuODQxNSA1Ny41NTQ3MTktNTcuNTI3MDg5IDU3LjU1NDcxOS0zMS43MjQ0NzUgMC01Ny41MzkzNjktMjUuODQyNTIzLTU3LjUzOTM2OS01Ny41NTQ3MTkgMC0zMS43MTQyNDIgMjUuODE1OTE3LTU3LjQ5ODQzNyA1Ny41MzkzNjktNTcuNDk4NDM3IDMxLjY4NTU5LTAuMDAxMDIzIDU3LjUyNzA5IDI1Ljc4MzE3MSA1Ny41MjcwODkgNTcuNDk4NDM3eiBtMjg3LjYzMTM1NSA1Ny41NTQ3MTljLTMxLjc0MTg3MiAwLTU3LjUyODExMy0yNS44NDI1MjMtNTcuNTI4MTEzLTU3LjU1NDcxOSAwLTMxLjcxNDI0MiAyNS43ODYyNDEtNTcuNDk4NDM3IDU3LjUyODExMy01Ny40OTg0MzcgMzEuNjg1NTkgMCA1Ny41MjcwOSAyNS43ODQxOTUgNTcuNTI3MDkgNTcuNDk4NDM3IDAgMzEuNzEyMTk2LTI1Ljg0MTUgNTcuNTU0NzE5LTU3LjUyNzA5IDU3LjU1NDcxOXoiIGZpbGw9IiMyYzJjMmMiIHAtaWQ9IjEwMjMiPjwvcGF0aD48L3N2Zz4="
