@@ -63,6 +63,7 @@ export interface ITopologyProps {
     showCenter?: boolean; // 是否显示工具栏中的定位中心
     showLayout?: boolean; // 是否显示工具栏中的自动布局
     showDownload?: boolean; // 是否显示工具栏中的下载图片
+    showMinimap?: boolean; // 是否显示小地图
     downloadImg?: (scopeType?: 'global' | 'selected', download?: boolean, name?: string) => void;
     canConnectMultiLines?: boolean; // 控制一个锚点是否可以连接多条线
     overlap?: boolean; // 是否允许节点覆盖，默认允许，设置 true 时不允许
@@ -1689,7 +1690,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     }
 
     render() {
-        const { connectDropTarget, showBar, snapline, renderMinimapChild } = this.props;
+        const { connectDropTarget, showBar, showMinimap, snapline, renderMinimapChild } = this.props;
         const { context, scaleNum, boxSelectionInfo, alignmentLines } = this.state;
         const xPos = boxSelectionInfo ? `${boxSelectionInfo.x},${boxSelectionInfo.initX}` : '';
         const yPos = boxSelectionInfo ? `${boxSelectionInfo.y},${boxSelectionInfo.initY}` : '';
@@ -1719,6 +1720,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 <Minimap
                     selector=".byai-topology-node-wrapper"
                     childComponent={renderMinimapChild ? renderMinimapChild : defaultChild}
+                    visible={Boolean(showMinimap)}
                 >
                     <div
                         ref={r => {

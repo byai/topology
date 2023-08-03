@@ -129,6 +129,12 @@ http://localhost:3000
             <td>是否显示工具栏中的下载图片</td>
         </tr>
         <tr>
+            <td>showMinimap</td>
+            <td>bool</td>
+            <td>false</td>
+            <td>是否显示小地图</td>
+        </tr>
+        <tr>
             <td>canConnectMultiLines</td>
             <td>bool</td>
             <td>false</td>

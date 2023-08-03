@@ -277,6 +277,7 @@ class Minimap extends React.Component<any, any> {
                     style={{
                         width: `${width}px`,
                         height: `${height}px`,
+                        display: this.props.visible ? 'block' : 'none',
                     }}
                     ref={(minimap: any) => {
                         this.minimap = minimap;
