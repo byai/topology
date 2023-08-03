@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.1](https://github.com/byai/topology/compare/v1.5.0...v1.6.1) (2023-08-03)
+
+
+### Features
+
+* add showMinimap config ([470bd6c](https://github.com/byai/topology/commit/470bd6cdcaa878d387182ff8d34716f64d79bfc0))
+* 自动布局算法优化 ([#30](https://github.com/byai/topology/issues/30)) ([7325314](https://github.com/byai/topology/commit/7325314d21709a01d587a7cf7643ba6400f54648))
+
 ## [1.5.0](https://github.com/byai/topology/compare/v1.4.1...v1.5.0) (2023-07-21)
 
 
