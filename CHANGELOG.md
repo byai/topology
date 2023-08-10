@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.2](https://github.com/byai/topology/compare/v1.6.1...v1.6.2) (2023-08-10)
+
+
+### Bug Fixes
+
+* add download img extension ([f066353](https://github.com/byai/topology/commit/f066353717cf929046bce4970ac383f9f4591c70))
+
 ### [1.6.1](https://github.com/byai/topology/compare/v1.5.0...v1.6.1) (2023-08-03)
 
 
