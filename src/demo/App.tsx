@@ -124,7 +124,7 @@ class Flow extends React.Component<{}, FlowState> {
                         snapline={snapline}
                         showDownload
                         downloadImg={() => {
-                            this.topology.downloadImg(true, '测试图片名称');
+                            this.topology.downloadImg('global', true, '测试图片名称');
                         }}
                         customPostionHeight={20}
                         canConnectMultiLines={canConnectMultiLines}

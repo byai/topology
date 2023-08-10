@@ -1437,7 +1437,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             if (openDownload) {
                 const a = document.createElement('a');
                 a.href = imgBase64;
-                a.download = imgName || '图片';
+                a.download = (imgName || '图片') + '.png';
                 a.click();
             }
             this.setState({ loading: false })
