@@ -2,7 +2,7 @@
 import React, { HTMLAttributes } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { DropTarget, ConnectDropTarget } from 'react-dnd';
-import _ from 'lodash';
+import _, { debounce } from 'lodash';
 import classnames from 'classnames';
 import html2canvas from 'html2canvas';
 import selectNodes, { getLinesFromNode, SelectMode } from '../../utils/selectNodes';
@@ -449,12 +449,82 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         this.clearSelectData(true); // refresh
     };
 
+    listenerWheel = (event) => {
+        if (event.metaKey || event.ctrlKey) {
+            event.preventDefault();
+            var deltaY = event.deltaY; // 获取垂直方向的滚动值
+
+            // 将 this.$wrapper 的 overflow 属性设置为 hidden
+            this.$wrapper.style.overflow = 'hidden';
+
+            // 根据滚动值进行相应的操作
+            if (deltaY > 0) {
+                // 向下滚动
+                console.log('Command/Windows + Scroll Down');
+                this.zoomIn()
+            } else if (deltaY < 0) {
+                // 向上滚动
+                console.log('Command/Windows + Scroll Up');
+                this.zoomOut()
+            }
+
+            // 调整画布坐标偏移，以便使缩放中心保持在鼠标位置
+            if (!this.$wrapper || !this.$canvas) {
+                return;
+            }
+
+            // var mouseX = event.clientX - this.$wrapper.offsetLeft;
+            // var mouseY = event.clientY - this.$wrapper.offsetTop;
+
+            // var deltaX = mouseX * (1 - this.scaleNum);
+            // var deltaY = mouseY * (1 - this.scaleNum);
+
+            // const canvasSize = getNodeSize(this.$canvas);
+            // const wrapperSize = getNodeSize(this.$wrapper);
+            // const contentCenter = computeContentCenter(this.props.data.nodes);
+            // const canvasCenter = {
+            //     x: canvasSize.width / 2,
+            //     y: canvasSize.height / 2
+            // };
+            // const defaultScrollTop = (canvasSize.height - wrapperSize.height) / 2;
+            // const defaultScrollLeft = (canvasSize.width - wrapperSize.width) / 2;
+            // if (!contentCenter) {
+            //     this.$wrapper.scrollTop = defaultScrollTop;
+            //     this.$wrapper.scrollLeft = defaultScrollLeft;
+            // } else {
+            //     this.$wrapper.scrollTop = defaultScrollTop + (contentCenter.y - canvasCenter.y);
+            //     this.$wrapper.scrollLeft = defaultScrollLeft + (contentCenter.x - canvasCenter.x);
+            // }
+
+            // this.$wrapper.scrollLeft =  defaultScrollTop + (contentCenter.y - canvasCenter.y)+  deltaY;
+            // this.$wrapper.scrollTop =  defaultScrollLeft + (contentCenter.x - canvasCenter.x) + deltaY;
+
+            // 阻止默认滚动行为
+            event.preventDefault();
+            event.stopPropagation(); // 阻止事件冒泡
+            return
+        } else {
+            console.log('auto auto');
+            this.$wrapper.style.overflow = 'scroll';
+        }
+    }
+
+    listenerWrapperScroll = (event) => {
+        event.preventDefault();
+        event.stopPropagation(); // 阻止事件冒泡
+        console.log('listenerWrapperScroll')
+    }
+
     initDomEvents = () => {
         window.addEventListener("keydown", this.handleKeydown);
+        // 监听滚动事件
+        window.addEventListener('wheel', debounce(this.listenerWheel, 10), { passive: false });
+        this.$wrapper.addEventListener('scroll', this.listenerWrapperScroll, { passive: false });
     };
 
     removeDomEvents = () => {
         window.removeEventListener("keydown", this.handleKeydown);
+        window.removeEventListener("wheel", this.listenerWheel);
     };
 
     getBoundary = (elements: Element[]) => {
