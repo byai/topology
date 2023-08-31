@@ -504,8 +504,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             event.stopPropagation(); // 阻止事件冒泡
             return
         } else {
-            console.log('auto auto');
-            this.$wrapper.style.overflow = 'scroll';
+            if (getComputedStyle(this.$wrapper).overflow !== 'scroll') {
+                console.log('设置 auto auto');
+                this.$wrapper.style.overflow = 'scroll';
+            }
         }
     }
 
