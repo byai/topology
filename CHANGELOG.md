@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/byai/topology/compare/v1.6.2...v1.7.0) (2023-10-23)
+
+
+### Features
+
+* add listenerWheel ([f8486b7](https://github.com/byai/topology/commit/f8486b7a238e2b7516d2705de463d8ed869114a3))
+* support whell scale ([97e3d96](https://github.com/byai/topology/commit/97e3d9628e0a722f2157ba2048af7f99a6716215))
+* 减少 overflow 值更新 ([c29128c](https://github.com/byai/topology/commit/c29128c57e366eefe09dfdc26cf4951e025baa38))
+
 ### [1.6.2](https://github.com/byai/topology/compare/v1.6.1...v1.6.2) (2023-08-10)
 
 
