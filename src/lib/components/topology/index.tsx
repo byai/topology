@@ -433,6 +433,47 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         });
     }
 
+    mergeArrays = (data, selectData) => {
+        const newData = [...data];
+
+        for (let i = 0; i < newData.length; i++) {
+            const item = newData[i];
+            const matchingItem = selectData.find((selectItem) => selectItem.id === item.id);
+            if (matchingItem) {
+            newData[i] = matchingItem;
+            }
+        }
+
+        return newData;
+    }
+
+    // 针对选中的数据自动布局
+    autoLayoutSelected = (options?: AutoLayoutOptions) => {
+        const { preprocess, resultProcess } = options ?? {};
+        const { data, sortChildren } = this.props;
+        const newData = preprocess ? preprocess(data) : data;
+        this.resetScale();
+        const selectResult = {
+            ...this.state.context.selectedData,
+            // TODO: 框选区域布局算法
+            nodes: computeLayout(this.state.context.selectedData, { sortChildren })
+        };
+
+        const newNodes = this.mergeArrays(data?.nodes, selectResult?.nodes);
+        const result = {
+            ...newData,
+            nodes: newNodes,
+        }
+        this.onChange(
+            resultProcess ? resultProcess(result) : result,
+            ChangeType.LAYOUT
+        );
+        // 更新框选位置
+        setTimeout(() => {
+            this.generateBoxBySelectedNode(this.state.context.selectedData.nodes);
+        }, 200)
+    };
+
     autoLayout = (options?: AutoLayoutOptions) => {
         const { preprocess, resultProcess } = options ?? {};
         const { data, sortChildren } = this.props;

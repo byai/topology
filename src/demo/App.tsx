@@ -96,6 +96,43 @@ class Flow extends React.Component<{}, FlowState> {
         this.setState({ data });
     };
 
+    renderBoxSelectionTool = () => {
+        const wapperStyle: React.CSSProperties = {
+            position: 'absolute',
+            background: '#fff',
+            top: '-8px',
+            left: '50%',
+            transform: 'translate(-50%,-100%)',
+            display: 'flex',
+            padding: '4px 6px',
+            borderRadius: '4px',
+            boxShadow: '0 2px 8px 0 rgba(200,201,204,.3)',
+            alignItems: 'center',
+            pointerEvents: 'all',
+        };
+        const itemStyle: React.CSSProperties = {
+            backgroundColor: 'rgb(246, 247, 250)',
+            borderRadius: '2px',
+            padding: '0px 6px',
+            lineHeight: '28px',
+            marginRight: '6px',
+            whiteSpace: 'nowrap',
+            color: 'rgba(10, 15, 44, 0.65)',
+            cursor: 'pointer',
+        }
+        return (
+            <div style={wapperStyle}>
+                <div onClick={(e) => {
+                    console.log('测试')
+                    e.stopPropagation();
+                    this.topology.autoLayoutSelected();
+                }} style={itemStyle}>
+                        测试
+                </div>
+            </div>
+        )
+    }
+
     render() {
         const {
             data, readonly, showBar, overlap,
@@ -126,6 +163,7 @@ class Flow extends React.Component<{}, FlowState> {
                         downloadImg={() => {
                             this.topology.downloadImg('global', true, '测试图片名称');
                         }}
+                        renderBoxSelectionTool={this.renderBoxSelectionTool}
                         customPostionHeight={20}
                         canConnectMultiLines={canConnectMultiLines}
                         overlap={overlap}
