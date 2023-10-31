@@ -123,11 +123,11 @@ class Flow extends React.Component<{}, FlowState> {
         return (
             <div style={wapperStyle}>
                 <div onClick={(e) => {
-                    console.log('测试')
+                    console.log('测试布局')
                     e.stopPropagation();
-                    this.topology.autoLayoutSelected();
+                    this.topology.autoLayoutForBoxSelection();
                 }} style={itemStyle}>
-                        测试
+                        测试布局
                 </div>
             </div>
         )

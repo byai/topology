@@ -5,6 +5,7 @@ import { computeCanvasPo } from '../../utils';
 import './index.less';
 
 export interface ISelectionProps {
+    ref?: any;
     xPos?: string;
     yPos?: string;
     wrapper?: HTMLDivElement;
@@ -14,7 +15,7 @@ export interface ISelectionProps {
     onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
-interface ISelectionState {
+export interface ISelectionState {
     minX: number;
     minY: number;
     width: number;
@@ -67,10 +68,11 @@ class Selection extends PureComponent<ISelectionProps, ISelectionState> {
     }
 
     render() {
-        const { visible } = this.props;
+        const { visible, ref } = this.props;
         const {
             minX, minY, width, height
         } = this.state;
+
         return (
             <div
                 className={classNames('byai-topology-selection', {
@@ -79,6 +81,7 @@ class Selection extends PureComponent<ISelectionProps, ISelectionState> {
                 style={{
                     left: `${minX}px`, top: `${minY}px`, width: `${width}px`, height: `${height}px`
                 }}
+                ref={ref}
             >
                 {this.props.toolVisible && this.props.renderTool
             && (

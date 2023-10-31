@@ -4,11 +4,13 @@ import { ITopologyData, ITopologyNode } from '../declare';
 import { getNodeSize } from '.';
 import config from '../config';
 import Graph from './Graph';
+import { ISelectionState } from '../components/selection';
 
 type SortChilren = (parent: ITopologyNode, childrenList: ITopologyNode[]) => ITopologyNode[];
 
 interface LayoutOptions {
     sortChildren?: SortChilren;
+    boxSelectionBoundary?: ISelectionState;
 }
 
 function computeLayout(data: ITopologyData, options: LayoutOptions) {
@@ -35,11 +37,21 @@ function computeLayout(data: ITopologyData, options: LayoutOptions) {
     };
     const leftOffset = containerSize.width / 2;
     const topOffset = containerSize.height / 2;
+
+    let offsetX = 0;
+    let offsetY = 0;
+    if (options?.boxSelectionBoundary) {
+        const { minX, minY, width: boxWidth, height: boxHeight } = options?.boxSelectionBoundary || {};
+        offsetX = config.canvas.width / 2 - minX - boxWidth / 2;
+        offsetY = config.canvas.height / 2 - minY - boxHeight / 2 ;
+
+    }
+
     return data.nodes.map((node) => {
         const infoPos = nodeMap.get(node.id);
         const newPosition = {
-            x: config.canvas.width / 2 + infoPos.x - leftOffset,
-            y: config.canvas.height / 2 + infoPos.y - topOffset,
+            x: config.canvas.width / 2 + infoPos.x - leftOffset - offsetX,
+            y: config.canvas.height / 2 + infoPos.y - topOffset - offsetY,
         };
         return {
             ...node,

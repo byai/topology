@@ -177,6 +177,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     hoverThreshold = this.props?.data?.nodes?.length >= 200 ? 350 : 40;
 
+    boxSelectionRef: any;
+
     constructor(props: ITopologyProps) {
         super(props);
         this.shouldAutoLayout = shouldAutoLayout(props.data.nodes);
@@ -447,16 +449,15 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return newData;
     }
 
-    // 针对选中的数据自动布局
-    autoLayoutSelected = (options?: AutoLayoutOptions) => {
+    // 针对框选中的节点自动布局
+    autoLayoutForBoxSelection = (options?: AutoLayoutOptions) => {
         const { preprocess, resultProcess } = options ?? {};
         const { data, sortChildren } = this.props;
         const newData = preprocess ? preprocess(data) : data;
-        this.resetScale();
+        // this.resetScale();
         const selectResult = {
             ...this.state.context.selectedData,
-            // TODO: 框选区域布局算法
-            nodes: computeLayout(this.state.context.selectedData, { sortChildren })
+            nodes: computeLayout(this.state.context.selectedData, { sortChildren, boxSelectionBoundary: this.boxSelectionRef?.state })
         };
 
         const newNodes = this.mergeArrays(data?.nodes, selectResult?.nodes);
@@ -1828,12 +1829,23 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                             <Provider value={context}>
                                 {this.renderNodes()}
                                 {this.renderLines()}
-                                <Selection onClick={e => {
-                                    e.stopPropagation();
-                                    this.setState({
-                                        boxSelectionInfo: null
-                                    })
-                                }} renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined} toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'} xPos={xPos} yPos={yPos} wrapper={this.$wrapper} visible={!!boxSelectionInfo} />
+                                <Selection
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        this.setState({
+                                            boxSelectionInfo: null
+                                        })
+                                    }}
+                                    ref={r => {
+                                        this.boxSelectionRef = r;
+                                    }}
+                                    renderTool={typeof this.props.renderBoxSelectionTool === 'function' ? this.props.renderBoxSelectionTool : undefined}
+                                    toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'}
+                                    xPos={xPos}
+                                    yPos={yPos}
+                                    wrapper={this.$wrapper}
+                                    visible={!!boxSelectionInfo}
+                                />
                                 {snapline !== false && <SnapLine alignmentLines={alignmentLines}/>}
                             </Provider>
                         </div>
