@@ -123,11 +123,18 @@ class Flow extends React.Component<{}, FlowState> {
         return (
             <div style={wapperStyle}>
                 <div onClick={(e) => {
-                    console.log('测试布局')
                     e.stopPropagation();
                     this.topology.autoLayoutForBoxSelection();
                 }} style={itemStyle}>
-                        测试布局
+                        测试横向布局
+                </div>
+                <div onClick={(e) => {
+                    e.stopPropagation();
+                    this.topology.autoLayoutForBoxSelection({
+                        rankDir: 'LR'
+                    });
+                }} style={itemStyle}>
+                        测试纵向布局
                 </div>
             </div>
         )

@@ -1,7 +1,7 @@
 /* eslint-disable no-debugger */
 /* eslint-disable no-param-reassign */
 import { ITopologyData, ITopologyNode } from '../declare';
-import { getNodeSize } from '.';
+import { DagreDirection, getNodeSize } from '.';
 import config from '../config';
 import Graph from './Graph';
 import { ISelectionState } from '../components/selection';
@@ -11,11 +11,14 @@ type SortChilren = (parent: ITopologyNode, childrenList: ITopologyNode[]) => ITo
 interface LayoutOptions {
     sortChildren?: SortChilren;
     boxSelectionBoundary?: ISelectionState;
+    rankDir?: DagreDirection;
 }
 
 function computeLayout(data: ITopologyData, options: LayoutOptions) {
     console.log(options);
-    const layoutGraph = new Graph();
+    const layoutGraph = new Graph({
+        rankDir: options?.rankDir
+    });
     layoutGraph.setNodeList(data.nodes.map((node) => {
         const nodeSize = getNodeSize(node.id);
         return [node.id, {

@@ -41,6 +41,7 @@ import {
     isInViewPort,
     computeMaxAndMin,
     isMatchKeyValue,
+    DagreDirection,
 } from '../../utils';
 // import layoutCalculation from '../../utils/layoutCalculation';
 import computeLayout from '../../utils/computeLayout';
@@ -53,6 +54,7 @@ import SnapLine from '../snapline';
 export interface AutoLayoutOptions {
     preprocess?: (data: ITopologyData) => ITopologyData;
     resultProcess?: (data: ITopologyData) => ITopologyData;
+    rankDir?: DagreDirection;
 }
 
 export interface ITopologyProps {
@@ -451,13 +453,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     // 针对框选中的节点自动布局
     autoLayoutForBoxSelection = (options?: AutoLayoutOptions) => {
-        const { preprocess, resultProcess } = options ?? {};
+        const { preprocess, resultProcess, rankDir } = options ?? {};
         const { data, sortChildren } = this.props;
         const newData = preprocess ? preprocess(data) : data;
         // this.resetScale();
         const selectResult = {
             ...this.state.context.selectedData,
-            nodes: computeLayout(this.state.context.selectedData, { sortChildren, boxSelectionBoundary: this.boxSelectionRef?.state })
+            nodes: computeLayout(this.state.context.selectedData, { sortChildren, rankDir, boxSelectionBoundary: this.boxSelectionRef?.state })
         };
 
         const newNodes = this.mergeArrays(data?.nodes, selectResult?.nodes);
