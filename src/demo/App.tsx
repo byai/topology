@@ -119,14 +119,14 @@ class Flow extends React.Component<{}, FlowState> {
             whiteSpace: 'nowrap',
             color: 'rgba(10, 15, 44, 0.65)',
             cursor: 'pointer',
-        }
+        };
         return (
             <div style={wapperStyle}>
                 <div onClick={(e) => {
                     e.stopPropagation();
                     this.topology.autoLayoutForBoxSelection();
                 }} style={itemStyle}>
-                        测试横向布局
+                        纵向布局
                 </div>
                 <div onClick={(e) => {
                     e.stopPropagation();
@@ -134,7 +134,7 @@ class Flow extends React.Component<{}, FlowState> {
                         rankDir: 'LR'
                     });
                 }} style={itemStyle}>
-                        测试纵向布局
+                        横向布局
                 </div>
             </div>
         )
