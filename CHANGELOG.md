@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/byai/topology/compare/v1.7.0...v1.8.0) (2023-11-07)
+
+
+### Features
+
+* add autoLayoutForBoxSelection computeLayout logic ([06cbd7f](https://github.com/byai/topology/commit/06cbd7f86a02c2dcac2195cf3f4626cecfc5b88f))
+* add selected autoLayout ([8f17c10](https://github.com/byai/topology/commit/8f17c10a67110217ce5fedefb99bbdfed5256a22))
+* compute LR layout ([4bc928b](https://github.com/byai/topology/commit/4bc928bd9a1e9055d8165d27b749c14c85a67f68))
+
+
+### Bug Fixes
+
+* update word ([4be67ec](https://github.com/byai/topology/commit/4be67ec4773d6290b3edbb8e42dbec33f28b2bec))
+
 ## [1.7.0](https://github.com/byai/topology/compare/v1.6.2...v1.7.0) (2023-10-23)
 
 
