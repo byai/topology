@@ -453,10 +453,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     // 针对框选中的节点自动布局
     autoLayoutForBoxSelection = (options?: AutoLayoutOptions) => {
-        const { preprocess, resultProcess, rankDir } = options ?? {};
+        const { rankDir } = options ?? {};
         const { data, sortChildren } = this.props;
-        const newData = preprocess ? preprocess(data) : data;
-        // this.resetScale();
         const selectResult = {
             ...this.state.context.selectedData,
             nodes: computeLayout(this.state.context.selectedData, { sortChildren, rankDir, boxSelectionBoundary: this.boxSelectionRef?.state })
@@ -464,17 +462,18 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         const newNodes = this.mergeArrays(data?.nodes, selectResult?.nodes);
         const result = {
-            ...newData,
+            ...data,
             nodes: newNodes,
         }
         this.onChange(
-            resultProcess ? resultProcess(result) : result,
+            result,
             ChangeType.LAYOUT
         );
-        // 更新框选位置
-        setTimeout(() => {
-            this.generateBoxBySelectedNode(this.state.context.selectedData.nodes);
-        }, 200)
+        // 更新框选位置，
+        // setTimeout(() => {
+        //     this.generateBoxBySelectedNode(this.state.context.selectedData.nodes);
+        // }, 200)
+        this.closeBoxSelection(); // 重新布局后立即更新框选区域位置会有延迟，先做 close 处理
     };
 
     autoLayout = (options?: AutoLayoutOptions) => {
@@ -491,6 +490,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             ChangeType.LAYOUT
         );
         this.clearSelectData(true); // refresh
+        this.closeBoxSelection();
     };
 
     listenerWheel = (event) => {
