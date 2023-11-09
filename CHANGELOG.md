@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/byai/topology/compare/v1.8.0...v1.8.1) (2023-11-09)
+
+
+### Bug Fixes
+
+* update autoLayoutForBoxSelection logic ([e9da5d9](https://github.com/byai/topology/commit/e9da5d93bf7b3967a3aefef5ac4126b7dfb2848f))
+
 ## [1.8.0](https://github.com/byai/topology/compare/v1.7.0...v1.8.0) (2023-11-07)
 
 
