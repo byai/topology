@@ -12,6 +12,22 @@ export const onlyOneRoot = (data: ITopologyData) => {
     return nodes.filter(item => !lineHashByEnd[item.id]).length === 1;
 };
 
+/**
+ * 判断是否是孤立节点
+ * @param lines
+ * @param id
+ * @returns
+ */
+export const isolatedNode = (data, id): boolean => {
+    const { lines } = data;
+    const lineHash = lines.reduce((pre, cur) => {
+        const { start, end } = cur;
+        const [parent] = start.split('-');
+        return { ...pre, [parent]: true, [end]: true };
+    }, {});
+    return !lineHash[id];
+};
+
 /** 单个父节点 */
 export const onlyOneParent = (data: ITopologyData) => {
     const { lines } = data;

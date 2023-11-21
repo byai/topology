@@ -135,6 +135,7 @@ class Line extends React.Component<ILineProps, ILineState> {
             <React.Fragment>
                 <path
                     onClick={this.handleClick}
+                    data-json={dataJson}
                     strokeWidth={config.line.triggerWidth}
                     stroke="transparent"
                     fill="none"

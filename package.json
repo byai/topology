@@ -95,6 +95,7 @@
     ]
   },
   "dependencies": {
+    "bezier-intersect": "^0.0.3",
     "classnames": "^2.2.6",
     "d3-path": "^2.0.0",
     "dagre": "^0.8.5",

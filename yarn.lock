@@ -3763,6 +3763,11 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
+bezier-intersect@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/bezier-intersect/-/bezier-intersect-0.0.3.tgz#b52fabc3146232a5fe505c8c3bc40c1a64efa4da"
+  integrity sha512-ZUv3/gz09WtqOUG2T5SABMSlERUwcxUeUdrAIZdRl6NwIgI2CoPNCEVEsKvokeQhjkXLYIGe09Una0zrXIICqQ==
+
 bfj@6.1.1:
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/bfj/-/bfj-6.1.1.tgz#05a3b7784fbd72cfa3c22e56002ef99336516c48"

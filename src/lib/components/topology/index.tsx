@@ -11,6 +11,9 @@ import NodeWrapper from '../node-wrapper';
 import Line from '../line';
 import LineText from '../line/lineText';
 import Minimap from '../minimap';
+import {
+  cubicBezierAABB
+} from 'bezier-intersect';
 
 import {
     KeyCode,
@@ -50,6 +53,7 @@ import config from '../../config';
 import './index.less';
 import Selection from '../selection';
 import SnapLine from '../snapline';
+import { isolatedNode } from '~/lib/utils/tree';
 
 export interface AutoLayoutOptions {
     preprocess?: (data: ITopologyData) => ITopologyData;
@@ -1156,13 +1160,45 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         this.clearMouseEventData();
     };
 
+    /**
+     * 遍历所有线条，生成[{ data: {origin, po}, point: [] }] 结构
+     */
+    getCurvePointsAndLineOriginMap = () => {
+        const pathElements = document.getElementsByTagName('path');
+        // 创建一个空数组来存储匹配的路径点
+        let linePointsMap = [];
+        // 遍历路径标签，筛选出 stroke-width 属性为"20"的路径
+        for (var i = 0; i < pathElements.length; i++) {
+            var path = pathElements[i];
+            if (path.getAttribute('stroke-width') === `${config.line.triggerWidth}`) {
+                const dValue = path.getAttribute('d');
+                // 获取贝塞尔曲线每个坐标点
+                const coordinates = dValue.replace(/\n/g, '').match(/\d+(?:\.\d+)?/g);
+                const formattedCoordinates = coordinates.map(coord => parseFloat(coord).toFixed(1));
+                const result = formattedCoordinates.join(',');
+
+                let dataJsonStr = path.getAttribute('data-json');
+                if (typeof dataJsonStr !== "string" || !dataJsonStr) {
+                    throw new Error("get line data-json error");
+                }
+
+                let pathPoint = {
+                    data: JSON.parse(dataJsonStr),
+                    point: [result]
+                }
+                linePointsMap.push(pathPoint);
+            }
+        }
+        return linePointsMap;
+    }
+
     handleNodeDraw = (nodeInfoList: [string, IPosition][], childPosMap?: {
         [key: string]: {
             x: number;
             y: number;
         };
     }) => {
-        const { data } = this.props;
+        const { data, lineColor } = this.props;
         const posMaps = {
             ...nodeInfoList.reduce((prev, curr) => {
                 const [nodeId, position] = curr;
@@ -1173,11 +1209,53 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             }, {}),
             ...childPosMap
         };
+
+        // 快速插入节点
+        let insertLines = [];
+        let cloneLines = [...data.lines];
+
+        const selectNodeIds = Object.keys(posMaps) || [];
+        const linePointsMap = this.getCurvePointsAndLineOriginMap();
+        console.log('linePointsMap =>', linePointsMap)
+        const dragId = selectNodeIds.length === 1 && selectNodeIds?.[0];
+        const isolated = dragId && isolatedNode(data, dragId);
+        // 拖动单个孤立节点，才会触发快捷插入逻辑
+        if (isolated) {
+            // 判断当前节点与某条线是否交集
+            const targetPos = posMaps[dragId];
+            const nodeSize = getNodeSize(dragId);
+            const minX = targetPos.x;
+            const minY = targetPos.y;
+            const maxX = targetPos.x + nodeSize.width;
+            const maxY = targetPos.y + nodeSize.height;
+
+            linePointsMap.forEach(line => {
+                const points = line.point.join(',').split(',').map(val => Number(val));
+                // 使用方法具体见：https://github.com/w8r/bezier-intersect#cubicbezieraabbax-ay-c1x-c1y-c2x-c2y-bx-by-minx-miny-maxx-maxy-resultarraynumbernumber
+                let res = cubicBezierAABB(...points, minX, minY, maxX, maxY); // return 0 || 1
+                if (res === 1) { // 相交
+                    const currentLine = line.data.origin;
+                    const sourceId = currentLine.start.split('-')?.[0];
+                    const targetId = currentLine.end;
+                    const colorMap = lineColor ? { color: lineColor[0] } : {};
+                    // 删除当前 line：currentLine， 并添加两条新的 line: sourceId => dragId；dragId => targetId;
+                    const upLine = { start: currentLine.start, end: dragId, ...colorMap };
+                    const downLine = { start: `${dragId}-0`, end: targetId, ...colorMap };
+                    cloneLines = _.differenceWith(data.lines, [currentLine], _.isEqual);
+                    insertLines = [upLine, downLine];
+                }
+            })
+        }
+
         this.onChange(
             {
                 ...data,
                 // @ts-ignore
-                nodes: data.nodes.map(item => (Object.keys(posMaps).includes(item.id) ? { ...item, position: posMaps[item.id] } : item))
+                nodes: data.nodes.map(item => (Object.keys(posMaps).includes(item.id) ? { ...item, position: posMaps[item.id] } : item)),
+                lines: [
+                    ...cloneLines,
+                    ...insertLines,
+                ]
             },
             ChangeType.LAYOUT
         );
