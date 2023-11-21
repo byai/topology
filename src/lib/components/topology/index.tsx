@@ -1192,47 +1192,36 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         return linePointsMap;
     }
 
-    handleNodeDraw = (nodeInfoList: [string, IPosition][], childPosMap?: {
-        [key: string]: {
-            x: number;
-            y: number;
-        };
-    }) => {
+    /**
+     * 拖动节点到边中间，自动连线
+     * @param dragId 当前拖动的节点
+     * @param targetPos 节点释放的位置
+     * @returns 
+     */
+    generateLinesByInsertNodeInLine = (dragId, targetPos) => {
         const { data, lineColor } = this.props;
-        const posMaps = {
-            ...nodeInfoList.reduce((prev, curr) => {
-                const [nodeId, position] = curr;
-                return {
-                    ...prev,
-                    [nodeId]: position
-                }
-            }, {}),
-            ...childPosMap
-        };
-
-        // 快速插入节点
         let insertLines = [];
         let cloneLines = [...data.lines];
 
-        const selectNodeIds = Object.keys(posMaps) || [];
         const linePointsMap = this.getCurvePointsAndLineOriginMap();
-        console.log('linePointsMap =>', linePointsMap)
-        const dragId = selectNodeIds.length === 1 && selectNodeIds?.[0];
         const isolated = dragId && isolatedNode(data, dragId);
         // 拖动单个孤立节点，才会触发快捷插入逻辑
         if (isolated) {
-            // 判断当前节点与某条线是否交集
-            const targetPos = posMaps[dragId];
             const nodeSize = getNodeSize(dragId);
             const minX = targetPos.x;
             const minY = targetPos.y;
             const maxX = targetPos.x + nodeSize.width;
             const maxY = targetPos.y + nodeSize.height;
+            // TODO: 从侧边栏拖入节点 getNodeSize 如何计算？？？,能否拖入的时候控制预览节点的宽度，topology-template-preview 如何设置节点真实宽高
+            // const maxX = targetPos.x + (nodeSize.width || 220);
+            // const maxY = targetPos.y + (nodeSize.height || 112);
 
+            console.log('nodeSize =>', minX, minY, maxX, maxY, nodeSize);
             linePointsMap.forEach(line => {
                 const points = line.point.join(',').split(',').map(val => Number(val));
                 // 使用方法具体见：https://github.com/w8r/bezier-intersect#cubicbezieraabbax-ay-c1x-c1y-c2x-c2y-bx-by-minx-miny-maxx-maxy-resultarraynumbernumber
                 let res = cubicBezierAABB(...points, minX, minY, maxX, maxY); // return 0 || 1
+                console.log('res =>', res);
                 if (res === 1) { // 相交
                     const currentLine = line.data.origin;
                     const sourceId = currentLine.start.split('-')?.[0];
@@ -1247,15 +1236,37 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             })
         }
 
+        return [...cloneLines, ...insertLines];
+    }
+
+    handleNodeDraw = (nodeInfoList: [string, IPosition][], childPosMap?: {
+        [key: string]: {
+            x: number;
+            y: number;
+        };
+    }) => {
+        const { data } = this.props;
+        const posMaps = {
+            ...nodeInfoList.reduce((prev, curr) => {
+                const [nodeId, position] = curr;
+                return {
+                    ...prev,
+                    [nodeId]: position
+                }
+            }, {}),
+            ...childPosMap
+        };
+        const selectNodeIds = Object.keys(posMaps) || [];
+        const dragId = selectNodeIds.length === 1 && selectNodeIds?.[0];
+
+        const newLines = this.generateLinesByInsertNodeInLine(dragId, posMaps[dragId]);
+
         this.onChange(
             {
                 ...data,
                 // @ts-ignore
                 nodes: data.nodes.map(item => (Object.keys(posMaps).includes(item.id) ? { ...item, position: posMaps[item.id] } : item)),
-                lines: [
-                    ...cloneLines,
-                    ...insertLines,
-                ]
+                lines: newLines,
             },
             ChangeType.LAYOUT
         );
@@ -2155,9 +2166,13 @@ export default DropTarget(
                             lines: [...props.data.lines, ...item.data.lines ]
                         }, ChangeType.ADD_NODE);
                     } else {
+                        const dragInId = item.data?.id;
+                        const newLines = component.generateLinesByInsertNodeInLine(dragInId, position);
+
                         component.onChange({
                             ...props.data,
                             nodes: [...props.data.nodes, { ...item.data, position }],
+                            lines: newLines,
                         }, ChangeType.ADD_NODE);
                     }
                     if (isOverlap(nodeProps)) {
