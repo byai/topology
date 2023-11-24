@@ -13,6 +13,10 @@ export interface ISelectionProps {
     renderTool?: () => React.ReactNode;
     toolVisible?: boolean;
     onClick?: React.MouseEventHandler<HTMLDivElement>;
+    scrollDistance?: {
+        scrollTopDistance: number;
+        scrollLeftDistance: number;
+    };
 }
 
 export interface ISelectionState {
@@ -44,7 +48,7 @@ class Selection extends PureComponent<ISelectionProps, ISelectionState> {
     }
 
     computeSize = () => {
-        const { xPos, yPos, wrapper } = this.props;
+        const { xPos, yPos, wrapper, scrollDistance = {} as any } = this.props;
         if (!xPos || !yPos || !wrapper) {
             return;
         }
@@ -54,10 +58,12 @@ class Selection extends PureComponent<ISelectionProps, ISelectionState> {
         const { x: initX, y: initY } = computeCanvasPo({ x: xPosList[0], y: yPosList[0] }, wrapper);
         const { x, y } = computeCanvasPo({ x: xPosList[1], y: yPosList[1] }, wrapper);
 
-        const minX = Math.min(initX, x);
-        const minY = Math.min(initY, y);
-        const width = Math.abs(x - initX);
-        const height = Math.abs(y - initY);
+        const { scrollLeftDistance = 0, scrollTopDistance = 0 } = scrollDistance;
+        const minX = Math.min(initX, x) - scrollLeftDistance;
+        const minY = Math.min(initY, y) - scrollTopDistance;
+
+        const width = Math.abs(x - initX) + Math.abs(scrollLeftDistance);
+        const height = Math.abs(y - initY) + Math.abs(scrollTopDistance);
 
         this.setState({
             minX,

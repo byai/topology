@@ -131,6 +131,11 @@ export interface ITopologyState {
         initY: number;
         x: number;
         y: number;
+        // 记录框选时画布滚动距离
+        initScrollLeft?: number;
+        initScrollTop?: number;
+        scrollLeft?: number;
+        scrollTop?: number;
         status?: 'drag' | 'static' | 'none';
     } | undefined;
     draggingId: string;
@@ -762,13 +767,14 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         });
     }
 
-
     handleMouseDown = (
         e: React.MouseEvent<HTMLDivElement | SVGCircleElement>
     ) => {
         if (e.button === 2) { // 检查是否右键
             this.setState({
                 boxSelectionInfo: {
+                    initScrollTop: this.$wrapper.scrollTop,
+                    initScrollLeft: this.$wrapper.scrollLeft,
                     initX: e.clientX,
                     initY: e.clientY,
                     x: e.clientX,
@@ -844,9 +850,39 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                         ...prev.boxSelectionInfo,
                         x: e.clientX,
                         y: e.clientY,
+                        scrollTop: this.$wrapper.scrollTop,
+                        scrollLeft: this.$wrapper.scrollLeft
                     }
                 }
             });
+
+            const wrapperRect = this.$wrapper.getBoundingClientRect();
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            const wrapperScrollLeft = wrapperRect.left;
+            const wrapperScrollTop = wrapperRect.top;
+
+            const scrollStep = 10;
+            console.log('handleMouseMove => mouseX, scrollLeft', mouseX, wrapperScrollLeft, mouseY, wrapperScrollTop);
+            // 检查鼠标位置是否到达画布边缘
+            if (mouseX < wrapperScrollLeft + 20) {
+                // 到达左侧边缘
+                this.$wrapper.scrollLeft = this.$wrapper.scrollLeft - scrollStep;
+                console.log('到达左侧边缘 =>');
+            } else if (mouseX > wrapperScrollLeft + wrapperRect.width - 20) {
+                // 到达右侧边缘
+                this.$wrapper.scrollLeft = this.$wrapper.scrollLeft + scrollStep;
+                console.log('到达右侧边缘 =>');
+            } else if (mouseY < wrapperScrollTop + 20) {
+                // 到达上侧边缘
+                console.log('到达上侧边缘 =>');
+                this.$wrapper.scrollTop = this.$wrapper.scrollTop - scrollStep;
+            } else if (mouseY > wrapperScrollTop + wrapperRect.height - 3) {
+                // 到达下侧边缘
+                this.$wrapper.scrollTop = this.$wrapper.scrollTop + scrollStep;
+                console.log('到达下侧边缘 =>', e.clientY, this.$wrapper.scrollTop);
+            } else {
+            }
             return;
         }
         const { activeLine } = this.state.context;
@@ -909,16 +945,26 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 initX,
                 initY,
                 x,
-                y
-            }
+                y,
+                initScrollTop,
+                initScrollLeft,
+                scrollTop,
+                scrollLeft,
+            },
+            scaleNum,
         } = this.state;
+
+        const scrollTopDistance = ((scrollTop - initScrollTop) || 0) / scaleNum;
+        const scrollLeftDistance = ((scrollLeft - initScrollLeft) || 0) / scaleNum;
+
+        console.log('getBoxPositionGroup scrollTopDistance => scrollLeftDistance', scrollTopDistance, scrollLeftDistance)
         const selectionLeftTopPosition = {
-            x: Math.min(initX, x),
-            y: Math.min(initY, y),
+            x: Math.min(initX, x) - scrollLeftDistance,
+            y: Math.min(initY, y) - scrollTopDistance,
         }
         const selectionRightBottomPosition = {
-            x: Math.max(initX, x),
-            y: Math.max(initY, y),
+            x: Math.max(initX, x) + scrollLeftDistance,
+            y: Math.max(initY, y) + scrollTopDistance,
         }
         return [selectionLeftTopPosition, selectionRightBottomPosition] as [IPosition, IPosition];
     }
@@ -1085,6 +1131,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             } else {
                 this.generateBoxByRealSelectedNodeDom(nativeNodeList);
             }
+            // console.log('nativeNodeList', nativeNodeList, nodeList);
             const lineList = getLinesFromNode(lines, nodeList);
             this.setContext({ selectedData: { nodes: nodeList, lines: lineList } }, () => {
                 const { onSelect } = this.props;
@@ -1856,6 +1903,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const xPos = boxSelectionInfo ? `${boxSelectionInfo.x},${boxSelectionInfo.initX}` : '';
         const yPos = boxSelectionInfo ? `${boxSelectionInfo.y},${boxSelectionInfo.initY}` : '';
 
+        // drag 框选操作时，窗口滚动的距离
+        const scrollTopDistance = boxSelectionInfo?.status === 'drag' ? ((boxSelectionInfo?.scrollTop - boxSelectionInfo?.initScrollTop) || 0) / scaleNum : 0;
+        const scrollLeftDistance = boxSelectionInfo?.status === 'drag' ? ((boxSelectionInfo?.scrollLeft - boxSelectionInfo?.initScrollLeft) || 0) / scaleNum : 0;
+
         const defaultChild = ({ node, ...props }) => {
             const id = node.getAttribute('id')?.split('-')?.[2];
             return (
@@ -1934,6 +1985,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                                     toolVisible={this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'static'}
                                     xPos={xPos}
                                     yPos={yPos}
+                                    scrollDistance={{
+                                        scrollLeftDistance,
+                                        scrollTopDistance,
+                                    }}
                                     wrapper={this.$wrapper}
                                     visible={!!boxSelectionInfo}
                                 />
