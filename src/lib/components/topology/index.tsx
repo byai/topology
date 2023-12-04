@@ -1250,18 +1250,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             const nodeSize = getNodeSize(dragId);
             const minX = targetPos.x;
             const minY = targetPos.y;
-            const maxX = targetPos.x + nodeSize.width;
-            const maxY = targetPos.y + nodeSize.height;
-            // TODO: 从侧边栏拖入节点 getNodeSize 如何计算？？？,能否拖入的时候控制预览节点的宽度，topology-template-preview 如何设置节点真实宽高
-            // const maxX = targetPos.x + (nodeSize.width || 220);
-            // const maxY = targetPos.y + (nodeSize.height || 112);
+            const maxX = targetPos.x + (nodeSize.width || 0);
+            const maxY = targetPos.y + (nodeSize.height || 0);
 
-            console.log('nodeSize =>', minX, minY, maxX, maxY, nodeSize);
             linePointsMap.forEach(line => {
                 const points = line.point.join(',').split(',').map(val => Number(val));
                 // 使用方法具体见：https://github.com/w8r/bezier-intersect#cubicbezieraabbax-ay-c1x-c1y-c2x-c2y-bx-by-minx-miny-maxx-maxy-resultarraynumbernumber
                 let res = cubicBezierAABB(...points, minX, minY, maxX, maxY); // return 0 || 1
-                console.log('res =>', res);
                 if (res === 1) { // 相交
                     const currentLine = line.data.origin;
                     const sourceId = currentLine.start.split('-')?.[0];
@@ -1274,6 +1269,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     insertLines = [upLine, downLine];
                 }
             })
+
         }
 
         return [...cloneLines, ...insertLines];
@@ -2215,11 +2211,17 @@ export default DropTarget(
                         }, ChangeType.ADD_NODE);
                     } else {
                         const dragInId = item.data?.id;
-                        const newLines = component.generateLinesByInsertNodeInLine(dragInId, position);
-
+                        const newNodes = [...props.data.nodes, { ...item.data, position }];
+                        // 优先设置 newNodes，目的是 generateLinesByInsertNodeInLine 函数中能够获取到当前拖入节点的 nodeSize
                         component.onChange({
                             ...props.data,
-                            nodes: [...props.data.nodes, { ...item.data, position }],
+                            nodes: newNodes,
+                        }, ChangeType.ADD_NODE);
+
+                        const newLines = component.generateLinesByInsertNodeInLine(dragInId, position);
+                        component.onChange({
+                            ...props.data,
+                            nodes: newNodes,
                             lines: newLines,
                         }, ChangeType.ADD_NODE);
                     }
