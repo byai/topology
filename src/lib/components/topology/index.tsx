@@ -863,24 +863,19 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             const wrapperScrollTop = wrapperRect.top;
 
             const scrollStep = 10;
-            console.log('handleMouseMove => mouseX, scrollLeft', mouseX, wrapperScrollLeft, mouseY, wrapperScrollTop);
             // 检查鼠标位置是否到达画布边缘
             if (mouseX < wrapperScrollLeft + 20) {
                 // 到达左侧边缘
                 this.$wrapper.scrollLeft = this.$wrapper.scrollLeft - scrollStep;
-                console.log('到达左侧边缘 =>');
             } else if (mouseX > wrapperScrollLeft + wrapperRect.width - 20) {
                 // 到达右侧边缘
                 this.$wrapper.scrollLeft = this.$wrapper.scrollLeft + scrollStep;
-                console.log('到达右侧边缘 =>');
             } else if (mouseY < wrapperScrollTop + 20) {
                 // 到达上侧边缘
-                console.log('到达上侧边缘 =>');
                 this.$wrapper.scrollTop = this.$wrapper.scrollTop - scrollStep;
             } else if (mouseY > wrapperScrollTop + wrapperRect.height - 3) {
                 // 到达下侧边缘
                 this.$wrapper.scrollTop = this.$wrapper.scrollTop + scrollStep;
-                console.log('到达下侧边缘 =>', e.clientY, this.$wrapper.scrollTop);
             } else {
             }
             return;
@@ -957,7 +952,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const scrollTopDistance = ((scrollTop - initScrollTop) || 0) / scaleNum;
         const scrollLeftDistance = ((scrollLeft - initScrollLeft) || 0) / scaleNum;
 
-        console.log('getBoxPositionGroup scrollTopDistance => scrollLeftDistance', scrollTopDistance, scrollLeftDistance)
         const selectionLeftTopPosition = {
             x: Math.min(initX, x) - scrollLeftDistance,
             y: Math.min(initY, y) - scrollTopDistance,
@@ -1131,7 +1125,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             } else {
                 this.generateBoxByRealSelectedNodeDom(nativeNodeList);
             }
-            // console.log('nativeNodeList', nativeNodeList, nodeList);
             const lineList = getLinesFromNode(lines, nodeList);
             this.setContext({ selectedData: { nodes: nodeList, lines: lineList } }, () => {
                 const { onSelect } = this.props;
@@ -1243,7 +1236,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
      * 拖动节点到边中间，自动连线
      * @param dragId 当前拖动的节点
      * @param targetPos 节点释放的位置
-     * @returns 
+     * @returns
      */
     generateLinesByInsertNodeInLine = (dragId, targetPos) => {
         const { data, lineColor } = this.props;
