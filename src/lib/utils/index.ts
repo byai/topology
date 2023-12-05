@@ -187,6 +187,21 @@ export const computeAnchorPo = (anchor: string, parentNode: ITopologyNode) => {
     return po;
 };
 
+// 锚点始终位于节点底部
+export const computeAnchorPoWithNodeBottom = (parentNode: ITopologyNode) => {
+    const parentSize = getNodeSize(parentNode.id);
+    const parentPosition = parentNode.position || { x: 0, y: 0 };
+    const po = {
+        x: parentPosition.x + parentSize.width / 2,
+        y: parentPosition.y + parentSize.height,
+    };
+    if (Number.isNaN(po.x) || Number.isNaN(po.y)) {
+        return null;
+    }
+
+    return po;
+};
+
 export const computeMaxAndMin = (nodes: ITopologyNode[]) => {
     // @ts-ignore
     if (!nodes.length || nodes.find(item => !item.position || [item.position.x, item.position.y].includes(undefined))) {

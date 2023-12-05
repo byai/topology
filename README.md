@@ -87,6 +87,12 @@ http://localhost:3000
             <td>保持所有线条起始点与 startPointAnchorId 线条一致</td>
         </tr>
         <tr>
+            <td>anchorPlacement</td>
+            <td>string</td>
+            <td></td>
+            <td>锚点位置，若值为 bottom，则位于锚点的父节点底部</td>
+        </tr>
+        <tr>
             <td>lineTextMap</td>
             <td>object</td>
             <td>{}</td>

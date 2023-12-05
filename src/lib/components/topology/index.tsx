@@ -45,6 +45,7 @@ import {
     computeMaxAndMin,
     isMatchKeyValue,
     DagreDirection,
+    computeAnchorPoWithNodeBottom,
 } from '../../utils';
 // import layoutCalculation from '../../utils/layoutCalculation';
 import computeLayout from '../../utils/computeLayout';
@@ -95,6 +96,7 @@ export interface ITopologyProps {
     }; // 线条上文字颜色映射对象 eg: {'锚点1': '#82BEFF', '锚点2': '#FFA39E'}
     lineOffsetY?: number; // 线条起始点向上偏移量
     startPointAnchorId?: string; // 保持所有线条起始点与 startPointAnchorId 线条一致
+    anchorPlacement?: string; // 锚点位置
     lineTextMap?: {
         [x: string]: string; // 线条上文字与 anchorId 映射对象 eg: {'anchorId1': '锚点1', 'anchorId2': '锚点2'}
     };
@@ -1422,6 +1424,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const {
             data: { lines, nodes },
             startPointAnchorId,
+            anchorPlacement,
             lineTextMap,
             lineOffsetY,
             readOnly,
@@ -1458,12 +1461,20 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                 return activeLine.start;
             }
 
-            // 这里特殊处理下，目的是保持所有锚点的起始点位置与 startPointAnchorId 锚点位置一致
-            return computeAnchorPo(
-                // `dom-map-${line.start}`,
-                `dom-map-${startPointAnchorId === undefined ? line.start : `${line.start.split("-")[0]}-${startPointAnchorId}`}`,
-                nodeHash[line.start.split("-")[0]]
-            );
+            if (anchorPlacement === 'bottom') {
+                return computeAnchorPoWithNodeBottom(
+                    nodeHash[line.start.split("-")[0]]
+                );
+            } else {
+                // 这里特殊处理下，目的是保持所有锚点的起始点位置与 startPointAnchorId 锚点位置一致
+                return computeAnchorPo(
+                    `dom-map-${line.start}`,
+                    // `dom-map-${startPointAnchorId === undefined ? line.start : `${line.start.split("-")[0]}-${startPointAnchorId}`}`,
+                    nodeHash[line.start.split("-")[0]]
+                );
+            }
+
+
         };
         const getLineEndPo = (line: ITopologyLine) => {
             if (isEditing(line) && activeLine.type === LineEditType.EDIT_END) {
