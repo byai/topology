@@ -1204,7 +1204,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
      * 遍历所有线条，生成[{ data: {origin, po}, point: [] }] 结构
      */
     getCurvePointsAndLineOriginMap = () => {
-        const pathElements = document.getElementsByTagName('path');
+        const pathElements = document.querySelectorAll('svg.topology-svg path');
         // 创建一个空数组来存储匹配的路径点
         let linePointsMap = [];
         // 遍历路径标签，筛选出 stroke-width 属性为"20"的路径
