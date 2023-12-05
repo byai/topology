@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/byai/topology/compare/v1.8.1...v1.9.0) (2023-12-05)
+
+
+### Features
+
+* add allowNodeInsertOnEdge ([7d8a1f6](https://github.com/byai/topology/commit/7d8a1f6d731be086181ba0d7d20929aa9f11bde6))
+* add anchorPlacement ([1032c28](https://github.com/byai/topology/commit/1032c28f66e044171b3d3160c68a0600d4158849))
+* add insert-node-in-line ([26ffd62](https://github.com/byai/topology/commit/26ffd626e9926e4060c450f8de4ed9d8c8f0831f))
+* auto Scroll when selectBox on edge of graph ([9f4ad44](https://github.com/byai/topology/commit/9f4ad449c1a95d9bdfa981b288e334655de79754))
+* delete log ([c65304b](https://github.com/byai/topology/commit/c65304b57603bfd1b6c6c509cd270c0a6bd63e3b))
+* extract generateLinesByInsertNodeInLine functions ([b78bd7f](https://github.com/byai/topology/commit/b78bd7f1a12b159d34874030f545d0f04b655bb7))
+* update onChange ([0e2dbf5](https://github.com/byai/topology/commit/0e2dbf5b20f0b5ca580d01ce5f757ea91ada6a23))
+
+
+### Bug Fixes
+
+* querySelectorAll topology-svg path ([7bb02d7](https://github.com/byai/topology/commit/7bb02d78776645b5fd59bd43df01b566d70edf58))
+
 ### [1.8.1](https://github.com/byai/topology/compare/v1.8.0...v1.8.1) (2023-11-09)
 
 
