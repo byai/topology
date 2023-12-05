@@ -54,7 +54,7 @@ import config from '../../config';
 import './index.less';
 import Selection from '../selection';
 import SnapLine from '../snapline';
-import { isolatedNode } from '~/lib/utils/tree';
+import { isolatedNode } from '../../utils/tree';
 
 export interface AutoLayoutOptions {
     preprocess?: (data: ITopologyData) => ITopologyData;
