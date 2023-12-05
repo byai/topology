@@ -141,6 +141,12 @@ http://localhost:3000
             <td>是否显示小地图</td>
         </tr>
         <tr>
+            <td>allowNodeInsertOnEdge</td>
+            <td>boolean</td>
+            <td></td>
+            <td>是否开启拖拽节点到线中间进行节点插入</td>
+        </tr>
+        <tr>
             <td>canConnectMultiLines</td>
             <td>bool</td>
             <td>false</td>

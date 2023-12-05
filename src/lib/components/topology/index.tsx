@@ -72,6 +72,7 @@ export interface ITopologyProps {
     showDownload?: boolean; // 是否显示工具栏中的下载图片
     showMinimap?: boolean; // 是否显示小地图
     downloadImg?: (scopeType?: 'global' | 'selected', download?: boolean, name?: string) => void;
+    allowNodeInsertOnEdge?: boolean; // 是否开启拖拽节点到线中间进行节点插入
     canConnectMultiLines?: boolean; // 控制一个锚点是否可以连接多条线
     overlap?: boolean; // 是否允许节点覆盖，默认允许，设置 true 时不允许
     overlapCallback?: () => void; // overlap 回调
@@ -1241,14 +1242,14 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
      * @returns
      */
     generateLinesByInsertNodeInLine = (dragId, targetPos) => {
-        const { data, lineColor } = this.props;
+        const { data, lineColor, allowNodeInsertOnEdge = false } = this.props;
         let insertLines = [];
         let cloneLines = [...data.lines];
 
         const linePointsMap = this.getCurvePointsAndLineOriginMap();
         const isolated = dragId && isolatedNode(data, dragId);
         // 拖动单个孤立节点，才会触发快捷插入逻辑
-        if (isolated) {
+        if (allowNodeInsertOnEdge && isolated) {
             const nodeSize = getNodeSize(dragId);
             const minX = targetPos.x;
             const minY = targetPos.y;
