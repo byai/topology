@@ -93,6 +93,12 @@ http://localhost:3000
             <td>锚点位置，若值为 bottom，则位于锚点的父节点底部</td>
         </tr>
         <tr>
+            <td>selectionAutoScroll</td>
+            <td>boolean</td>
+            <td>false</td>
+            <td>是否开启框选至边缘时画布自动滚动</td>
+        </tr>
+        <tr>
             <td>lineTextMap</td>
             <td>object</td>
             <td>{}</td>

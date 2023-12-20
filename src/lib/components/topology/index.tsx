@@ -98,6 +98,7 @@ export interface ITopologyProps {
     lineOffsetY?: number; // 线条起始点向上偏移量
     startPointAnchorId?: string; // 保持所有线条起始点与 startPointAnchorId 线条一致
     anchorPlacement?: string; // 锚点位置
+    selectionAutoScroll?: boolean; // 是否开启框选至边缘时画布自动滚动
     lineTextMap?: {
         [x: string]: string; // 线条上文字与 anchorId 映射对象 eg: {'anchorId1': '锚点1', 'anchorId2': '锚点2'}
     };
@@ -848,6 +849,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     };
 
     handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const { selectionAutoScroll = false } = this.props;
         e.persist();
         if (!!this.state.boxSelectionInfo && this.state.boxSelectionInfo.status === 'drag') {
             this.setState((prev) => {
@@ -861,7 +863,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     }
                 }
             });
-
+            if(!selectionAutoScroll) return;
             const wrapperRect = this.$wrapper.getBoundingClientRect();
             const mouseX = e.clientX;
             const mouseY = e.clientY;
