@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.2](https://github.com/byai/topology/compare/v1.9.1...v1.9.2) (2023-12-20)
+
+
+### Bug Fixes
+
+* update triggering time selection operation ([d368edd](https://github.com/byai/topology/commit/d368eddc26df61ad6b22e39f71bceb66d15e6254))
+
 ### [1.9.1](https://github.com/byai/topology/compare/v1.9.0...v1.9.1) (2023-12-05)
 
 
