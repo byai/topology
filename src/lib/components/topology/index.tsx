@@ -773,7 +773,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     handleMouseDown = (
         e: React.MouseEvent<HTMLDivElement | SVGCircleElement>
     ) => {
-        if (e.button === 2) { // 检查是否右键
+        /**
+         * 不在节点上时方可触发框选
+         */
+        if (e.button === 2 && !this.isEmitByNodeWrapper(e)) { // 检查是否右键
             this.setState({
                 boxSelectionInfo: {
                     initScrollTop: this.$wrapper.scrollTop,
@@ -1072,6 +1075,17 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         }
     }
 
+    isEmitByNodeWrapper = (e) => {
+        let target = e.target as HTMLElement;
+        while(target.className !== e.currentTarget.className && target !== document.body) {
+            if (target.className.indexOf('topology-node-content') > -1) {
+                return true;
+            }
+            target = target.parentElement;
+        }
+        return false;
+    }
+
     handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
         const {
             data: { lines },
@@ -1085,19 +1099,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         const shouldOpenContextMenuFlag = this.couldDispatchContextMenuEvent(e);
         const isMultiClick = e.ctrlKey || e.metaKey || e.shiftKey;
         const isDragBox = boxSelectionInfo && boxSelectionInfo.status === 'drag' && !shouldOpenContextMenuFlag;
-        const isEmitByNodeWrapper = () => {
-        let target = e.target as HTMLElement;
-            while(target.className !== e.currentTarget.className && target !== document.body) {
-                if (target.className.indexOf('topology-node-content') > -1) {
-                    return true;
-                }
-                target = target.parentElement;
-            }
-            return false;
-        }
 
         // 允许打开右键菜单
-        if (shouldOpenContextMenuFlag && !isEmitByNodeWrapper()) {
+        if (shouldOpenContextMenuFlag && !this.isEmitByNodeWrapper(e)) {
             const mouseEvent = new MouseEvent('contextmenu', {
                 bubbles: true,
                 cancelable: true,
