@@ -2113,8 +2113,12 @@ const hover = (props: ITopologyProps, monitor, component: Topology) => {
                     }
                 }
             })
+            // 选中多个节点
+            const isSelectMultipleNode = context.selectedData.nodes.length > 1;
 
-            component.setAlignmentLines(newAlignmentLines)
+            if (!isSelectMultipleNode) {
+                component.setAlignmentLines(newAlignmentLines)
+            }
 
             component.setContext({
                 dragging: true,
