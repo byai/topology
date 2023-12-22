@@ -188,7 +188,11 @@ export const computeAnchorPo = (anchor: string, parentNode: ITopologyNode) => {
 };
 
 // 锚点始终位于节点底部
-export const computeAnchorPoWithNodeBottom = (parentNode: ITopologyNode) => {
+export const computeAnchorPoWithNodeBottom = (anchor: string, parentNode: ITopologyNode) => {
+    const $anchor = document.getElementById(anchor);
+    if (!$anchor) {
+        return null;
+    }
     const parentSize = getNodeSize(parentNode.id);
     const parentPosition = parentNode.position || { x: 0, y: 0 };
     const po = {

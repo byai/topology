@@ -1470,6 +1470,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
             if (anchorPlacement === 'bottom') {
                 return computeAnchorPoWithNodeBottom(
+                    `dom-map-${line.start}`,
                     nodeHash[line.start.split("-")[0]]
                 );
             } else {
