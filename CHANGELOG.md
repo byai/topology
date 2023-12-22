@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.6](https://github.com/byai/topology/compare/v1.9.5...v1.9.6) (2023-12-22)
+
+
+### Bug Fixes
+
+* fix computeAnchorPoWithNodeBottom ([ce00270](https://github.com/byai/topology/commit/ce0027008230ef80f75cd319581e77b73ac5b0e6))
+
 ### [1.9.5](https://github.com/byai/topology/compare/v1.9.4...v1.9.5) (2023-12-22)
 
 
