@@ -49,11 +49,6 @@ module.exports = {
         "react/prefer-stateless-function": 0,
         "jsx-a11y/click-events-have-key-events": 0,
         "jsx-a11y/no-static-element-interactions": 0,
-        "no-use-before-define": ["error", { functions: false }],
-        "@typescript-eslint/no-use-before-define": [
-            "error",
-            { functions: false }
-        ],
         "react/jsx-filename-extension": [1, { extensions: [".ts", ".tsx"] }],
         "@typescript-eslint/no-empty-interface": 0,
         "@typescript-eslint/interface-name-prefix": 0,
