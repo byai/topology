@@ -619,7 +619,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     deleteItem = () => {
         const { data } = this.props;
-        const { selectedData } = this.state.context;
+        const { selectedData, selectedData: { nodes, lines } } = this.state.context;
+        if (nodes?.length === 0 && lines?.length === 0) return;
         this.onChange(
             deleteSelectedData(data, selectedData),
             ChangeType.DELETE
@@ -1079,8 +1080,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     isEmitByNodeWrapper = (e) => {
         let target = e.target as HTMLElement;
-        while(target.className !== e.currentTarget.className && target !== document.body) {
-            if (target.className.indexOf('topology-node-content') > -1) {
+        while(target?.className !== e?.currentTarget?.className && target !== document.body) {
+            if (target?.className?.indexOf('topology-node-content') > -1) {
                 return true;
             }
             target = target.parentElement;
