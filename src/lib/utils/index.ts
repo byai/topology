@@ -71,9 +71,8 @@ export const multiComputeCanvasPo = (positionList: IPosition[], $wrapper: HTMLDi
     });
 };
 
-
 /** 计算连接线路径 */
-export const computeLinePath = (start: IPosition, end: IPosition, lineOffsetY: number = 0)/* istanbul ignore next */ => {
+export const computeLinePath = (start: IPosition, end: IPosition, lineOffsetY = 0)/* istanbul ignore next */ => {
     // const svgPath = path();
     // // 直线绘制方式（代码暂时保留）
     // const distance = Math.abs(start.y - end.y) * 0.5 + start.y;
@@ -306,7 +305,6 @@ export const computeContentCenter = (nodes: ITopologyNode[]) => {
     };
 };
 
-
 /**
  * 滚动 Y 轴距离顶部距离
  */
@@ -359,7 +357,6 @@ export const createHashFromObjectArray = (arr: object[], field: string | GetFiel
     },
     {},
 );
-
 
 /**
  * 判断对象是否存在一组 matchKey: matchValue

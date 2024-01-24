@@ -109,7 +109,6 @@ const selectNodes: SelectNodesFunc = ({ data, selectedData }) => {
             return { nodes: [node], lines: [] };
         }
 
-
         const currWillSelectNodeList = getCombineNodes(data, node.combineId); // 当前节点的合并节点
         const hasCombineNode = currWillSelectNodeList.length > 0;
         if (!hasCombineNode) {

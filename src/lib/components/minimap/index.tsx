@@ -75,6 +75,7 @@ class Minimap extends React.Component<any, any> {
         window.removeEventListener('resize', this.resize);
     }
 
+    // eslint-disable-next-line react/no-deprecated
     componentWillReceiveProps(nextProps) {
         if (nextProps.keepAspectRatio !== this.props.keepAspectRatio) {
             setTimeout(this.synchronize);

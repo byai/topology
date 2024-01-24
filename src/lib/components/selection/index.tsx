@@ -48,7 +48,9 @@ class Selection extends PureComponent<ISelectionProps, ISelectionState> {
     }
 
     computeSize = () => {
-        const { xPos, yPos, wrapper, scrollDistance = {} as any } = this.props;
+        const {
+            xPos, yPos, wrapper, scrollDistance = {} as any
+        } = this.props;
         if (!xPos || !yPos || !wrapper) {
             return;
         }
@@ -105,8 +107,7 @@ class Selection extends PureComponent<ISelectionProps, ISelectionState> {
                 >
                     {this.props.renderTool()}
                 </div>
-            )
-                }
+            )}
             </div>
         );
     }

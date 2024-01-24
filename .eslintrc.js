@@ -1,35 +1,35 @@
 module.exports = {
     env: {
         browser: true,
-        es6: true
+        es6: true,
     },
     settings: {
         "import/extensions": [".ts", ".tsx"],
         "import/resolver": {
-            typescript: {}
+            typescript: {},
         },
         "import/parsers": {
-            "@typescript-eslint/parser": [".ts", ".tsx"]
-        }
+            "@typescript-eslint/parser": [".ts", ".tsx"],
+        },
     },
     parser: "@typescript-eslint/parser",
     extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:jsx-a11y/recommended",
-        "airbnb"
+        "airbnb",
     ],
     globals: {
         Atomics: "readonly",
-        SharedArrayBuffer: "readonly"
+        SharedArrayBuffer: "readonly",
     },
     parserOptions: {
         ecmaFeatures: {
-            jsx: true
+            jsx: true,
         },
         ecmaVersion: 2018,
         sourceType: "module",
-        errorOnTypeScriptSyntaticAndSemanticIssues: false
+        errorOnTypeScriptSyntaticAndSemanticIssues: false,
     },
     plugins: ["react", "import", "jsx-a11y", "@typescript-eslint"],
     rules: {
@@ -47,9 +47,21 @@ module.exports = {
         "react/no-did-update-set-state": 0,
         "react/jsx-indent-props": ["error", 4],
         "react/prefer-stateless-function": 0,
+        "react/jsx-props-no-spreading": 0,
+        "react/static-property-placement": 0,
         "jsx-a11y/click-events-have-key-events": 0,
         "jsx-a11y/no-static-element-interactions": 0,
+        "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/ban-types": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "no-use-before-define": "off",
+        "no-shadow": "off",
+        "no-mixed-operators": 0,
+        "no-undef": 0,
+        "no-console": "off",
         "react/jsx-filename-extension": [1, { extensions: [".ts", ".tsx"] }],
+        "react/state-in-constructor": 0,
         "@typescript-eslint/no-empty-interface": 0,
         "@typescript-eslint/interface-name-prefix": 0,
         "@typescript-eslint/explicit-function-return-type": 0,
@@ -58,7 +70,7 @@ module.exports = {
         "@typescript-eslint/no-object-literal-type-assertion": 0,
         "@typescript-eslint/no-unused-vars": [
             "error",
-            { vars: "all", args: "after-used", ignoreRestSiblings: true }
+            { vars: "all", args: "after-used", ignoreRestSiblings: true },
         ],
         quotes: 0,
         "comma-dangle": "off",
@@ -66,10 +78,10 @@ module.exports = {
         "react/destructuring-assignment": [
             "warn",
             "always",
-            { ignoreClassFields: true }
+            { ignoreClassFields: true },
         ],
         "react/require-default-props": [0],
         "react/destructuring-assignment": [0],
         "react/no-unused-prop-types": [0],
-    }
+    },
 };

@@ -57,9 +57,9 @@ export interface INodeWrapperProps {
 
 class NodeWrapper extends React.Component<INodeWrapperProps> {
     /** 锚点自增id */
-    private increaseAnchorId: number = 0;
+    private increaseAnchorId = 0;
 
-    private updateNumber: number = 0;
+    private updateNumber = 0;
 
     shouldComponentUpdate(nextprops) {
         const { data: nextData, context: { selectedData: nextSelectedData, impactNode: nextImpactNode }, isReduceRender } = nextprops;

@@ -44,10 +44,11 @@ function computeLayout(data: ITopologyData, options: LayoutOptions) {
     let offsetX = 0;
     let offsetY = 0;
     if (options?.boxSelectionBoundary) {
-        const { minX, minY, width: boxWidth, height: boxHeight } = options?.boxSelectionBoundary || {};
+        const {
+            minX, minY, width: boxWidth, height: boxHeight
+        } = options?.boxSelectionBoundary || {};
         offsetX = config.canvas.width / 2 - minX - boxWidth / 2;
-        offsetY = config.canvas.height / 2 - minY - boxHeight / 2 ;
-
+        offsetY = config.canvas.height / 2 - minY - boxHeight / 2;
     }
 
     return data.nodes.map((node) => {

@@ -15,7 +15,6 @@ import { computeLinePath, computeTrianglePath } from '../../utils';
 import config from '../../config';
 import './index.less';
 
-
 const Colors = { ACTIVE: '#1F8CEC', NORMAL: '#AAB7C4' };
 
 interface ILineProps {
@@ -132,7 +131,7 @@ class Line extends React.Component<ILineProps, ILineState> {
         const lColor = highLight || selected || hover || curLinking ? Colors.ACTIVE : ((data && data.color) || Colors.NORMAL);
         const transition = linking ? 'none' : config.transition;
         return (
-            <React.Fragment>
+            <>
                 <path
                     onClick={this.handleClick}
                     data-json={dataJson}
@@ -165,7 +164,7 @@ class Line extends React.Component<ILineProps, ILineState> {
                     onMouseEnter={this.handleMouseEnter}
                     onMouseLeave={this.handleMouseLeave}
                 />
-            </React.Fragment>
+            </>
         );
     }
 }

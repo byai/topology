@@ -122,22 +122,28 @@ class Flow extends React.Component<{}, FlowState> {
         };
         return (
             <div style={wapperStyle}>
-                <div onClick={(e) => {
-                    e.stopPropagation();
-                    this.topology.autoLayoutForBoxSelection();
-                }} style={itemStyle}>
-                        纵向布局
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        this.topology.autoLayoutForBoxSelection();
+                    }}
+                    style={itemStyle}
+                >
+                    纵向布局
                 </div>
-                <div onClick={(e) => {
-                    e.stopPropagation();
-                    this.topology.autoLayoutForBoxSelection({
-                        rankDir: 'LR'
-                    });
-                }} style={itemStyle}>
-                        横向布局
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        this.topology.autoLayoutForBoxSelection({
+                            rankDir: 'LR'
+                        });
+                    }}
+                    style={itemStyle}
+                >
+                    横向布局
                 </div>
             </div>
-        )
+        );
     }
 
     render() {
