@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.7](https://github.com/byai/topology/compare/v1.9.6...v1.9.7) (2024-01-25)
+
+
+### Bug Fixes
+
+* lint fix ([9d9704c](https://github.com/byai/topology/commit/9d9704c8e41a2bf4deffac68994bf54c73692257))
+* optimization problem fixes ([80f8819](https://github.com/byai/topology/commit/80f881956abefe80790ab9f3d4bdeadbf11d50d2))
+* optimize lint ([ee201e2](https://github.com/byai/topology/commit/ee201e263fdf8ba474a2c70176676c6d1cc25f70))
+
 ### [1.9.6](https://github.com/byai/topology/compare/v1.9.5...v1.9.6) (2023-12-22)
 
 

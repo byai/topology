@@ -1,6 +1,6 @@
 {
   "name": "@byai/topology",
-  "version": "1.9.6",
+  "version": "1.9.7",
   "description": "拓扑图组件",
   "bugs": {
     "url": "https://github.com/byai/topology/issues"
