@@ -213,8 +213,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         } = this.props;
         this.editLine = _.throttle(this.editLine, this.hoverThreshold);
         if (!readOnly) {
-            this.initDomEvents();
+            this.initKeydownEvent();
         }
+        this.initWheelEvent();
 
         //  $wrapper 赋值
         // this.$wrapper = document.querySelector('.minimap-container-scroll');
@@ -264,10 +265,10 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         this.renderDomMap(nextProps);
         this.shouldAutoLayout = shouldAutoLayout(nextProps.data.nodes);
         if (readOnly && !nextReadOnly) {
-            this.initDomEvents();
+            this.initKeydownEvent();
         }
         if (!readOnly && nextReadOnly) {
-            this.removeDomEvents();
+            this.removeKeydownEvent();
         }
     }
 
@@ -285,7 +286,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             this.editLine.cancel();
         }
 
-        this.removeDomEvents();
+        this.removeKeydownEvent();
+        this.removeWheelEvent();
     }
 
     onChange = (data: ITopologyData, type: ChangeType) => {
@@ -532,15 +534,21 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         }
     }
 
-    initDomEvents = () => {
+    initKeydownEvent = () => {
         window.addEventListener("keydown", this.handleKeydown);
-        this.$wrapper.addEventListener("wheel", this.listenerWheel);
-    };
+    }
 
-    removeDomEvents = () => {
+    removeKeydownEvent = () => {
         window.removeEventListener("keydown", this.handleKeydown);
+    }
+
+    initWheelEvent = () => {
+        this.$wrapper.addEventListener("wheel", this.listenerWheel);
+    }
+
+    removeWheelEvent = () => {
         this.$wrapper.removeEventListener("wheel", this.listenerWheel);
-    };
+    }
 
     getBoundary = (elements: Element[]) => {
         let minX = Infinity;
