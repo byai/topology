@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.8](https://github.com/byai/topology/compare/v1.9.7...v1.9.8) (2024-02-01)
+
+
+### Features
+
+* update event listening ([fc6f21e](https://github.com/byai/topology/commit/fc6f21edbf1706ec21d31d9b6d9466b67a095f83))
+
 ### [1.9.7](https://github.com/byai/topology/compare/v1.9.6...v1.9.7) (2024-01-25)
 
 
