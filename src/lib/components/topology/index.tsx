@@ -783,6 +783,14 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     handleMouseDown = (
         e: React.MouseEvent<HTMLDivElement | SVGCircleElement>
     ) => {
+        const { boxSelectionInfo } = this.state
+        /**
+         * 框选时鼠标如果移出容器后触发mouseUp，重新移回容器首次mouseDown不执行操作，之后自动触发mouseUp，完成框选
+         */
+        if (boxSelectionInfo?.status === 'drag') {
+            return
+        }
+
         /**
          * 不在节点上时方可触发框选
          */
@@ -1186,6 +1194,13 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     };
 
     clearMouseEventData = () => {
+        const { boxSelectionInfo } = this.state
+        /**
+         * 框选时鼠标如果移出容器不清除数据
+         */
+        if (boxSelectionInfo?.status === 'drag') {
+            return
+        }
         this.dragCanvasPo = null;
         this.setContext({ activeLine: null, linking: false, impactNode: null });
     };
