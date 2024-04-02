@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/byai/topology/compare/v1.9.8...v1.10.0) (2024-04-02)
+
+
+### Bug Fixes
+
+* 框选时鼠标移出容器 ([9ba00ce](https://github.com/byai/topology/commit/9ba00cea93133b2a270036cd95645ad7b8f90947))
+
 ### [1.9.8](https://github.com/byai/topology/compare/v1.9.7...v1.9.8) (2024-02-01)
 
 
