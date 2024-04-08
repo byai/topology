@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/byai/topology/compare/v1.11.1...v1.12.0) (2024-04-08)
+
+
+### Bug Fixes
+
+* 框选优化 ([a67131f](https://github.com/byai/topology/commit/a67131f5ae3e888725ca2c4ed4c70dabc40cc532))
+
 ### [1.11.1](https://github.com/byai/topology/compare/v1.11.0...v1.11.1) (2024-04-02)
 
 
