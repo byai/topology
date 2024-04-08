@@ -1342,14 +1342,15 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     };
 
     handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        const { boxSelectionInfo } = this.state;
         // @ts-ignore
         const { className } = e.target;
         if (
             typeof className === "string"
             && className.includes("topology-canvas")
         ) {
-            // 当按住cmd或者ctrl的时候，左键点击背景图层的时候，不会清楚选中的数据。
-            if (e.ctrlKey || e.metaKey) {
+            // 当按住cmd或者ctrl的时候，左键点击背景图层的时候，不会清除选中的数据。
+            if (e.ctrlKey || e.metaKey || !!boxSelectionInfo) {
                 return;
             }
             this.clearSelectData();
