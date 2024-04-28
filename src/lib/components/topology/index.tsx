@@ -1097,7 +1097,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     isEmitByNodeWrapper = (e) => {
         let target = e.target as HTMLElement;
         while(target?.className !== e?.currentTarget?.className && target !== document.body) {
-            if (target?.className?.indexOf('topology-node-content') > -1) {
+            /** 在连线上鼠标右键，SVG的className属性返回的是一个SVGAnimatedString对象，不是字符串*/
+            if (typeof(target.className) === 'string' && target.className.indexOf('topology-node-content') > -1) {
                 return true;
             }
             target = target.parentElement;
@@ -1967,6 +1968,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     childComponent={renderMinimapChild ? renderMinimapChild : defaultChild}
                     visible={Boolean(showMinimap)}
                 >
+                    123
                     <div
                         ref={r => {
                             this.$wrapper = r;
