@@ -1968,7 +1968,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                     childComponent={renderMinimapChild ? renderMinimapChild : defaultChild}
                     visible={Boolean(showMinimap)}
                 >
-                    123
                     <div
                         ref={r => {
                             this.$wrapper = r;
