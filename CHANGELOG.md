@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.13.0](https://github.com/byai/topology/compare/v1.12.0...v1.13.0) (2024-04-28)
+
+
+### Features
+
+* 移除logo ([a5f9c0a](https://github.com/byai/topology/commit/a5f9c0a784b9eb3f3a46b27158ddf9b2e1b5ffd5))
+
+
+### Bug Fixes
+
+* 报错处理t.className.indexOf ([b65c36d](https://github.com/byai/topology/commit/b65c36dda5934204c4129ffcd7c22597cd3817af))
+
 ## [1.12.0](https://github.com/byai/topology/compare/v1.11.1...v1.12.0) (2024-04-08)
 
 
