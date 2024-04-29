@@ -248,6 +248,11 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             this.defaultScaleNum = this.scaleNum;
             return { scaleNum };
         });
+        this.$topology.addEventListener('click', this.handleContainerClick.bind(this), true);
+    }
+
+    handleContainerClick() {
+        this.setContext({ curClickNodeId: null })
     }
 
     getAutoClearSelectedFn() {
@@ -288,6 +293,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         this.removeKeydownEvent();
         this.removeWheelEvent();
+        this.$topology.removeEventListener('click', this.handleContainerClick.bind(this), true);
     }
 
     onChange = (data: ITopologyData, type: ChangeType) => {
@@ -691,6 +697,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         this.setContext(
             {
                 selectedData: selectData,
+                curClickNodeId: node.id
             },
             () => {
                 if (mode === SelectMode.BOX_SELECTION) {
@@ -2002,6 +2009,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                             }}
                             onClick={this.handleCanvasClick}
                         >
+                            
                             <Provider value={context}>
                                 {this.renderNodes()}
                                 {this.renderLines()}
