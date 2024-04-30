@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 import React from 'react';
 import * as Lib from '../lib';
-import { ITopologyNode, ITopologyData, IWrapperOptions } from '../lib/declare';
+import {
+    ITopologyNode, ITopologyData, IWrapperOptions, ITopologyLine
+} from '../lib/declare';
 import './index.less';
 
 const { Topology, topologyWrapper, TemplateWrapper } = Lib;
@@ -42,9 +44,19 @@ class Flow extends React.Component<{}, FlowState> {
                     branches: ['锚点1', '锚点2', '锚点3'],
                     position: {
                         x: 19629.79557800293,
-                        y: 19696.197512626648,
+                        y: 20050.197512626648,
                     },
                     // canDrag: false,
+                },
+                {
+                    id: '1111',
+                    name: '宽节点2',
+                    content: '快捷插入测试',
+                    branches: ['锚点1', '锚点2', '锚点3'],
+                    position: {
+                        x: 20000.79557800293,
+                        y: 19800.197512626648,
+                    },
                 },
             ],
         },
@@ -146,6 +158,20 @@ class Flow extends React.Component<{}, FlowState> {
         );
     }
 
+    /**
+     * 快捷插入节点连线处理
+     * 可根据id、newLines信息判断是否可以插入节点，返回oldLines表示不许节点插入
+     * @param id: 节点id
+     * @param oldLines: 原连线线数据
+     * @param newLines: 新连线数据
+     * @returns ITopologyLine[]
+     */
+    handleInsertNodeLines = (id: string, oldLines: ITopologyLine[], newLines: ITopologyLine[]) => {
+        console.log(id, oldLines);
+        // return oldLines; /** 不可插入 */
+        return newLines; /** 可插入 */
+    }
+
     render() {
         const {
             data, readonly, showBar, overlap,
@@ -187,6 +213,8 @@ class Flow extends React.Component<{}, FlowState> {
                         getInstance={
                             // eslint-disable-next-line
                             (ins: any) => { this.topology = ins; }}
+                        allowNodeInsertOnEdge
+                        handleInsertNodeLines={this.handleInsertNodeLines}
                     />
                 </div>
                 <div className="topology-templates" data-html2canvas-ignore="true">

@@ -12,7 +12,6 @@ export const defaultContext: ITopologyContext = {
         nodes: [],
         lines: [],
     },
-    curClickNodeId: null,
 };
 
 const Context = React.createContext(defaultContext);

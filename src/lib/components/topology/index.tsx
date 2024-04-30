@@ -125,6 +125,8 @@ export interface ITopologyProps {
     customToolboxList?: { wrapperProps?: HTMLAttributes<HTMLDivElement>; content: React.ReactNode; tooltip: string; }[];
     renderMinimapChild?: (params) => React.ReactNode;
     autoLayoutOption?: AutoLayoutOptions;
+    /** 快捷插入节点连线处理 */
+    handleInsertNodeLines?: (id: string, oldLines: ITopologyLine[], newLines: ITopologyLine[]) => ITopologyLine[]
 }
 
 export interface ITopologyState {
@@ -248,11 +250,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             this.defaultScaleNum = this.scaleNum;
             return { scaleNum };
         });
-        this.$topology.addEventListener('click', this.handleContainerClick.bind(this), true);
-    }
-
-    handleContainerClick() {
-        this.setContext({ curClickNodeId: null })
     }
 
     getAutoClearSelectedFn() {
@@ -293,7 +290,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         this.removeKeydownEvent();
         this.removeWheelEvent();
-        this.$topology.removeEventListener('click', this.handleContainerClick.bind(this), true);
     }
 
     onChange = (data: ITopologyData, type: ChangeType) => {
@@ -696,8 +692,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         });
         this.setContext(
             {
-                selectedData: selectData,
-                curClickNodeId: node.id
+                selectedData: selectData
             },
             () => {
                 if (mode === SelectMode.BOX_SELECTION) {
@@ -1280,7 +1275,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
      * @returns
      */
     generateLinesByInsertNodeInLine = (dragId, targetPos) => {
-        const { data, lineColor, allowNodeInsertOnEdge = false } = this.props;
+        const { data, lineColor, allowNodeInsertOnEdge = false, handleInsertNodeLines } = this.props;
         let insertLines = [];
         let cloneLines = [...data.lines];
 
@@ -1313,7 +1308,9 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
         }
 
-        return [...cloneLines, ...insertLines];
+        return handleInsertNodeLines 
+            ? handleInsertNodeLines(dragId, data.lines, [...cloneLines, ...insertLines]) 
+            : [...cloneLines, ...insertLines]
     }
 
     handleNodeDraw = (nodeInfoList: [string, IPosition][], childPosMap?: {

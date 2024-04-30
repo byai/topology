@@ -83,8 +83,6 @@ export interface ITopologyContext {
         nodes: ITopologyNode[];
         lines: ITopologyLine[];
     };
-    /** 当前点击的节点Id */
-    curClickNodeId: string | null;
 }
 
 export interface ITopologyData {

@@ -222,7 +222,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
             onMouseLeave
         } = this.props;
 
-        const { selectedData, activeLine, curClickNodeId } = context;
+        const { selectedData, activeLine } = context;
         const isSelected = selectedData.nodes.find(item => item.id === data.id) !== undefined;
         return connectDragSource(
             <div
@@ -245,7 +245,7 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
                 <div
                     className={classnames({
                         "topology-node-content": true,
-                        "topology-node-selected": isSelected || curClickNodeId === id,
+                        "topology-node-selected": isSelected,
                         "topology-node-impact": activeLine && this.impactCheck()
                     })}
                 >
