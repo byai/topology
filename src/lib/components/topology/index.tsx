@@ -692,7 +692,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         });
         this.setContext(
             {
-                selectedData: selectData
+                selectedData: selectData,
             },
             () => {
                 if (mode === SelectMode.BOX_SELECTION) {
@@ -2006,7 +2006,6 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
                             }}
                             onClick={this.handleCanvasClick}
                         >
-                            
                             <Provider value={context}>
                                 {this.renderNodes()}
                                 {this.renderLines()}

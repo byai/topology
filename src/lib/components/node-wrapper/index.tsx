@@ -223,7 +223,8 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
         } = this.props;
 
         const { selectedData, activeLine } = context;
-        const isSelected = selectedData.nodes.find(item => item.id === data.id) !== undefined;
+        const isSelected =
+            selectedData.nodes.find(item => item.id === data.id) !== undefined;
         return connectDragSource(
             <div
                 id={data ? `topology-node-${data.id}` : ""}
@@ -232,7 +233,10 @@ class NodeWrapper extends React.Component<INodeWrapperProps> {
                 className="byai-topology-node-wrapper"
                 onClick={this.handleClick}
                 onContextMenu={this.handleRightClick}
-                onMouseDown={this.handleMouseDown}
+                onMouseDown={(e) => {
+                    // @ts-ignore
+                    this.handleMouseDown(e, isSelected);
+                }}
                 onMouseEnter={() => { onMouseEnter(data) }}
                 onMouseLeave={() => { onMouseLeave() }}>
                 {connectDragPreview(
