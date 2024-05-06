@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.1](https://github.com/byai/topology/compare/v1.13.0...v1.13.1) (2024-05-06)
+
+
+### Features
+
+* 代码优化 ([2daa08b](https://github.com/byai/topology/commit/2daa08be12e87df4ecbef3261028bdbd23e14768))
+* 记录上一次点击的节点id ([e6c650c](https://github.com/byai/topology/commit/e6c650c6aafb3347bee2b27d30aff06e7641e146))
+* 快捷插入节点连线处理 ([3fb919d](https://github.com/byai/topology/commit/3fb919dfa47309150c6b5dbed5698d30fbdc7ee3))
+
 ## [1.13.0](https://github.com/byai/topology/compare/v1.12.0...v1.13.0) (2024-04-28)
 
 
