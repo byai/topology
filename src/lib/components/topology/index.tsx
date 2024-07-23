@@ -1,6 +1,7 @@
 /* eslint-disable */
 import React, { HTMLAttributes } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
+import { createRoot } from 'react-dom/client';
+import { flushSync } from 'react-dom';
 import { DropTarget, ConnectDropTarget } from 'react-dnd';
 import _, { debounce } from 'lodash';
 import classnames from 'classnames';
@@ -196,6 +197,8 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
 
     boxSelectionRef: any;
 
+    $domMap: any;
+
     constructor(props: ITopologyProps) {
         super(props);
         this.shouldAutoLayout = shouldAutoLayout(props.data.nodes);
@@ -264,7 +267,7 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
     componentWillReceiveProps(nextProps: ITopologyProps) {
         const { readOnly } = this.props;
         const { readOnly: nextReadOnly } = nextProps;
-        this.renderDomMap(nextProps);
+        requestAnimationFrame(() => this.renderDomMap(nextProps));
         this.shouldAutoLayout = shouldAutoLayout(nextProps.data.nodes);
         if (readOnly && !nextReadOnly) {
             this.initKeydownEvent();
@@ -1428,31 +1431,36 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
             domMap = document.createElement("div");
             domMap.setAttribute("id", "topology-dom-map");
         }
-        domMap.innerHTML = renderToStaticMarkup(
-            <div>
-                {nodes.map(item => (
-                    <div
-                        key={item.id}
-                        id={`dom-map-${item.id}`}
-                        className="dom-map-wrapper"
-                    >
-                        {renderTreeNode(item, {
-                            anchorDecorator: ({ anchorId }) => (
-                                _item: React.ReactNode
-                            ) => (
-                                <div
-                                    id={`dom-map-${item.id}-${anchorId}`}
-                                    key={anchorId}
-                                    className="dom-map-wrapper"
-                                >
-                                    {_item}
-                                </div>
-                            )
-                        })}
-                    </div>
-                ))}
-            </div>
-        );
+        if (!this.$domMap) {
+            this.$domMap = createRoot(domMap);
+        }
+        flushSync(() => {
+            this.$domMap.render(
+                <div>
+                    {nodes.map(item => (
+                        <div
+                            key={item.id}
+                            id={`dom-map-${item.id}`}
+                            className="dom-map-wrapper"
+                        >
+                            {renderTreeNode(item, {
+                                anchorDecorator: ({ anchorId }) => (
+                                    _item: React.ReactNode
+                                ) => (
+                                    <div
+                                        id={`dom-map-${item.id}-${anchorId}`}
+                                        key={anchorId}
+                                        className="dom-map-wrapper"
+                                    >
+                                        {_item}
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    ))}
+                </div>
+            );
+        });
         document.body.appendChild(domMap);
         setTimeout(this.cacheNodeSize, 1000);
     };

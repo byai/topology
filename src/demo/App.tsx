@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import React from 'react';
+import { Tooltip } from 'antd';
 import * as Lib from '../lib';
 import {
     ITopologyNode, ITopologyData, IWrapperOptions, ITopologyLine
@@ -29,7 +30,7 @@ class Flow extends React.Component<{}, FlowState> {
                 {
                     id: '1585466878859',
                     name: '窄节点',
-                    content: '这是一个窄节点',
+                    content: <div><Tooltip title="测试useLayoutEffect报错">这是一个带Tooltip窄节点</Tooltip></div>,
                     branches: ['锚点1'],
                     position: {
                         x: 19726.906692504883,
