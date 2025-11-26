@@ -8,6 +8,7 @@ export interface ITemplateWrapperProps {
     connectDragSource?: DragElementWrapper<React.ReactNode>;
     connectDragPreview?: DragElementWrapper<React.ReactNode>;
     disabled?: boolean;
+    onBeginDrag?: () => void;
 }
 
 class TemplateWrapper extends React.Component<ITemplateWrapperProps> {
@@ -34,6 +35,9 @@ export default DragSource(
             return !props.disabled;
         },
         beginDrag(props: ITemplateWrapperProps) {
+            if (props.onBeginDrag) {
+                props.onBeginDrag();
+            }
             return { data: props.generator() };
         },
     },
