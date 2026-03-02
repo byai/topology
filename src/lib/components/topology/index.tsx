@@ -536,6 +536,34 @@ class Topology extends React.Component<ITopologyProps, ITopologyState> {
         </div>
     )
 
+    handleSelectAll = () => {
+        const { data, onSelect } = this.props;
+        this.setContext(
+            {
+                selectedData: data
+            },
+            () => {
+                if (onSelect) {
+                    onSelect(this.state.context.selectedData);
+                }
+            }
+        );
+    };
+
+    handleDeselectAll = () => {
+        const { onSelect } = this.props;
+        this.setContext(
+            {
+                selectedData: { nodes: [], lines: [] }
+            },
+            () => {
+                if (onSelect) {
+                    onSelect(this.state.context.selectedData);
+                }
+            }
+        );
+    };
+
     render() {
         const { connectDropTarget } = this.props;
         const { context } = this.state;
